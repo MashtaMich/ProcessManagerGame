@@ -21,4 +21,6 @@
     <string name="game_over_message">Too many processes died! The system crashed.</string>
     <string name="restart_button">Restart</string>
     <string name="main_menu_button">Main Menu</string>
+    <string name="fetch_ingredients">Fetch Ingredients</string>
+    <string name="kitchen_game_area">Kitchen Game Area</string>
 </resources>

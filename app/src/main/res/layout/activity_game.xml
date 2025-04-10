@@ -22,7 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kitchen Game Area"
+            android:text="@string/kitchen_game_area"
             android:textSize="16sp"
             android:textColor="@color/textDark"
             android:textStyle="bold"
@@ -102,6 +102,48 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             tools:listitem="@layout/item_process" />
+    </FrameLayout>
+
+    <!-- Ingredient List (Horizontally scrolling at the top) - More visible container -->
+    <FrameLayout
+        android:id="@+id/ingredientRecycleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#CC1ABC9C"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:elevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/kitchenAreaContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ingredientRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            tools:listitem="@layout/item_ingredient" />
+
+        <!-- Button placed at bottom-end -->
+        <Button
+            android:id="@+id/fetchIngredientButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fetch_ingredients"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="12dp"
+            android:textColor="@color/white" />
+        </LinearLayout>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
