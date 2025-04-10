@@ -150,7 +150,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
                 // Set a small fixed size
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        40, 40 // Smaller fixed size in pixels
+                        80, 80 // Smaller fixed size in pixels
                 );
                 params.setMargins(2, 0, 2, 0);
                 ingredientIcon.setLayoutParams(params);

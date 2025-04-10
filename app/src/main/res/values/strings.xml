@@ -7,6 +7,8 @@
     <string name="score_format">Score: %d</string>
     <string name="failed_processes_format">Failed: %d/3</string>
     <string name="queue_size_format">Queue: %d</string>
+    <string name="kitchen_game_area">Kitchen Game Area</string>
+
 
     <!-- Process Item Strings -->
     <string name="complete_button">Complete</string>
@@ -21,4 +23,12 @@
     <string name="game_over_message">Too many processes died! The system crashed.</string>
     <string name="restart_button">Restart</string>
     <string name="main_menu_button">Main Menu</string>
+
+    <!-- Joystick Strings -->
+    <string name="btn_up">↑</string>
+    <string name="btn_down">↓</string>
+    <string name="btn_left">←</string>
+    <string name="btn_right">→</string>
+
+    <string name="fetch_ingredients">Fetch Ingredients</string>
 </resources>
