@@ -5,6 +5,8 @@ import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.TextView;
 import android.widget.Button;
 
@@ -39,6 +41,7 @@ public class GameActivity extends AppCompatActivity implements
         mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
         mediaPlayer.setLooping(true); // Enable looping
         mediaPlayer.start(); // Start playing the audio
+        hideSystemUI();
 
         try {
             // 🌟 Init GameView + Game logic
@@ -171,7 +174,12 @@ public class GameActivity extends AppCompatActivity implements
             }
         });
     }
-
+    private void hideSystemUI() {
+        WindowInsetsController controller = getWindow().getInsetsController();
+        if (controller != null) {
+            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+        }
+    }
     private void updateMediaPlaybackSpeed(int deadProcessCount) {
         if (deadProcessCount >= 3) {
             if (mediaPlayer != null) {
