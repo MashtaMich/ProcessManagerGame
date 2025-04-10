@@ -2,6 +2,7 @@ package com.example.cs205processes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class Recipe {
@@ -20,9 +21,9 @@ public class Recipe {
     public static List<Recipe> getDefaultRecipes() {
         List<Recipe> recipes = new ArrayList<>();
         List<Ingredient> tomatoSoup = Arrays.asList(
-                new Ingredient("Tomato", R.drawable.tomato),
-                new Ingredient("Tomato", R.drawable.tomato),
-                new Ingredient("Tomato", R.drawable.tomato)
+                new Ingredient(0),
+                new Ingredient(2),
+                new Ingredient(4)
         );
         recipes.add(new Recipe("Tomato Soup", tomatoSoup,
                 "Put tomatoes in pot until boiling"));
@@ -45,5 +46,9 @@ public class Recipe {
 
     public String getInstructions() {
         return instructions;
+    }
+
+    public boolean have_all_ingredients(List<Ingredient> inventory_list){
+        return new HashSet<>(this.ingredients).containsAll(inventory_list);
     }
 }
