@@ -1,5 +1,8 @@
 package com.example.cs205processes;
 
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.media.PlaybackParams;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -16,7 +19,7 @@ public class GameActivity extends AppCompatActivity implements
         ProcessAdapter.OnProcessInteractionListener {
 
     private static final String TAG = "GameActivity";
-
+    private MediaPlayer mediaPlayer;
     private GameManager gameManager;
     private ProcessAdapter processAdapter;
     private RecyclerView processRecyclerView;
@@ -26,11 +29,16 @@ public class GameActivity extends AppCompatActivity implements
 
     private GameView gameView;
     private Game game;
+    private int highScore = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
+        mediaPlayer.setLooping(true); // Enable looping
+        mediaPlayer.start(); // Start playing the audio
 
         try {
             // 🌟 Init GameView + Game logic
@@ -92,6 +100,9 @@ public class GameActivity extends AppCompatActivity implements
         if (gameManager != null) {
             gameManager.pauseGame();
         }
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause(); // Pause the audio
+        }
     }
 
     @Override
@@ -100,6 +111,9 @@ public class GameActivity extends AppCompatActivity implements
         if (gameManager != null) {
             gameManager.resumeGame();
         }
+        if (mediaPlayer != null) {
+            mediaPlayer.start(); // Resume playing if it was paused
+        }
     }
 
     @Override
@@ -107,6 +121,10 @@ public class GameActivity extends AppCompatActivity implements
         super.onDestroy();
         if (gameManager != null) {
             gameManager.stopGame();
+        }
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 
@@ -148,8 +166,45 @@ public class GameActivity extends AppCompatActivity implements
             if (processAdapter != null && gameManager != null) {
                 processAdapter.updateProcesses(gameManager.getActiveProcesses());
                 updateDeadProcessCountDisplay(gameManager.getDeadProcessCount());
+                // Update media playback speed based on dead process count
+                updateMediaPlaybackSpeed(gameManager.getDeadProcessCount());
             }
         });
+    }
+
+    private void updateMediaPlaybackSpeed(int deadProcessCount) {
+        if (deadProcessCount >= 3) {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop(); // Stop the music
+                mediaPlayer.reset(); // Reset the MediaPlayer to prepare for reuse if needed
+                mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
+                mediaPlayer.start(); // Start playing the audio
+            }
+            return; // Exit the method
+        }
+
+        float speed;
+        switch (deadProcessCount) {
+            case 0:
+                speed = 1.0f; // 0/3 speed
+                break;
+            case 1:
+                speed = 2.0f; // 1/3 speed
+                break;
+            case 2:
+                speed = 3.0f; // 2/3 speed
+                break;
+            default:
+                speed = 1.0f; // Fallback (should not occur)
+                break;
+        }
+
+        if (mediaPlayer != null) {
+            PlaybackParams playbackParams = new PlaybackParams();
+            playbackParams.setSpeed(speed);
+            mediaPlayer.setPlaybackParams(playbackParams);
+            Log.d(TAG, "Playback speed updated to: " + speed);
+        }
     }
 
     @Override
@@ -168,13 +223,33 @@ public class GameActivity extends AppCompatActivity implements
             try {
                 GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
                 gameOverDialog.show();
+
+                // Store the score
+                saveHighScore(finalScore);
             } catch (Exception e) {
                 Log.e(TAG, "Error showing game over dialog: " + e.getMessage());
                 e.printStackTrace();
             }
         });
     }
+    private void saveHighScore(int score) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyGamePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        // Retrieve the current high score
+        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE); // Use Integer.MIN_VALUE as the default
+
+        // Check if the score is negative and if the current high score is the default
+        if (score < 0 && highScore == Integer.MIN_VALUE) {
+            // Store the negative score as high score
+            editor.putInt("highScore", score);
+            editor.apply();
+        } else if (score > highScore) {
+            // Update high score if the new score is greater
+            editor.putInt("highScore", score);
+            editor.apply();
+        }
+    }
     @Override
     public void onCompleteButtonClicked(Process process) {
         if (gameManager != null) {

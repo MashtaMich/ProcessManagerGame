@@ -25,7 +25,6 @@
         <!-- Game Activity - Now in landscape mode -->
         <activity
             android:name=".GameActivity"
-            android:screenOrientation="landscape"
             android:exported="false" />
     </application>
 

@@ -1,41 +1,67 @@
 package com.example.cs205processes;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button startGameButton;
     private Button howToPlayButton;
-    private Button highScoresButton;
     private Button settingsButton;
+    private Button loadGameButton;
+    private static final String PREFS_NAME = "MyGamePrefs";
+    private MediaPlayer mediaPlayer;
+    private TextView highScoreTextView;
     private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
+        highScoreTextView = findViewById(R.id.highScore1);
+        loadHighScore();
 
-        // Set orientation to landscape
-        // Note: This is now better handled in the AndroidManifest.xml
+        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
+        mediaPlayer.setLooping(true); // Enable looping
+        mediaPlayer.start(); // Start playing the audio
+        hideSystemUI();
 
         // Initialize preferences
         preferences = getSharedPreferences("ProcessManagerPrefs", MODE_PRIVATE);
 
         // Initialize buttons
-        startGameButton = findViewById(R.id.startGameButton);
-        howToPlayButton = findViewById(R.id.howToPlayButton);
-        highScoresButton = findViewById(R.id.highScoresButton);
-        settingsButton = findViewById(R.id.settingsButton);
+        startGameButton = findViewById(R.id.StartGame);
+        howToPlayButton = findViewById(R.id.HowToPlay);
+        loadGameButton = findViewById(R.id.LoadGame);
+        settingsButton = findViewById(R.id.Settings);
 
         // Set button click listeners
         setupButtonListeners();
+    }
+
+    private void loadHighScore() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE); // Default to Integer.MIN_VALUE
+
+        // Display the high score, or leave it empty if it's the initial value
+        if (highScore == Integer.MIN_VALUE) {
+            highScoreTextView.setText(""); // Set as empty
+        } else {
+            highScoreTextView.setText(String.valueOf(highScore)); // Display the high score
+        }
     }
 
     private void setupButtonListeners() {
@@ -53,14 +79,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showHowToPlayDialog();
-            }
-        });
-
-        // High Scores button - Shows high scores dialog
-        highScoresButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showHighScoresDialog();
             }
         });
 
@@ -93,16 +111,6 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void showHighScoresDialog() {
-        int highScore = preferences.getInt("highScore", 0);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("High Scores");
-        builder.setMessage("Your best score: " + highScore);
-        builder.setPositiveButton("Close", null);
-        builder.show();
-    }
-
     private void showSettingsDialog() {
         // In a real app, you might implement a more complex settings dialog
         // or launch a separate Settings Activity
@@ -111,5 +119,43 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage("Settings options would go here.");
         builder.setPositiveButton("Close", null);
         builder.show();
+    }
+    private void hideSystemUI() {
+        WindowInsetsController controller = getWindow().getInsetsController();
+        if (controller != null) {
+            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Release MediaPlayer resources
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause(); // Pause the audio
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mediaPlayer != null) {
+            mediaPlayer.start(); // Resume playing if it was paused
+        }
     }
 }

@@ -48,6 +48,9 @@ public class GameOverDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 dismiss();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(intent);
                 // Go back to main menu
                 if (getContext() instanceof GameActivity) {
                     ((GameActivity) getContext()).finish();
