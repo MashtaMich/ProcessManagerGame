@@ -1,10 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CS205 Project</string>
+    <string name="app_name">CS205 Processes</string>
 
     <!-- Game UI Strings -->
-    <string name="game_title">Game Title</string>
+    <string name="game_title">Process Chef</string>
     <string name="score_format">Score: %d</string>
     <string name="failed_processes_format">Failed: %d/3</string>
+    <string name="queue_size_format">Queue: %d</string>
 
     <!-- Process Item Strings -->
     <string name="complete_button">Complete</string>

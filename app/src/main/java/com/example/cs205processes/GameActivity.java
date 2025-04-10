@@ -1,10 +1,11 @@
 package com.example.cs205processes;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -13,11 +14,14 @@ public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
         ProcessAdapter.OnProcessInteractionListener {
 
+    private static final String TAG = "GameActivity";
+
     private GameManager gameManager;
     private ProcessAdapter processAdapter;
     private RecyclerView processRecyclerView;
     private TextView scoreTextView;
     private TextView deadProcessCountTextView;
+    private TextView queueSizeTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,67 +29,112 @@ public class GameActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_game);
 
         // Initialize views
-        processRecyclerView = findViewById(R.id.processRecyclerView);
-        scoreTextView = findViewById(R.id.scoreTextView);
-        deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
+        try {
+            processRecyclerView = findViewById(R.id.processRecyclerView);
+            scoreTextView = findViewById(R.id.scoreTextView);
+            deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
+            queueSizeTextView = findViewById(R.id.queueSizeTextView);
 
-        // Setup RecyclerView with GridLayoutManager for landscape orientation
-        int spanCount = 2; // Number of columns
-        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
-        processRecyclerView.setLayoutManager(layoutManager);
+            // Setup RecyclerView with LinearLayoutManager for horizontal scrolling
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            processRecyclerView.setLayoutManager(layoutManager);
 
-        processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
-        processRecyclerView.setAdapter(processAdapter);
+            processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
+            processRecyclerView.setAdapter(processAdapter);
 
-        // Initialize game manager
-        gameManager = new GameManager(this, this);
+            // Initialize game manager
+            gameManager = new GameManager(this, this);
 
-        // Start the game
-        gameManager.startGame();
+            // Start the game
+            gameManager.startGame();
 
-        // Initialize score display
-        updateScoreDisplay(0);
-        updateDeadProcessCountDisplay(0);
+            // Initialize displays
+            updateScoreDisplay(0);
+            updateDeadProcessCountDisplay(0);
+            updateQueueSizeDisplay(0);
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing views: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    // [Rest of your GameActivity implementation]
+
+    // Make this method safely handle null queueSizeTextView
+    private void updateQueueSizeDisplay(int queueSize) {
+        if (queueSizeTextView != null) {
+            queueSizeTextView.setText(getString(R.string.queue_size_format, queueSize));
+        }
+    }
+
+    // Other methods remain the same...
 
     @Override
     protected void onPause() {
         super.onPause();
-        gameManager.pauseGame();
+        if (gameManager != null) {
+            gameManager.pauseGame();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        gameManager.resumeGame();
+        if (gameManager != null) {
+            gameManager.resumeGame();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        gameManager.stopGame();
+        if (gameManager != null) {
+            gameManager.stopGame();
+        }
     }
 
-    // GameManager.GameListener implementation
+    // Handle queue size changes
+    @Override
+    public void onQueueChanged(int queueSize) {
+        runOnUiThread(() -> {
+            updateQueueSizeDisplay(queueSize);
+        });
+    }
+
+    @Override
+    public void onTimerTick() {
+        runOnUiThread(() -> {
+            if (gameManager != null && processAdapter != null) {
+                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            }
+        });
+    }
+
     @Override
     public void onProcessAdded(Process process) {
         runOnUiThread(() -> {
-            processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            if (processAdapter != null) {
+                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            }
         });
     }
 
     @Override
     public void onProcessCompleted(Process process) {
         runOnUiThread(() -> {
-            processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            if (processAdapter != null) {
+                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            }
         });
     }
 
     @Override
     public void onProcessDied(Process process) {
         runOnUiThread(() -> {
-            processAdapter.updateProcesses(gameManager.getActiveProcesses());
-            updateDeadProcessCountDisplay(gameManager.getDeadProcessCount());
+            if (processAdapter != null && gameManager != null) {
+                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                updateDeadProcessCountDisplay(gameManager.getDeadProcessCount());
+            }
         });
     }
 
@@ -104,23 +153,33 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void onGameOver(int finalScore) {
         runOnUiThread(() -> {
-            // You could show a game over dialog here
-            GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
-            gameOverDialog.show();
+            try {
+                // Show game over dialog
+                GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
+                gameOverDialog.show();
+            } catch (Exception e) {
+                Log.e(TAG, "Error showing game over dialog: " + e.getMessage());
+                e.printStackTrace();
+            }
         });
     }
 
-    // ProcessAdapter.OnProcessInteractionListener implementation
     @Override
     public void onCompleteButtonClicked(Process process) {
-        gameManager.completeProcess(process.getId());
+        if (gameManager != null) {
+            gameManager.completeProcess(process.getId());
+        }
     }
 
     private void updateScoreDisplay(int score) {
-        scoreTextView.setText(getString(R.string.score_format, score));
+        if (scoreTextView != null) {
+            scoreTextView.setText(getString(R.string.score_format, score));
+        }
     }
 
     private void updateDeadProcessCountDisplay(int count) {
-        deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
+        if (deadProcessCountTextView != null) {
+            deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
+        }
     }
 }

@@ -1,29 +1,36 @@
 package com.example.cs205processes;
 
-import java.util.ArrayList;
+import android.util.Log;
+
 import java.util.List;
 import java.util.UUID;
 
 public class Process {
-    private String id;
-    private String name;
-    private int timeLimit; // in seconds
+    private static final String TAG = "Process";
+
+    private final String id;
+    private final String name;
+    private final int timeLimit; // in seconds
     private int timeRemaining; // in seconds
     private boolean isComplete;
     private boolean isDead;
-    private Recipe recipe;
-    private static final String[] PROCESS_NAMES = {"P1", "P2", "P3",
-            "P4", "P5", "P6",
-            "P7", "P8", "P9"};
+    private final Recipe recipe;
+    private final Object mutex = new Object();
+
+    private static final String[] CUSTOMER_NAMES = {
+            "Customer A", "Customer B", "Customer C"
+    };
 
     public Process(Recipe recipe, int timeLimit) {
         this.id = UUID.randomUUID().toString();
-        this.name = PROCESS_NAMES[(int)(Math.random() * PROCESS_NAMES.length)];
+        this.name = CUSTOMER_NAMES[(int)(Math.random() * CUSTOMER_NAMES.length)];
         this.recipe = recipe;
         this.timeLimit = timeLimit;
         this.timeRemaining = timeLimit;
         this.isComplete = false;
         this.isDead = false;
+
+        Log.d(TAG, "New process created: " + name + ", Recipe: " + recipe.getName() + ", Time: " + timeLimit + "s");
     }
 
     public static Process generateRandomProcess(List<Recipe> availableRecipes) {
@@ -34,24 +41,37 @@ public class Process {
     }
 
     public void updateTime(int secondsElapsed) {
-        if (!isComplete && !isDead) {
-            timeRemaining -= secondsElapsed;
-            if (timeRemaining <= 0) {
-                isDead = true;
-                timeRemaining = 0;
+        synchronized (mutex) {
+            // Only update if not complete and not dead
+            if (!isComplete && !isDead) {
+                timeRemaining -= secondsElapsed;
+
+                // Check for death
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    isDead = true;
+                    Log.d(TAG, "Process died: " + name);
+                }
             }
         }
     }
 
     public void completeProcess() {
-        this.isComplete = true;
+        synchronized (mutex) {
+            if (!isComplete && !isDead) {
+                isComplete = true;
+                Log.d(TAG, "Process completed: " + name);
+            }
+        }
     }
 
     public boolean isAboutToDie() {
-        return timeRemaining <= 10 && !isComplete && !isDead;
+        synchronized (mutex) {
+            return timeRemaining <= 10 && !isComplete && !isDead;
+        }
     }
 
-    // Getters and setters
+    // Getters with thread-safe access
     public String getId() {
         return id;
     }
@@ -65,18 +85,32 @@ public class Process {
     }
 
     public int getTimeRemaining() {
-        return timeRemaining;
+        synchronized (mutex) {
+            return timeRemaining;
+        }
     }
 
     public boolean isComplete() {
-        return isComplete;
+        synchronized (mutex) {
+            return isComplete;
+        }
     }
 
     public boolean isDead() {
-        return isDead;
+        synchronized (mutex) {
+            return isDead;
+        }
     }
 
     public Recipe getRecipe() {
         return recipe;
+    }
+
+    // For debugging
+    @Override
+    public String toString() {
+        synchronized (mutex) {
+            return "Process{" + "name='" + name + '\'' + ", recipe=" + recipe.getName() + ", timeRemaining=" + timeRemaining + ", isComplete=" + isComplete + ", isDead=" + isDead + '}';
+        }
     }
 }

@@ -3,19 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="160dp"
-    android:layout_height="wrap_content"
+    android:layout_width="150dp"
+    android:layout_height="130dp"
     android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="6dp"
+    app:cardElevation="3dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="6dp">
 
-        <!-- Process Name and Time -->
+        <!-- Process name and time in one row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,65 +26,54 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/processNameColor"
                 android:ellipsize="end"
                 android:maxLines="1"
-                tools:text="Customer Name" />
+                tools:text="Customer" />
 
             <TextView
                 android:id="@+id/timeRemainingTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/timeRemainingColor"
                 tools:text="45s" />
         </LinearLayout>
 
-        <!-- Progress Bar -->
+        <!-- Progress bar -->
         <ProgressBar
             android:id="@+id/timeProgressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:progressDrawable="@drawable/progress_normal"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="2dp" />
 
-        <!-- Recipe Name -->
-        <TextView
-            android:id="@+id/recipeNameTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/recipeNameColor"
-            android:layout_marginTop="4dp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            tools:text="Needs: Recipe Name" />
-
-        <!-- Ingredients Container -->
+        <!-- Ingredients row -->
         <LinearLayout
             android:id="@+id/ingredientsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="4dp">
+            android:gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp">
             <!-- Ingredients will be added dynamically -->
         </LinearLayout>
 
-        <!-- Complete Button -->
+        <!-- Complete button -->
         <Button
             android:id="@+id/completeButton"
             android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:text="@string/complete_button"
+            android:layout_height="30dp"
+            android:text="Complete"
+            android:textSize="8sp"
             android:background="@drawable/button_normal"
             android:textColor="@color/white"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
