@@ -3,6 +3,7 @@ package com.example.cs205processes;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,32 +24,41 @@ public class GameActivity extends AppCompatActivity implements
     private TextView deadProcessCountTextView;
     private TextView queueSizeTextView;
 
+    private GameView gameView;
+    private Game game;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        // Initialize views
         try {
+            // 🌟 Init GameView + Game logic
+            gameView = findViewById(R.id.gameView);
+            game = new Game(gameView, this);
+            gameView.init(game);
+
+            // 🌟 Hook joystick controls to movement
+            findViewById(R.id.btnUp).setOnClickListener(v -> game.moveUp());
+            findViewById(R.id.btnDown).setOnClickListener(v -> game.moveDown());
+            findViewById(R.id.btnLeft).setOnClickListener(v -> game.moveLeft());
+            findViewById(R.id.btnRight).setOnClickListener(v -> game.moveRight());
+
+            // 🌟 Init RecyclerView + Stats UI
             processRecyclerView = findViewById(R.id.processRecyclerView);
             scoreTextView = findViewById(R.id.scoreTextView);
             deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
             queueSizeTextView = findViewById(R.id.queueSizeTextView);
 
-            // Setup RecyclerView with LinearLayoutManager for horizontal scrolling
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             processRecyclerView.setLayoutManager(layoutManager);
-
             processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
             processRecyclerView.setAdapter(processAdapter);
 
-            // Initialize game manager
+            // 🌟 Init GameManager
             gameManager = new GameManager(this, this);
-
-            // Start the game
             gameManager.startGame();
 
-            // Initialize displays
             updateScoreDisplay(0);
             updateDeadProcessCountDisplay(0);
             updateQueueSizeDisplay(0);
@@ -58,16 +68,23 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    // [Rest of your GameActivity implementation]
-
-    // Make this method safely handle null queueSizeTextView
     private void updateQueueSizeDisplay(int queueSize) {
         if (queueSizeTextView != null) {
             queueSizeTextView.setText(getString(R.string.queue_size_format, queueSize));
         }
     }
 
-    // Other methods remain the same...
+    private void updateScoreDisplay(int score) {
+        if (scoreTextView != null) {
+            scoreTextView.setText(getString(R.string.score_format, score));
+        }
+    }
+
+    private void updateDeadProcessCountDisplay(int count) {
+        if (deadProcessCountTextView != null) {
+            deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -93,12 +110,9 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    // Handle queue size changes
     @Override
     public void onQueueChanged(int queueSize) {
-        runOnUiThread(() -> {
-            updateQueueSizeDisplay(queueSize);
-        });
+        runOnUiThread(() -> updateQueueSizeDisplay(queueSize));
     }
 
     @Override
@@ -140,21 +154,18 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onProcessAboutToDie(Process process) {
-        // Handled by GameManager (vibration)
+        // Optional: vibration is already handled by GameManager
     }
 
     @Override
     public void onScoreChanged(int newScore) {
-        runOnUiThread(() -> {
-            updateScoreDisplay(newScore);
-        });
+        runOnUiThread(() -> updateScoreDisplay(newScore));
     }
 
     @Override
     public void onGameOver(int finalScore) {
         runOnUiThread(() -> {
             try {
-                // Show game over dialog
                 GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
                 gameOverDialog.show();
             } catch (Exception e) {
@@ -168,18 +179,6 @@ public class GameActivity extends AppCompatActivity implements
     public void onCompleteButtonClicked(Process process) {
         if (gameManager != null) {
             gameManager.completeProcess(process.getId());
-        }
-    }
-
-    private void updateScoreDisplay(int score) {
-        if (scoreTextView != null) {
-            scoreTextView.setText(getString(R.string.score_format, score));
-        }
-    }
-
-    private void updateDeadProcessCountDisplay(int count) {
-        if (deadProcessCountTextView != null) {
-            deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
         }
     }
 }

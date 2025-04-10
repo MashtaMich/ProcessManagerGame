@@ -22,7 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/kitchen_game_area"
+            android:text="Kitchen Game Area"
             android:textSize="16sp"
             android:textColor="@color/textDark"
             android:textStyle="bold"
@@ -145,5 +145,13 @@
             android:textColor="@color/white" />
         </LinearLayout>
     </FrameLayout>
+
+
+    <include
+        layout="@layout/joystick_layout"
+        android:id="@+id/joystickInclude"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
