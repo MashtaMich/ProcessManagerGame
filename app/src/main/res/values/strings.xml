@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">CS205 Project</string>
+
+    <!-- Game UI Strings -->
+    <string name="game_title">Game Title</string>
+    <string name="score_format">Score: %d</string>
+    <string name="failed_processes_format">Failed: %d/3</string>
+
+    <!-- Process Item Strings -->
+    <string name="complete_button">Complete</string>
+    <string name="completed_button">Completed</string>
+    <string name="failed_button">Failed</string>
+    <string name="needs_recipe_format">Needs: %s</string>
+    <string name="time_remaining_format">%ds</string>
+
+    <!-- Game Over Dialog Strings -->
+    <string name="game_over_title">Game Over!</string>
+    <string name="final_score_format">Final Score: %d</string>
+    <string name="game_over_message">Too many processes died! The system crashed.</string>
+    <string name="restart_button">Restart</string>
+    <string name="main_menu_button">Main Menu</string>
+</resources>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Standard Colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- App Specific Colors -->
+    <color name="gameBackground">#F5F5F5</color>
+    <color name="headerBackground">#2C3E50</color>
+    <color name="kitchenBackground">#E0F7FA</color>
+
+    <!-- Text Colors -->
+    <color name="textDark">#2C3E50</color>
+    <color name="textMedium">#7F8C8D</color>
+    <color name="textLight">#ECF0F1</color>
+
+    <!-- Process Item Colors -->
+    <color name="processNameColor">#2C3E50</color>
+    <color name="recipeNameColor">#7F8C8D</color>
+    <color name="timeRemainingColor">#E74C3C</color>
+
+    <!-- Progress Bar Colors -->
+    <color name="progressBackground">#DDDDDD</color>
+    <color name="progressNormal">#3498DB</color>
+    <color name="progressWarning">#F39C12</color>
+    <color name="progressCritical">#E74C3C</color>
+
+    <!-- Button Colors -->
+    <color name="buttonNormal">#3498DB</color>
+    <color name="buttonCompleted">#27AE60</color>
+    <color name="buttonFailed">#7F8C8D</color>
+    <color name="buttonPrimary">#2980B9</color>
+    <color name="buttonSecondary">#95A5A6</color>
+
+    <!-- Other UI Elements -->
+    <color name="borderColor">#BDC3C7</color>
+</resources>
