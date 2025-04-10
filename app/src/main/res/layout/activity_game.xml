@@ -22,7 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kitchen Game Area"
+            android:text="@string/kitchen_game_area"
             android:textSize="16sp"
             android:textColor="@color/textDark"
             android:textStyle="bold"
@@ -84,6 +84,16 @@
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.example.cs205processes.GameView
+        android:id="@+id/gameView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
     <!-- Process List (Horizontally scrolling at the top) - More visible container -->
     <FrameLayout
         android:layout_width="match_parent"
@@ -103,5 +113,13 @@
             android:paddingEnd="8dp"
             tools:listitem="@layout/item_process" />
     </FrameLayout>
+
+
+    <include
+        layout="@layout/joystick_layout"
+        android:id="@+id/joystickInclude"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
