@@ -31,4 +31,6 @@
     <string name="btn_right">→</string>
 
     <string name="fetch_ingredients">Fetch Ingredients</string>
+    <string name="ingredient_slot">Ingredient Slot</string>
+    <string name="gettable_ingredient">gettable Ingredient</string>
 </resources>

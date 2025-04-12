@@ -1,11 +1,14 @@
 package com.example.cs205processes;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Inventory {
+    private static final String TAG = "Inventory";
     int max_cap=3;
-    private final List<Ingredient> heldIngredients=new ArrayList<>(max_cap);
+    private List<Ingredient> heldIngredients=new ArrayList<>(max_cap);
 
     public List<Ingredient> getHeld(){
         return this.heldIngredients;
@@ -14,6 +17,9 @@ public class Inventory {
     public void grabIngredient(Ingredient ingredient){
         if (!isFull()){
             heldIngredients.add(ingredient);
+            Log.d(TAG, "put in inventory "+ingredient.getName());
+        }else{
+            Log.d(TAG, "Failed to add "+ingredient.getName());
         }
     }
 
@@ -21,12 +27,19 @@ public class Inventory {
         heldIngredients.clear();
     }
 
-    public void dropIngredient(Ingredient ingredient){
-        heldIngredients.remove(ingredient);
+    public boolean dropIngredient(Ingredient ingredient){
+        return heldIngredients.remove(ingredient);
     }
 
-    public void drop_by_index(int index){
-        heldIngredients.remove(index);
+    public void setInitialList(List<Ingredient> initial_list){
+        heldIngredients.clear();
+        heldIngredients=initial_list;
+    }
+
+    public Ingredient dropByIndex(int index){
+        Ingredient returnIngredient=heldIngredients.remove(index);
+        Log.d(TAG, "Removed and returned "+returnIngredient.getName());
+        return returnIngredient;
     }
 
     public int heldItemCount(){
@@ -40,4 +53,13 @@ public class Inventory {
     public boolean isEmpty(){
         return heldIngredients.isEmpty();
     }
-}
+
+    public boolean isInHeld(List<Ingredient> ingredients){
+        for (Ingredient ingredient : ingredients) {
+            if (!heldIngredients.contains(ingredient)) {
+                return false; // If even one ingredient missing return false
+            }
+        }
+        return true; //Is in held list, have all ingredients for recipe
+        }
+    }

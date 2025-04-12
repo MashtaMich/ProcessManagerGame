@@ -1,24 +1,32 @@
 package com.example.cs205processes;
 
+import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
-        ProcessAdapter.OnProcessInteractionListener {
+        ProcessAdapter.OnProcessInteractionListener,
+        IngredientFetchWorker.ingredientFetchListener{
 
     private static final String TAG = "GameActivity";
     private MediaPlayer mediaPlayer;
@@ -32,6 +40,16 @@ public class GameActivity extends AppCompatActivity implements
     private GameView gameView;
     private Game game;
     private int highScore = 0;
+
+    private List<ImageView> inventoryViews;
+    private List<ImageView> availableIngredientsViews;
+    private LinearLayout swapOptionsLayout;
+
+    private IngredientFetchWorker ingredientFetcher;
+    private Inventory inventory;
+    View ingredientBlocker;
+    private int selectedIngredientIndex=-1;
+    private int selectedSwapIndex=-1;
 
 
     @Override
@@ -66,6 +84,22 @@ public class GameActivity extends AppCompatActivity implements
             processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
             processRecyclerView.setAdapter(processAdapter);
 
+            //Init inventory Views
+            ingredientFetcher=new IngredientFetchWorker();
+            inventory =new Inventory();
+            inventoryViews = new ArrayList<>(List.of(
+                    findViewById(R.id.ingredientSlot1),
+                    findViewById(R.id.ingredientSlot2),
+                    findViewById(R.id.ingredientSlot3)
+            ));
+            availableIngredientsViews=new ArrayList<>(List.of(
+                    findViewById(R.id.swapOption1),
+                    findViewById(R.id.swapOption2)
+            ));
+            swapOptionsLayout = findViewById(R.id.swapOptionsLayout);
+            ingredientBlocker=findViewById(R.id.ingredientBlockerOverlay);
+            initIngredientViews();
+
             // 🌟 Init GameManager
             gameManager = new GameManager(this, this);
             gameManager.startGame();
@@ -96,6 +130,88 @@ public class GameActivity extends AppCompatActivity implements
             deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
         }
     }
+
+    private void initIngredientViews(){
+        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
+        inventory.setInitialList(initialList);
+        updateInventoryUI();
+        updateAvailableUI();
+    }
+
+    private void updateAvailableUI(){
+        List<Ingredient> swappableIngredients = ingredientFetcher.getAvailableList();
+        for (int i=0;i<availableIngredientsViews.size();i++){
+            final int index = i;
+            ImageView avIngView=availableIngredientsViews.get(i);
+            avIngView.setImageResource(swappableIngredients.get(i).getIconResourceId());
+            avIngView.setBackgroundResource(R.drawable.swap_options_normal);
+            avIngView.setOnClickListener(v->{
+                if (selectedIngredientIndex!=-1){
+                    List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
+                    Ingredient dropIngredient=inventory.dropByIndex(selectedIngredientIndex);
+                    availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
+                    selectedSwapIndex=index;
+                    for (View imageView:availableIngredientsViews){
+                        imageView.setEnabled(false);
+                    }
+                    for (View imageView:inventoryViews){
+                        imageView.setEnabled(false);
+                    }
+                    ingredientBlocker.setVisibility(VISIBLE);
+                    ingredientFetcher.exchangeIngredient(dropIngredient,swapOptions.get(index), this);
+                }
+            });
+        }
+    }
+
+    private void updateInventoryUI(){
+        List<Ingredient> invHeld=inventory.getHeld();
+        for (int i=0;i<inventoryViews.size();i++){
+            final int index = i;
+            ImageView invView=inventoryViews.get(i);
+            invView.setImageResource(invHeld.get(i).getIconResourceId());
+            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
+            invView.setOnClickListener(v->{
+                if (selectedIngredientIndex==index){
+                    selectedIngredientIndex=-1;
+                    swapOptionsLayout.setVisibility(INVISIBLE);
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
+                    for (View imageView:availableIngredientsViews){
+                        imageView.setEnabled(false);
+                    }
+                }else{
+                    selectedIngredientIndex = index;
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
+                    swapOptionsLayout.setVisibility(VISIBLE);
+                    for (View imageView:availableIngredientsViews){
+                        imageView.setEnabled(true);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void receiveNewIngredient(Ingredient newIngredient){
+        runOnUiThread(()->{
+            if (newIngredient!=null){
+                inventory.grabIngredient(newIngredient);
+            }
+            updateInventoryUI();
+            updateAvailableUI();
+            inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+            availableIngredientsViews.get(selectedSwapIndex).setBackgroundResource(R.drawable.swap_options_normal);
+            selectedSwapIndex=-1;
+            selectedIngredientIndex=-1;
+            for (View imageView:inventoryViews){
+                imageView.setEnabled(true);
+            }
+            ingredientBlocker.setVisibility(GONE);
+            swapOptionsLayout.setVisibility(INVISIBLE);
+        });
+    }
+
+
 
     @Override
     protected void onPause() {
