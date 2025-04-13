@@ -64,4 +64,9 @@ public class Ingredient {
         Ingredient object=(Ingredient) o;
         return this.id==object.getId();//If ingredient compare id
     }
+
+    @Override
+    public int hashCode() {//For in case someone wants to use hashmaps
+        return Integer.hashCode(id);
+    }
 }
