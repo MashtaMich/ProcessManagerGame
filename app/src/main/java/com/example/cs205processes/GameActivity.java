@@ -45,6 +45,8 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> availableIngredientsViews;
     private LinearLayout swapOptionsLayout;
 
+    private List<ImageView> basketViews;
+
     private IngredientFetchWorker ingredientFetcher;
     private Inventory inventory;
     View ingredientBlocker;
@@ -98,6 +100,13 @@ public class GameActivity extends AppCompatActivity implements
             ));
             swapOptionsLayout = findViewById(R.id.swapOptionsLayout);
             ingredientBlocker=findViewById(R.id.ingredientBlockerOverlay);
+
+            basketViews = new ArrayList<>(List.of(
+                    findViewById(R.id.basket1),
+                    findViewById(R.id.basket2),
+                    findViewById(R.id.basket3)
+            ));
+
             initIngredientViews();
 
             // 🌟 Init GameManager
@@ -133,6 +142,7 @@ public class GameActivity extends AppCompatActivity implements
 
     private void initIngredientViews(){
         List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
+        Log.d("GameDebug", "Initial ingredients: " + initialList.size()); // Should be 3
         inventory.setInitialList(initialList);
         updateInventoryUI();
         updateAvailableUI();
@@ -164,32 +174,119 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    private void updateInventoryUI(){
-        List<Ingredient> invHeld=inventory.getHeld();
-        for (int i=0;i<inventoryViews.size();i++){
-            final int index = i;
-            ImageView invView=inventoryViews.get(i);
-            invView.setImageResource(invHeld.get(i).getIconResourceId());
-            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
-            invView.setOnClickListener(v->{
-                if (selectedIngredientIndex==index){
-                    selectedIngredientIndex=-1;
-                    swapOptionsLayout.setVisibility(INVISIBLE);
-                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
-                    for (View imageView:availableIngredientsViews){
-                        imageView.setEnabled(false);
-                    }
-                }else{
-                    selectedIngredientIndex = index;
-                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
-                    swapOptionsLayout.setVisibility(VISIBLE);
-                    for (View imageView:availableIngredientsViews){
-                        imageView.setEnabled(true);
-                    }
-                }
-            });
-        }
+private void updateInventoryUI() {
+    try {
+        List<Ingredient> invHeld = inventory.getHeld();
+        Log.d("GameDebug", "Running updateInventoryUI() with size = " + invHeld.size());
+
+        updateInventoryIcons(invHeld);
+        updateBasketIcons(invHeld);
+        setupInventoryClickListeners(invHeld);
+
+        Log.d("GameDebug", "Finished updateInventoryUI()");
+    } catch (Exception e) {
+        Log.e("GameDebug", "Error in updateInventoryUI: " + e.getMessage(), e);
     }
+}
+
+private void updateInventoryIcons(List<Ingredient> invHeld) {
+    for (int i = 0; i < inventoryViews.size(); i++) {
+        if (i >= invHeld.size()) break; // Prevent crash
+        inventoryViews.get(i).setImageResource(invHeld.get(i).getIconResourceId());
+        inventoryViews.get(i).setBackgroundResource(R.drawable.inventory_slot_normal);
+    }
+}
+private void updateBasketIcons(List<Ingredient> invHeld) {
+    for (int i = 0; i < basketViews.size(); i++) {
+        if (i >= invHeld.size()) {
+            // Prevent crash
+            Log.d("GameDebug", "Skipping basket index " + i + " due to missing ingredient");
+            continue;
+        }
+
+        Ingredient ingredient = invHeld.get(i);
+        Log.d("GameDebug", "Updating basket " + i + " with " + ingredient.getName());
+
+        int resId;
+        Log.d("BasketUpdate", "Ingredient: " + ingredient.getName());
+        switch (ingredient.getName()) {
+            case "carrot":
+                resId = R.drawable.carrot_basket; break;
+            case "potato":
+                resId = R.drawable.potato_basket; break;
+            case "onion":
+                resId = R.drawable.onion_basket; break;
+            case "cabbage":
+                resId = R.drawable.cabbage_basket; break;
+            case "tomato":
+                resId = R.drawable.tomato_basket; break;
+            default:
+                Log.d("BasketUpdate", "SHOWING EMPTY BASKET");
+                resId = R.drawable.basket; break;
+        }
+
+        basketViews.get(i).setImageResource(resId);
+
+    }
+}
+private void setupInventoryClickListeners(List<Ingredient> invHeld) {
+    for (int i = 0; i < inventoryViews.size(); i++) {
+        if (i >= invHeld.size()) continue;
+
+        final int index = i;
+        ImageView invView = inventoryViews.get(i);
+        Log.d("GameDebug", "Setting listener for inventory index " + i + " (" + invHeld.get(i).getName() + ")");
+
+        invView.setOnClickListener(v -> {
+            Log.d("GameDebug", "Clicked inventory index: " + index);
+            if (selectedIngredientIndex == index) {
+                selectedIngredientIndex = -1;
+                swapOptionsLayout.setVisibility(INVISIBLE);
+                inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
+                disableAll(availableIngredientsViews);
+            } else {
+                selectedIngredientIndex = index;
+                inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
+                swapOptionsLayout.setVisibility(VISIBLE);
+                enableAll(availableIngredientsViews);
+            }
+        });
+    }
+}
+private void enableAll(List<? extends View> views) {
+    for (View v : views) v.setEnabled(true);
+}
+
+private void disableAll(List<? extends View> views) {
+    for (View v : views) v.setEnabled(false);
+}
+
+//    private void updateInventoryUI(){
+//        List<Ingredient> invHeld=inventory.getHeld();
+//        for (int i=0;i<inventoryViews.size();i++){
+//            final int index = i;
+//            ImageView invView=inventoryViews.get(i);
+//            invView.setImageResource(invHeld.get(i).getIconResourceId());
+//            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
+//            invView.setOnClickListener(v->{
+//                if (selectedIngredientIndex==index){
+//                    selectedIngredientIndex=-1;
+//                    swapOptionsLayout.setVisibility(INVISIBLE);
+//                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
+//                    for (View imageView:availableIngredientsViews){
+//                        imageView.setEnabled(false);
+//                    }
+//                }else{
+//                    selectedIngredientIndex = index;
+//                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
+//                    swapOptionsLayout.setVisibility(VISIBLE);
+//                    for (View imageView:availableIngredientsViews){
+//                        imageView.setEnabled(true);
+//                    }
+//                }
+//            });
+//        }
+//    }
 
     @Override
     public void receiveNewIngredient(Ingredient newIngredient){
@@ -197,7 +294,10 @@ public class GameActivity extends AppCompatActivity implements
             if (newIngredient!=null){
                 inventory.grabIngredient(newIngredient);
             }
+            Log.d("GameDebug", "Calling updateInventoryUI()");
             updateInventoryUI();
+            Log.d("GameDebug", "Completed updateInventoryUI()");
+
             updateAvailableUI();
             inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
             availableIngredientsViews.get(selectedSwapIndex).setBackgroundResource(R.drawable.swap_options_normal);
