@@ -41,6 +41,9 @@ public class GameManager {
     private final Context context;
     private final GameListener gameListener;
 
+    /*
+     * logic is in GameView Class
+     */
     public interface GameListener {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
@@ -65,6 +68,7 @@ public class GameManager {
         this.random = new Random();
 
         // Create handlers on the main thread
+        // can be used to post tasks to a specific thread
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.gameTickHandler = new Handler(Looper.getMainLooper());
     }
@@ -106,7 +110,7 @@ public class GameManager {
     }
 
     private void generateNewProcess() {
-        Process newProcess = Process.generateRandomProcess(availableRecipes);
+        Process newProcess = Process.generateRandomProcess(availableRecipes); // gets a random recipe from available list
 
         synchronized (mutex) {
             // Check if we can add directly to active processes

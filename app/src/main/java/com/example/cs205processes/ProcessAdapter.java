@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * ProcessAdapter Class handles only the UI related to the list of processes
+ */
 public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessViewHolder> {
     private static final String TAG = "ProcessAdapter";
 
@@ -37,13 +40,14 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
     @NonNull
     @Override
     public ProcessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_process_compact, parent, false);
+        View view /* represents one process item */ = LayoutInflater.from(context).inflate(R.layout.item_process_compact, parent, false); // gets an object that can turn XML into View objects
         return new ProcessViewHolder(view);
     }
 
+    // this method is called by RecyclerView every time a view needs to be shown or reused
     @Override
     public void onBindViewHolder(@NonNull ProcessViewHolder holder, int position) {
-        Process process = processes.get(position);
+        Process process = processes.get(position); // get it at this position in the list
         holder.bind(process);
     }
 
@@ -64,6 +68,9 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
         notifyDataSetChanged();
     }
 
+    /*
+     * ViewHolder is a helper class that helps to hold the views of one item and is created once and reused by the RecyclerView
+     */
     class ProcessViewHolder extends RecyclerView.ViewHolder {
         private TextView processNameTextView;
         private TextView timeRemainingTextView;
