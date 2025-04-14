@@ -69,5 +69,5 @@ public class Inventory {
             }
         }
         return true; //Is in held list, have all ingredients for recipe
-        }
     }
+}
