@@ -158,7 +158,7 @@ public class GameActivity extends AppCompatActivity implements
             avIngView.setOnClickListener(v->{
                 if (selectedIngredientIndex!=-1){
                     List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
-                    Ingredient dropIngredient=inventory.dropByIndex(selectedIngredientIndex);
+                    Ingredient dropIngredient=inventory.getByIndex(selectedIngredientIndex);
                     availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
                     selectedSwapIndex=index;
                     for (View imageView:availableIngredientsViews){
@@ -245,6 +245,9 @@ private void setupInventoryClickListeners(List<Ingredient> invHeld) {
                 inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
                 disableAll(availableIngredientsViews);
             } else {
+                if (selectedIngredientIndex!=-1){
+                    inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+                }
                 selectedIngredientIndex = index;
                 inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
                 swapOptionsLayout.setVisibility(VISIBLE);
