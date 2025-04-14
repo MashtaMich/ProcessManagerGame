@@ -87,15 +87,12 @@ public class IngredientFetchWorker {
         Ingredient result = null;
         // get input ingredient from the available list
         synchronized (availableLock) {
-            //add returned ingredient from inventory
-            if (!availableList.contains(returnIngredient)){
-                availableList.add(returnIngredient);
-            }
-            //remove ingredient to fetch from inventory
-            if (availableList.contains(ingredient)) {
+            //replace ingredient to fetch from inventory
+            if (!availableList.contains(returnIngredient) && availableList.contains(ingredient)) {
+                int swapItemIndex=availableList.indexOf(ingredient);
+                availableList.set(swapItemIndex,returnIngredient);
+
                 result = ingredient;
-                // remove ingredient to prevent duplicates
-                availableList.remove(ingredient);
             }
         }
         Log.d(TAG,"Swapped "+returnIngredient.getName()+" for "+ingredient.getName());
