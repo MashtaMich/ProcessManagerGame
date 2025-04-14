@@ -31,6 +31,10 @@ public class Inventory {
         return heldIngredients.remove(ingredient);
     }
 
+    public Ingredient getIngredientByIndex(int index){
+        return heldIngredients.get(index);
+    }
+
     public void setInitialList(List<Ingredient> initial_list){
         heldIngredients.clear();
         heldIngredients=initial_list;
@@ -40,6 +44,10 @@ public class Inventory {
         Ingredient returnIngredient=heldIngredients.remove(index);
         Log.d(TAG, "Removed and returned "+returnIngredient.getName());
         return returnIngredient;
+    }
+
+    public void swapIngredientAtIndex(int index,Ingredient swapIngredient){
+        heldIngredients.set(index,swapIngredient);
     }
 
     public int heldItemCount(){

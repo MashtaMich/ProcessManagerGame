@@ -50,9 +50,7 @@ public class IngredientFetchWorker {
     }
 
     public void exchangeIngredient(Ingredient returnIngredient,Ingredient getIngredient,ingredientFetchListener listener){
-        executor.submit(()->{
-            fetchIngredient(returnIngredient,getIngredient,listener);
-        });
+        executor.submit(()-> fetchIngredient(returnIngredient,getIngredient,listener));
     }
 
     public List<Ingredient> generateIngredientsRandom(Integer get_number){
@@ -87,15 +85,13 @@ public class IngredientFetchWorker {
         Ingredient result = null;
         // get input ingredient from the available list
         synchronized (availableLock) {
-            //add returned ingredient from inventory
-            if (!availableList.contains(returnIngredient)){
-                availableList.add(returnIngredient);
-            }
             //remove ingredient to fetch from inventory
-            if (availableList.contains(ingredient)) {
-                result = ingredient;
+            if (availableList.contains(ingredient) && !availableList.contains(returnIngredient)) {
                 // remove ingredient to prevent duplicates
-                availableList.remove(ingredient);
+                int swapItemIndex=availableList.indexOf(ingredient);
+                availableList.set(swapItemIndex,returnIngredient);
+
+                result = ingredient;
             }
         }
         Log.d(TAG,"Swapped "+returnIngredient.getName()+" for "+ingredient.getName());
