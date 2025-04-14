@@ -182,6 +182,9 @@ public class GameActivity extends AppCompatActivity implements
                         imageView.setEnabled(false);
                     }
                 }else{
+                    if (selectedIngredientIndex!=-1){
+                        inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+                    }
                     selectedIngredientIndex = index;
                     inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
                     swapOptionsLayout.setVisibility(VISIBLE);
