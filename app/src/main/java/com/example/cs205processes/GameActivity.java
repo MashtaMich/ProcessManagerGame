@@ -292,7 +292,7 @@ private void disableAll(List<? extends View> views) {
     public void receiveNewIngredient(Ingredient newIngredient){
         runOnUiThread(()->{
             if (newIngredient!=null){
-                inventory.grabIngredient(newIngredient);
+                inventory.swapIngredientAtIndex(selectedIngredientIndex,newIngredient);
             }
             Log.d("GameDebug", "Calling updateInventoryUI()");
             updateInventoryUI();

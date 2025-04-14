@@ -42,6 +42,10 @@ public class Inventory {
         return returnIngredient;
     }
 
+    public void swapIngredientAtIndex(int index,Ingredient swapIngredient){
+        heldIngredients.set(index,swapIngredient);
+    }
+
     public int heldItemCount(){
         return heldIngredients.size();
     }
