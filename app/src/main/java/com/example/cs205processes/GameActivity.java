@@ -45,6 +45,8 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> availableIngredientsViews;
     private LinearLayout swapOptionsLayout;
 
+    private List<ImageView> basketViews;
+
     private IngredientFetchWorker ingredientFetcher;
     private Inventory inventory;
     View ingredientBlocker;
@@ -54,199 +56,577 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_game);
-        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
-        mediaPlayer.setLooping(true); // Enable looping
-        mediaPlayer.start(); // Start playing the audio
-        hideSystemUI();
-
         try {
-            // Initialize GameView + Game logic
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setContentView(R.layout.activity_game);
+            mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
+            mediaPlayer.setLooping(true);
+            mediaPlayer.start();
+            hideSystemUI();
+            initializeGameComponents();
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onCreate: " + e.getMessage(), e);
+            finish(); // Safely exit the activity if initialization fails
+        }
+    }
+
+    private void initializeGameComponents() {
+            // Initialize game view and logic
             gameView = findViewById(R.id.gameView);
+
             game = new Game(gameView, this);
             gameView.init(game);
 
-            // Hook joystick controls to movement
-            findViewById(R.id.btnUp).setOnClickListener(v -> game.moveUp());
-            findViewById(R.id.btnDown).setOnClickListener(v -> game.moveDown());
-            findViewById(R.id.btnLeft).setOnClickListener(v -> game.moveLeft());
-            findViewById(R.id.btnRight).setOnClickListener(v -> game.moveRight());
+            // Set up movement controls
+            setupMovementControls();
 
-            // Initialize stats display in the new top-right corner container
+            // Initialize UI components
+            initializeUIComponents();
+
+            // Initialize inventory and ingredients
+            initializeInventory();
+
+            // Initialize game manager
+            gameManager = new GameManager(this, this);
+            gameManager.startGame();
+
+            // Set initial values for statistics
+            updateScoreDisplay(0);
+            updateDeadProcessCountDisplay(0);
+    }
+
+    private void setupMovementControls() {
+
+            View btnUp = findViewById(R.id.btnUp);
+            View btnDown = findViewById(R.id.btnDown);
+            View btnLeft = findViewById(R.id.btnLeft);
+            View btnRight = findViewById(R.id.btnRight);
+
+            if (btnUp != null) btnUp.setOnClickListener(v -> game.moveUp());
+            if (btnDown != null) btnDown.setOnClickListener(v -> game.moveDown());
+            if (btnLeft != null) btnLeft.setOnClickListener(v -> game.moveLeft());
+            if (btnRight != null) btnRight.setOnClickListener(v -> game.moveRight());
+    }
+
+    private void initializeUIComponents() {
+        try {
+            // Initialize statistics text views
             scoreTextView = findViewById(R.id.scoreTextView);
             deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
 
-            // Set up process list with compact cards in a horizontal layout
+            // Initialize process list
             processRecyclerView = findViewById(R.id.processRecyclerView);
+            if (processRecyclerView == null) {
+                Log.e(TAG, "processRecyclerView is null");
+                return;
+            }
+
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             processRecyclerView.setLayoutManager(layoutManager);
             processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
             processRecyclerView.setAdapter(processAdapter);
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing UI components: " + e.getMessage(), e);
+        }
+    }
 
-            // Initialize inventory views
+    private void initializeInventory() {
+        try {
+            // Initialize ingredient fetcher and inventory
             ingredientFetcher = new IngredientFetchWorker();
             inventory = new Inventory();
-            inventoryViews = new ArrayList<>(List.of(
-                    findViewById(R.id.ingredientSlot1),
-                    findViewById(R.id.ingredientSlot2),
-                    findViewById(R.id.ingredientSlot3)
-            ));
-            availableIngredientsViews = new ArrayList<>(List.of(
-                    findViewById(R.id.swapOption1),
-                    findViewById(R.id.swapOption2)
-            ));
+
+            // Initialize view lists
+            initializeViewLists();
+
+            // Initialize ingredient views
+            initIngredientViews();
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing inventory: " + e.getMessage(), e);
+        }
+    }
+
+    private void initializeViewLists() {
+        try {
+            // Initialize inventory slots
+            inventoryViews = new ArrayList<>();
+            View slot1 = findViewById(R.id.ingredientSlot1);
+            View slot2 = findViewById(R.id.ingredientSlot2);
+            View slot3 = findViewById(R.id.ingredientSlot3);
+
+            if (slot1 != null) inventoryViews.add((ImageView) slot1);
+            if (slot2 != null) inventoryViews.add((ImageView) slot2);
+            if (slot3 != null) inventoryViews.add((ImageView) slot3);
+
+            // Initialize available ingredients view
+            availableIngredientsViews = new ArrayList<>();
+            View option1 = findViewById(R.id.swapOption1);
+            View option2 = findViewById(R.id.swapOption2);
+
+            if (option1 != null) availableIngredientsViews.add((ImageView) option1);
+            if (option2 != null) availableIngredientsViews.add((ImageView) option2);
+
+            // Initialize basket views
+            basketViews = new ArrayList<>();
+            View basket1 = findViewById(R.id.basket1);
+            View basket2 = findViewById(R.id.basket2);
+            View basket3 = findViewById(R.id.basket3);
+
+            if (basket1 != null) basketViews.add((ImageView) basket1);
+            if (basket2 != null) basketViews.add((ImageView) basket2);
+            if (basket3 != null) basketViews.add((ImageView) basket3);
+
+            // Get other UI elements
             swapOptionsLayout = findViewById(R.id.swapOptionsLayout);
             ingredientBlocker = findViewById(R.id.ingredientBlockerOverlay);
-            initIngredientViews();
-
-            // Initialize GameManager
-            gameManager = new GameManager(this, this);
-            gameManager.startGame();
-
-            // Set initial values for stats displays
-            updateScoreDisplay(0);
-            updateDeadProcessCountDisplay(0);
         } catch (Exception e) {
-            Log.e(TAG, "Error initializing views: " + e.getMessage());
-            e.printStackTrace();
+            Log.e(TAG, "Error initializing view lists: " + e.getMessage(), e);
         }
     }
 
     private void updateScoreDisplay(int score) {
-        if (scoreTextView != null) {
-            scoreTextView.setText(getString(R.string.score_format, score));
+        try {
+            if (scoreTextView != null) {
+                scoreTextView.setText(getString(R.string.score_format, score));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating score display: " + e.getMessage(), e);
         }
     }
 
     private void updateDeadProcessCountDisplay(int count) {
-        if (deadProcessCountTextView != null) {
-            deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
+        try {
+            if (deadProcessCountTextView != null) {
+                deadProcessCountTextView.setText(getString(R.string.failed_processes_format, count));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating dead process count: " + e.getMessage(), e);
         }
     }
 
     private void initIngredientViews() {
-        List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
-        inventory.setInitialList(initialList);
-        updateInventoryUI();
-        updateAvailableUI();
+        try {
+            if (inventory == null || ingredientFetcher == null) {
+                Log.e(TAG, "Inventory or ingredientFetcher is null");
+                return;
+            }
+
+            List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
+            Log.d(TAG, "Initial ingredients: " + initialList.size());
+
+            if (initialList.isEmpty()) {
+                Log.e(TAG, "Initial ingredient list is empty");
+                return;
+            }
+
+            inventory.setInitialList(initialList);
+            updateInventoryUI();
+            updateAvailableUI();
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing ingredient views: " + e.getMessage(), e);
+        }
     }
 
     private void updateAvailableUI() {
-        List<Ingredient> swappableIngredients = ingredientFetcher.getAvailableList();
-        for (int i = 0; i < availableIngredientsViews.size(); i++) {
-            final int index = i;
-            ImageView avIngView = availableIngredientsViews.get(i);
-            avIngView.setImageResource(swappableIngredients.get(i).getIconResourceId());
-            avIngView.setBackgroundResource(R.drawable.swap_options_normal);
-            avIngView.setOnClickListener(v -> {
-                if (selectedIngredientIndex != -1) {
-                    List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
+        try {
+            if (ingredientFetcher == null || availableIngredientsViews == null || availableIngredientsViews.isEmpty()) {
+                Log.e(TAG, "ingredientFetcher or availableIngredientsViews is null/empty");
+                return;
+            }
+
+            List<Ingredient> swappableIngredients = ingredientFetcher.getAvailableList();
+            if (swappableIngredients == null || swappableIngredients.isEmpty()) {
+                Log.e(TAG, "Swappable ingredients list is null/empty");
+                return;
+            }
+
+            for (int i = 0; i < availableIngredientsViews.size(); i++) {
+                if (i >= swappableIngredients.size()) {
+                    break;
+                }
+
+                final int index = i;
+                ImageView avIngView = availableIngredientsViews.get(i);
+                Ingredient ingredient = swappableIngredients.get(i);
+
+                if (ingredient != null) {
+                    avIngView.setImageResource(ingredient.getIconResourceId());
+                    avIngView.setBackgroundResource(R.drawable.swap_options_normal);
+
+                    avIngView.setOnClickListener(v -> {
+                        handleAvailableIngredientClick(index);
+                    });
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating available UI: " + e.getMessage(), e);
+        }
+    }
+
+    private void handleAvailableIngredientClick(int index) {
+        try {
+            if (selectedIngredientIndex != -1 && inventory != null && ingredientFetcher != null) {
+                List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
+
+                if (swapOptions != null && index < swapOptions.size() && selectedIngredientIndex < inventory.heldItemCount()) {
                     Ingredient dropIngredient = inventory.getByIndex(selectedIngredientIndex);
-                    availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
+
+                    if (index < availableIngredientsViews.size()) {
+                        availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
+                    }
+
                     selectedSwapIndex = index;
-                    for (View imageView : availableIngredientsViews) {
-                        imageView.setEnabled(false);
+                    disableAllViews();
+
+                    if (ingredientBlocker != null) {
+                        ingredientBlocker.setVisibility(VISIBLE);
                     }
-                    for (View imageView : inventoryViews) {
-                        imageView.setEnabled(false);
-                    }
-                    ingredientBlocker.setVisibility(VISIBLE);
+
                     ingredientFetcher.exchangeIngredient(dropIngredient, swapOptions.get(index), this);
                 }
-            });
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling available ingredient click: " + e.getMessage(), e);
+            resetSelectionState();
+        }
+    }
+
+    private void disableAllViews() {
+        try {
+            disableAll(availableIngredientsViews);
+            disableAll(inventoryViews);
+        } catch (Exception e) {
+            Log.e(TAG, "Error disabling views: " + e.getMessage(), e);
         }
     }
 
     private void updateInventoryUI() {
-        List<Ingredient> invHeld = inventory.getHeld();
-        for (int i = 0; i < inventoryViews.size(); i++) {
-            final int index = i;
-            ImageView invView = inventoryViews.get(i);
-            invView.setImageResource(invHeld.get(i).getIconResourceId());
-            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
-            invView.setOnClickListener(v -> {
-                if (selectedIngredientIndex == index) {
-                    selectedIngredientIndex = -1;
-                    swapOptionsLayout.setVisibility(INVISIBLE);
-                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
-                    for (View imageView : availableIngredientsViews) {
-                        imageView.setEnabled(false);
+        try {
+            if (inventory == null) {
+                Log.e(TAG, "Inventory is null");
+                return;
+            }
+
+            List<Ingredient> invHeld = inventory.getHeld();
+            Log.d(TAG, "Running updateInventoryUI() with size = " + invHeld.size());
+
+            updateInventoryIcons(invHeld);
+            updateBasketIcons(invHeld);
+            setupInventoryClickListeners(invHeld);
+
+            Log.d(TAG, "Finished updateInventoryUI()");
+        } catch (Exception e) {
+            Log.e(TAG, "Error in updateInventoryUI: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateInventoryIcons(List<Ingredient> invHeld) {
+        try {
+            if (inventoryViews == null || invHeld == null) {
+                return;
+            }
+
+            for (int i = 0; i < inventoryViews.size(); i++) {
+                if (i >= invHeld.size()) {
+                    break;
+                }
+
+                ImageView view = inventoryViews.get(i);
+                if (view != null) {
+                    view.setImageResource(invHeld.get(i).getIconResourceId());
+                    view.setBackgroundResource(R.drawable.inventory_slot_normal);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating inventory icons: " + e.getMessage(), e);
+        }
+    }
+
+    private void updateBasketIcons(List<Ingredient> invHeld) {
+        try {
+            if (basketViews == null || invHeld == null) {
+                return;
+            }
+
+            for (int i = 0; i < basketViews.size(); i++) {
+                ImageView basketView = basketViews.get(i);
+                if (basketView == null) continue;
+
+                if (i >= invHeld.size()) {
+                    // Set default basket image
+                    basketView.setImageResource(R.drawable.basket);
+                    continue;
+                }
+
+                Ingredient ingredient = invHeld.get(i);
+                if (ingredient == null) {
+                    basketView.setImageResource(R.drawable.basket);
+                    continue;
+                }
+
+                Log.d(TAG, "Updating basket " + i + " with " + ingredient.getName());
+                int resId;
+
+                try {
+                    switch (ingredient.getName()) {
+                        case "carrot":
+                            resId = R.drawable.carrot_basket;
+                            break;
+                        case "potato":
+                            resId = R.drawable.potato_basket;
+                            break;
+                        case "onion":
+                            resId = R.drawable.onion_basket;
+                            break;
+                        case "cabbage":
+                            resId = R.drawable.cabbage_basket;
+                            break;
+                        case "tomato":
+                            resId = R.drawable.tomato_basket;
+                            break;
+                        default:
+                            Log.d(TAG, "SHOWING EMPTY BASKET");
+                            resId = R.drawable.basket;
+                            break;
                     }
-                } else {
-                    if (selectedIngredientIndex != -1) {
-                        inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
-                    }
-                    selectedIngredientIndex = index;
-                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
-                    swapOptionsLayout.setVisibility(VISIBLE);
-                    for (View imageView : availableIngredientsViews) {
-                        imageView.setEnabled(true);
+                    basketView.setImageResource(resId);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error setting basket image: " + e.getMessage(), e);
+                    // Fallback to default basket
+                    try {
+                        basketView.setImageResource(R.drawable.basket);
+                    } catch (Exception ex) {
+                        Log.e(TAG, "Error setting fallback basket image: " + ex.getMessage(), ex);
                     }
                 }
-            });
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating basket icons: " + e.getMessage(), e);
+        }
+    }
+
+    private void setupInventoryClickListeners(List<Ingredient> invHeld) {
+        try {
+            if (inventoryViews == null || invHeld == null) {
+                return;
+            }
+
+            for (int i = 0; i < inventoryViews.size(); i++) {
+                if (i >= invHeld.size()) {
+                    continue;
+                }
+
+                final int index = i;
+                ImageView invView = inventoryViews.get(i);
+
+                if (invView == null) continue;
+
+                Log.d(TAG, "Setting listener for inventory index " + i + " (" + invHeld.get(i).getName() + ")");
+
+                invView.setOnClickListener(v -> {
+                    handleInventoryItemClick(index);
+                });
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error setting up inventory click listeners: " + e.getMessage(), e);
+        }
+    }
+
+    private void handleInventoryItemClick(int index) {
+        try {
+            Log.d(TAG, "Clicked inventory index: " + index);
+
+            if (selectedIngredientIndex == index) {
+                // Deselect the current item
+                selectedIngredientIndex = -1;
+
+                if (swapOptionsLayout != null) {
+                    swapOptionsLayout.setVisibility(INVISIBLE);
+                }
+
+                if (index < inventoryViews.size()) {
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
+                }
+
+                disableAll(availableIngredientsViews);
+            } else {
+                // Deselect previous selection if there was one
+                if (selectedIngredientIndex != -1 && selectedIngredientIndex < inventoryViews.size()) {
+                    inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+                }
+
+                // Select new item
+                selectedIngredientIndex = index;
+
+                if (index < inventoryViews.size()) {
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
+                }
+
+                if (swapOptionsLayout != null) {
+                    swapOptionsLayout.setVisibility(VISIBLE);
+                }
+
+                enableAll(availableIngredientsViews);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling inventory item click: " + e.getMessage(), e);
+            resetSelectionState();
+        }
+    }
+
+    private void enableAll(List<? extends View> views) {
+        try {
+            if (views == null) return;
+
+            for (View v : views) {
+                if (v != null) {
+                    v.setEnabled(true);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error enabling views: " + e.getMessage(), e);
+        }
+    }
+
+    private void disableAll(List<? extends View> views) {
+        try {
+            if (views == null) return;
+
+            for (View v : views) {
+                if (v != null) {
+                    v.setEnabled(false);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error disabling views: " + e.getMessage(), e);
         }
     }
 
     @Override
     public void receiveNewIngredient(Ingredient newIngredient) {
         runOnUiThread(() -> {
-            if (newIngredient != null) {
-                inventory.swapIngredientAtIndex(selectedIngredientIndex, newIngredient);
+            try {
+                if (newIngredient != null && inventory != null && selectedIngredientIndex >= 0 && selectedIngredientIndex < inventory.heldItemCount()) {
+                    inventory.swapIngredientAtIndex(selectedIngredientIndex, newIngredient);
+                }
+
+                Log.d(TAG, "Calling updateInventoryUI()");
+                updateInventoryUI();
+                Log.d(TAG, "Completed updateInventoryUI()");
+                updateAvailableUI();
+
+                // Reset selection states safely
+                resetSelectionState();
+
+                // Re-enable inventory items
+                enableAll(inventoryViews);
+
+                // Hide UI elements
+                if (ingredientBlocker != null) {
+                    ingredientBlocker.setVisibility(GONE);
+                }
+
+                if (swapOptionsLayout != null) {
+                    swapOptionsLayout.setVisibility(INVISIBLE);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in receiveNewIngredient: " + e.getMessage(), e);
+                resetSelectionState();
             }
-            updateInventoryUI();
-            updateAvailableUI();
-            inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
-            availableIngredientsViews.get(selectedSwapIndex).setBackgroundResource(R.drawable.swap_options_normal);
+        });
+    }
+
+    private void resetSelectionState() {
+        try {
+            // Reset background for selected inventory item if valid
+            if (selectedIngredientIndex >= 0 && selectedIngredientIndex < inventoryViews.size()) {
+                inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+            }
+
+            // Reset background for selected swap option if valid
+            if (selectedSwapIndex >= 0 && selectedSwapIndex < availableIngredientsViews.size()) {
+                availableIngredientsViews.get(selectedSwapIndex).setBackgroundResource(R.drawable.swap_options_normal);
+            }
+
+            // Reset selection indices
             selectedSwapIndex = -1;
             selectedIngredientIndex = -1;
-            for (View imageView : inventoryViews) {
-                imageView.setEnabled(true);
+
+            // Re-enable all views
+            enableAll(inventoryViews);
+
+            // Hide UI elements
+            if (ingredientBlocker != null) {
+                ingredientBlocker.setVisibility(GONE);
             }
-            ingredientBlocker.setVisibility(GONE);
-            swapOptionsLayout.setVisibility(INVISIBLE);
-        });
+
+            if (swapOptionsLayout != null) {
+                swapOptionsLayout.setVisibility(INVISIBLE);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error resetting selection state: " + e.getMessage(), e);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (gameManager != null) {
-            gameManager.pauseGame();
-        }
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause(); // Pause the audio
+        try {
+            if (gameManager != null) {
+                gameManager.pauseGame();
+            }
+
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onPause: " + e.getMessage(), e);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (gameManager != null) {
-            gameManager.resumeGame();
+        try {
+            hideSystemUI();
+
+            if (gameManager != null) {
+                gameManager.resumeGame();
+            }
+
+            if (mediaPlayer != null) {
+                mediaPlayer.start();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onResume: " + e.getMessage(), e);
         }
-        if (mediaPlayer != null) {
-            mediaPlayer.start(); // Resume playing if it was paused
-        }
-        hideSystemUI(); // Re-hide system UI when resuming
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (gameManager != null) {
-            gameManager.stopGame();
-        }
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+        try {
+            if (gameManager != null) {
+                gameManager.stopGame();
+            }
+
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error in onDestroy: " + e.getMessage(), e);
         }
     }
 
     private void hideSystemUI() {
-        WindowInsetsController controller = getWindow().getInsetsController();
-        if (controller != null) {
-            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+        try {
+            WindowInsetsController controller = getWindow().getInsetsController();
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error hiding system UI: " + e.getMessage(), e);
         }
     }
 
@@ -285,11 +665,16 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
+    // GameManager.GameListener implementation
     @Override
     public void onTimerTick() {
         runOnUiThread(() -> {
-            if (gameManager != null && processAdapter != null) {
-                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            try {
+                if (gameManager != null && processAdapter != null) {
+                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in onTimerTick: " + e.getMessage(), e);
             }
         });
     }
@@ -297,8 +682,12 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void onProcessAdded(Process process) {
         runOnUiThread(() -> {
-            if (processAdapter != null) {
-                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            try {
+                if (processAdapter != null && gameManager != null) {
+                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in onProcessAdded: " + e.getMessage(), e);
             }
         });
     }
@@ -306,8 +695,12 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void onProcessCompleted(Process process) {
         runOnUiThread(() -> {
-            if (processAdapter != null) {
-                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            try {
+                if (processAdapter != null && gameManager != null) {
+                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in onProcessCompleted: " + e.getMessage(), e);
             }
         });
     }
@@ -318,7 +711,6 @@ public class GameActivity extends AppCompatActivity implements
             if (processAdapter != null && gameManager != null) {
                 processAdapter.updateProcesses(gameManager.getActiveProcesses());
                 updateDeadProcessCountDisplay(gameManager.getDeadProcessCount());
-                // Update media playback speed based on dead process count
                 updateMediaPlaybackSpeed(gameManager.getDeadProcessCount());
             }
         });
@@ -326,27 +718,25 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onProcessAboutToDie(Process process) {
-        // Handled by GameManager (vibration)
     }
 
     @Override
     public void onScoreChanged(int newScore) {
-        runOnUiThread(() -> updateScoreDisplay(newScore));
+        runOnUiThread(() -> {
+            try {
+                updateScoreDisplay(newScore);
+            } catch (Exception e) {
+                Log.e(TAG, "Error in onScoreChanged: " + e.getMessage(), e);
+            }
+        });
     }
 
     @Override
     public void onGameOver(int finalScore) {
         runOnUiThread(() -> {
-            try {
-                GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
-                gameOverDialog.show();
-
-                // Store the score
-                saveHighScore(finalScore);
-            } catch (Exception e) {
-                Log.e(TAG, "Error showing game over dialog: " + e.getMessage());
-                e.printStackTrace();
-            }
+            GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
+            gameOverDialog.show();
+            saveHighScore(finalScore);
         });
     }
 
@@ -354,10 +744,9 @@ public class GameActivity extends AppCompatActivity implements
         SharedPreferences sharedPreferences = getSharedPreferences("MyGamePrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        // Retrieve the current high score
-        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE); // Use Integer.MIN_VALUE as the default
+        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE);
 
-        if (score > highScore) {
+        if (score > highScore || highScore == Integer.MIN_VALUE) {
             editor.putInt("highScore", score);
             editor.apply();
         }
@@ -365,7 +754,7 @@ public class GameActivity extends AppCompatActivity implements
 
     @Override
     public void onCompleteButtonClicked(Process process) {
-        if (gameManager != null) {
+        if (gameManager != null && process != null) {
             gameManager.completeProcess(process.getId());
         }
     }
