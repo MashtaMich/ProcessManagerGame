@@ -5,8 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Inventory {
-    private static final String TAG = "Inventory";
+public class IngredientInventory {
+    private static final String TAG = "Ingredient Inventory";
     int max_cap=3;
     private List<Ingredient> heldIngredients=new ArrayList<>(max_cap);
 

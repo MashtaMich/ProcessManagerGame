@@ -49,8 +49,8 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> basketViews;
 
     private IngredientFetchWorker ingredientFetcher;
-    private Inventory inventory;
-    View ingredientBlocker;
+    private IngredientInventory ingredientInventory;
+    private View ingredientBlocker;
     private int selectedIngredientIndex=-1;
     private int selectedSwapIndex=-1;
 
@@ -90,7 +90,7 @@ public class GameActivity extends AppCompatActivity implements
 
             //Init inventory Views
             ingredientFetcher=new IngredientFetchWorker();
-            inventory =new Inventory();
+            ingredientInventory =new IngredientInventory();
             inventoryViews = new ArrayList<>(List.of(
                     findViewById(R.id.ingredientSlot1),
                     findViewById(R.id.ingredientSlot2),
@@ -143,9 +143,9 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     private void initIngredientViews(){
-        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
+        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(ingredientInventory.max_cap);
         Log.d("GameDebug", "Initial ingredients: " + initialList.size()); // Should be 3
-        inventory.setInitialList(initialList);
+        ingredientInventory.setInitialList(initialList);
         updateInventoryUI();
         updateAvailableUI();
     }
@@ -160,7 +160,7 @@ public class GameActivity extends AppCompatActivity implements
             avIngView.setOnClickListener(v->{
                 if (selectedIngredientIndex!=-1){
                     List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
-                    Ingredient dropIngredient=inventory.getIngredientByIndex(selectedIngredientIndex);
+                    Ingredient dropIngredient= ingredientInventory.getIngredientByIndex(selectedIngredientIndex);
                     availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
                     selectedSwapIndex=index;
                     for (View imageView:availableIngredientsViews){
@@ -178,7 +178,7 @@ public class GameActivity extends AppCompatActivity implements
 
 private void updateInventoryUI() {
     try {
-        List<Ingredient> invHeld = inventory.getHeld();
+        List<Ingredient> invHeld = ingredientInventory.getHeld();
         Log.d("GameDebug", "Running updateInventoryUI() with size = " + invHeld.size());
 
         updateInventoryIcons(invHeld);
@@ -297,7 +297,7 @@ private void disableAll(List<? extends View> views) {
     public void receiveNewIngredient(Ingredient newIngredient){
         runOnUiThread(()->{
             if (newIngredient!=null){
-                inventory.swapIngredientAtIndex(selectedIngredientIndex,newIngredient);
+                ingredientInventory.swapIngredientAtIndex(selectedIngredientIndex,newIngredient);
             }
             Log.d("GameDebug", "Calling updateInventoryUI()");
             updateInventoryUI();

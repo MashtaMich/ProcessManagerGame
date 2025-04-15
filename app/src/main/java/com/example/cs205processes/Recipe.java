@@ -48,7 +48,7 @@ public class Recipe {
         return instructions;
     }
 
-    public boolean have_all_ingredients(List<Ingredient> inventory_list){
+    public boolean haveAllIngredients(List<Ingredient> inventory_list){
         return new HashSet<>(this.ingredients).containsAll(inventory_list);
     }
 }
