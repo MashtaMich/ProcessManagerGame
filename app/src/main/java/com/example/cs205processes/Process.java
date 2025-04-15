@@ -18,7 +18,6 @@ public class Process {
     private final Recipe recipe;
     private final Object mutex = new Object();
 
-    // New timer utilities
     private final ElapsedTimer elapsedTimer = new ElapsedTimer();
     private final DeltaStepper timeStepper;
 
