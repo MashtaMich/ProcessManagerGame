@@ -190,7 +190,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/basket" />
+        app:srcCompat="@drawable/potato_basket" />
 
     <ImageView
         android:id="@+id/basket2"
@@ -202,7 +202,7 @@
         app:layout_constraintStart_toStartOf="@+id/gameView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996"
-        app:srcCompat="@drawable/basket" />
+        app:srcCompat="@drawable/cabbage_basket" />
 
     <ImageView
         android:id="@+id/basket3"
@@ -214,6 +214,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996"
-        app:srcCompat="@drawable/basket" />
+        app:srcCompat="@drawable/tomato_basket" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
