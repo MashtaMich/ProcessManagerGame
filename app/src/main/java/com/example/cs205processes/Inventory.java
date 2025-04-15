@@ -40,6 +40,10 @@ public class Inventory {
         heldIngredients=initial_list;
     }
 
+    public Ingredient getByIndex(int index){
+        return heldIngredients.get(index);
+    }
+
     public Ingredient dropByIndex(int index){
         Ingredient returnIngredient=heldIngredients.remove(index);
         Log.d(TAG, "Removed and returned "+returnIngredient.getName());

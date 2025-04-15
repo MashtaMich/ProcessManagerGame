@@ -18,8 +18,12 @@ public class GameManager {
     private static final int POINTS_PER_COMPLETED_PROCESS = 100;
     private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 500;
     private static final int MAX_DEAD_PROCESSES = 3;
-    private static final int TIMER_INTERVAL_MS = 1000; // 1 second interval for timer updates
+    private static final int TIMER_INTERVAL_MS = 16; // Update more frequently for smoother animation (~60 FPS)
     private static final int MAX_ACTIVE_PROCESSES = 5; // Maximum number of active processes
+
+    // Timer utilities for smooth timing
+    private final ElapsedTimer elapsedTimer = new ElapsedTimer();
+    private final DeltaStepper timerStepper;
 
     // Simple mutex for thread synchronization
     private final Object mutex = new Object();
@@ -41,9 +45,6 @@ public class GameManager {
     private final Context context;
     private final GameListener gameListener;
 
-    /*
-     * logic is in GameView Class
-     */
     public interface GameListener {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
@@ -67,10 +68,20 @@ public class GameManager {
         this.isGameOver = false;
         this.random = new Random();
 
+        // Initialize timer stepper
+        this.timerStepper = new DeltaStepper(1000, this::tickUpdate);
+
         // Create handlers on the main thread
-        // can be used to post tasks to a specific thread
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.gameTickHandler = new Handler(Looper.getMainLooper());
+    }
+
+    // This method updates the UI every second
+    private boolean tickUpdate(long deltaTime) {
+        if (gameListener != null) {
+            gameListener.onTimerTick();
+        }
+        return true;
     }
 
     public void startGame() {
@@ -110,7 +121,7 @@ public class GameManager {
     }
 
     private void generateNewProcess() {
-        Process newProcess = Process.generateRandomProcess(availableRecipes); // gets a random recipe from available list
+        Process newProcess = Process.generateRandomProcess(availableRecipes);
 
         synchronized (mutex) {
             // Check if we can add directly to active processes
@@ -153,29 +164,33 @@ public class GameManager {
     }
 
     private void startGameTick() {
-        // Use a fixed-rate timer technique
+        // Reset the elapsed timer
+        elapsedTimer.progress();
+
+        // Use a higher frequency timer for smoother updates
         gameTickRunnable = new Runnable() {
             @Override
             public void run() {
                 if (!isGameOver) {
                     updateProcesses();
 
-                    // Notify the UI about the timer tick so it can update
-                    if (gameListener != null) {
-                        gameListener.onTimerTick();
-                    }
-
-                    // Important: use a fixed rate for timer accuracy
+                    // Schedule the next update
                     gameTickHandler.postDelayed(this, TIMER_INTERVAL_MS);
                 }
             }
         };
 
-        // Start immediately, with precise timing
+        // Start immediately
         gameTickHandler.post(gameTickRunnable);
     }
 
     private void updateProcesses() {
+        // Get elapsed time since last update
+        long delta = elapsedTimer.progress();
+
+        // Update the timer stepper for UI updates
+        timerStepper.update(delta);
+
         // Create a local list of processes to handle in this update
         List<Process> processesToUpdate = new ArrayList<>();
 
@@ -187,7 +202,8 @@ public class GameManager {
         // Process the snapshot without holding the lock
         for (Process process : processesToUpdate) {
             if (!process.isComplete() && !process.isDead()) {
-                process.updateTime(1);
+                // Update each process's timer
+                process.updateTime();
 
                 // Check if process is about to die
                 if (process.isAboutToDie()) {
@@ -322,6 +338,8 @@ public class GameManager {
     public void resumeGame() {
         if (!isGameOver) {
             Log.d(TAG, "Game resumed");
+            // Reset the elapsed timer
+            elapsedTimer.progress();
             scheduleNextProcess();
             startGameTick();
         }

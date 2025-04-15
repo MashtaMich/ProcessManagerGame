@@ -11,6 +11,7 @@
     <!-- Game canvas -->
 
     <!-- Header Section -->
+
     <com.example.cs205processes.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
@@ -207,5 +208,41 @@
         android:id="@+id/joystickInclude"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/basket1"
+        android:layout_width="288dp"
+        android:layout_height="145dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.194"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/basket" />
+
+    <ImageView
+        android:id="@+id/basket2"
+        android:layout_width="460dp"
+        android:layout_height="144dp"
+        app:layout_constraintBottom_toBottomOf="@+id/gameView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.413"
+        app:layout_constraintStart_toStartOf="@+id/gameView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.996"
+        app:srcCompat="@drawable/basket" />
+
+    <ImageView
+        android:id="@+id/basket3"
+        android:layout_width="403dp"
+        android:layout_height="143dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.768"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.996"
+        app:srcCompat="@drawable/basket" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
