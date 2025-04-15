@@ -143,7 +143,7 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     private void initIngredientViews(){
-        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(ingredientInventory.max_cap);
+        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(ingredientInventory.maxCap);
         Log.d("GameDebug", "Initial ingredients: " + initialList.size()); // Should be 3
         ingredientInventory.setInitialList(initialList);
         updateInventoryUI();

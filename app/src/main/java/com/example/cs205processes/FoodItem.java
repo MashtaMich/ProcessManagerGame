@@ -1,6 +1,6 @@
 package com.example.cs205processes;
 
-public abstract class FoodItem {
+public class FoodItem {
     protected int id;
     protected String name;
     protected int iconResourceId;

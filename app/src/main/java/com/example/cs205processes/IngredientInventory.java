@@ -7,8 +7,8 @@ import java.util.List;
 
 public class IngredientInventory {
     private static final String TAG = "Ingredient Inventory";
-    int max_cap=3;
-    private List<Ingredient> heldIngredients=new ArrayList<>(max_cap);
+    int maxCap=3;
+    private List<Ingredient> heldIngredients=new ArrayList<>(maxCap);
 
     public List<Ingredient> getHeld(){
         return this.heldIngredients;
