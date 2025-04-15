@@ -31,19 +31,18 @@ public class Game {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
         int TILES_PER_ROW = 13;
-        int TILES_PER_COL = 19;
 
 
         // Use smaller dimension to calculate tile size
-        TILE_SIZE = 100;
+        TILE_SIZE = (int)Math.ceil(Math.min(screenWidth, screenHeight) / (double)TILES_PER_ROW);
 
         // Scale player to 1 tile
         Bitmap rawPlayer = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
         playerBitmap = Bitmap.createScaledBitmap(rawPlayer, TILE_SIZE, TILE_SIZE, true);
 
         // Load map and scale it to 13x13 tiles
-        Bitmap rawMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.kitchen);
-        mapBitmap = Bitmap.createScaledBitmap(rawMap, TILE_SIZE * TILES_PER_ROW, TILE_SIZE * TILES_PER_COL, true);
+        Bitmap rawMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.cookhouse);
+        mapBitmap = Bitmap.createScaledBitmap(rawMap, TILE_SIZE * 13, TILE_SIZE * 13, true);
 
         // Initial player position (top-left tile)
         playerX = TILE_SIZE;

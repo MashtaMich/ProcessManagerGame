@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public class Process {
     private static final String TAG = "Process";
+    private static final long TIME_INTERVAL_MS = 1000; // 1 second interval
 
     private final String id;
     private final String name;
@@ -16,6 +17,9 @@ public class Process {
     private boolean isDead;
     private final Recipe recipe;
     private final Object mutex = new Object();
+
+    private final ElapsedTimer elapsedTimer = new ElapsedTimer();
+    private final DeltaStepper timeStepper;
 
     private static final String[] CUSTOMER_NAMES = {
             "Customer A", "Customer B", "Customer C"
@@ -30,6 +34,9 @@ public class Process {
         this.isComplete = false;
         this.isDead = false;
 
+        // Initialize the DeltaStepper with our time update logic
+        this.timeStepper = new DeltaStepper(TIME_INTERVAL_MS, this::timeStep);
+
         Log.d(TAG, "New process created: " + name + ", Recipe: " + recipe.getName() + ", Time: " + timeLimit + "s");
     }
 
@@ -40,11 +47,11 @@ public class Process {
         return new Process(randomRecipe, randomTime);
     }
 
-    public void updateTime(int secondsElapsed) {
+    // This is called by the DeltaStepper
+    private boolean timeStep(long deltaTime) {
         synchronized (mutex) {
-            // Only update if not complete and not dead
             if (!isComplete && !isDead) {
-                timeRemaining -= secondsElapsed;
+                timeRemaining -= 1; // Decrement by 1 second
 
                 // Check for death
                 if (timeRemaining <= 0) {
@@ -53,6 +60,15 @@ public class Process {
                     Log.d(TAG, "Process died: " + name);
                 }
             }
+        }
+        return true; // Continue processing time steps
+    }
+
+    // This will be called from GameManager
+    public void updateTime() {
+        long delta = elapsedTimer.progress();
+        if (delta > 0) {
+            timeStepper.update(delta);
         }
     }
 
