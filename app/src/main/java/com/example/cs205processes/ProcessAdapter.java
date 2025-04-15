@@ -1,25 +1,22 @@
 package com.example.cs205processes;
 
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * ProcessAdapter Class handles only the UI related to the list of processes
- */
 public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessViewHolder> {
     private static final String TAG = "ProcessAdapter";
 
@@ -40,14 +37,13 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
     @NonNull
     @Override
     public ProcessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view /* represents one process item */ = LayoutInflater.from(context).inflate(R.layout.item_process_compact, parent, false); // gets an object that can turn XML into View objects
+        View view = LayoutInflater.from(context).inflate(R.layout.item_process_compact, parent, false);
         return new ProcessViewHolder(view);
     }
 
-    // this method is called by RecyclerView every time a view needs to be shown or reused
     @Override
     public void onBindViewHolder(@NonNull ProcessViewHolder holder, int position) {
-        Process process = processes.get(position); // get it at this position in the list
+        Process process = processes.get(position);
         holder.bind(process);
     }
 
@@ -56,41 +52,27 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
         return processes.size();
     }
 
-    /**
-     * Updates the process list efficiently
-     */
     public void updateProcesses(List<Process> newProcesses) {
-        // Simple approach: clear and add all
         this.processes.clear();
         this.processes.addAll(newProcesses);
-
-        // Notify adapter that all items may have changed
         notifyDataSetChanged();
     }
 
-    /*
-     * ViewHolder is a helper class that helps to hold the views of one item and is created once and reused by the RecyclerView
-     */
     class ProcessViewHolder extends RecyclerView.ViewHolder {
-        private TextView processNameTextView;
         private TextView timeRemainingTextView;
         private ProgressBar timeProgressBar;
-        private Button completeButton;
         private LinearLayout ingredientsContainer;
+        private CardView cardView;
 
         public ProcessViewHolder(@NonNull View itemView) {
             super(itemView);
-            processNameTextView = itemView.findViewById(R.id.processNameTextView);
+            cardView = (CardView) itemView;
             timeRemainingTextView = itemView.findViewById(R.id.timeRemainingTextView);
             timeProgressBar = itemView.findViewById(R.id.timeProgressBar);
-            completeButton = itemView.findViewById(R.id.completeButton);
             ingredientsContainer = itemView.findViewById(R.id.ingredientsContainer);
         }
 
         public void bind(final Process process) {
-            // Set compact display data
-            processNameTextView.setText(process.getName());
-
             // Update time display
             int timeRemaining = process.getTimeRemaining();
             timeRemainingTextView.setText(timeRemaining + "s");
@@ -99,31 +81,24 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
             timeProgressBar.setMax(process.getTimeLimit());
             timeProgressBar.setProgress(timeRemaining);
 
+            // Update card color based on process state
+            updateCardBackgroundColor(process);
+
             // Set progress bar color based on time remaining
             updateProgressBarColor(process);
 
-            // Set button state
-            completeButton.setEnabled(!process.isComplete() && !process.isDead());
+            // Display tiny ingredient icons
+            displayTinyIngredientIcons(process);
+        }
 
+        private void updateCardBackgroundColor(Process process) {
             if (process.isComplete()) {
-                completeButton.setText("✓"); // Checkmark for completed
-                completeButton.setBackgroundResource(R.drawable.button_completed);
+                cardView.setCardBackgroundColor(Color.parseColor("#E8F5E9")); // Light green
             } else if (process.isDead()) {
-                completeButton.setText("✗"); // X mark for failed
-                completeButton.setBackgroundResource(R.drawable.button_failed);
+                cardView.setCardBackgroundColor(Color.parseColor("#FFEBEE")); // Light red
             } else {
-                completeButton.setText("◉"); // Circle for active
-                completeButton.setBackgroundResource(R.drawable.button_normal);
+                cardView.setCardBackgroundColor(Color.WHITE);
             }
-
-            completeButton.setOnClickListener(v -> {
-                if (listener != null && !process.isComplete() && !process.isDead()) {
-                    listener.onCompleteButtonClicked(process);
-                }
-            });
-
-            // Display recipe ingredients in compact form
-            displayIngredients(process);
         }
 
         private void updateProgressBarColor(Process process) {
@@ -139,19 +114,17 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
             }
         }
 
-        private void displayIngredients(Process process) {
+        private void displayTinyIngredientIcons(Process process) {
             ingredientsContainer.removeAllViews();
 
-            // Display only icons in compact form
+            // Show tiny icons in a row
             for (Ingredient ingredient : process.getRecipe().getIngredients()) {
                 ImageView ingredientIcon = new ImageView(context);
                 ingredientIcon.setImageResource(ingredient.getIconResourceId());
                 ingredientIcon.setContentDescription(ingredient.getName());
 
-                // Set a small fixed size
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        80, 80 // Smaller fixed size in pixels
-                );
+                // Set tiny size for the icons
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(24, 24);
                 params.setMargins(2, 0, 2, 0);
                 ingredientIcon.setLayoutParams(params);
 

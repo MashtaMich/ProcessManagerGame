@@ -41,7 +41,7 @@ public class Game {
         playerBitmap = Bitmap.createScaledBitmap(rawPlayer, TILE_SIZE, TILE_SIZE, true);
 
         // Load map and scale it to 13x13 tiles
-        Bitmap rawMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.kitchen);
+        Bitmap rawMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.cookhouse);
         mapBitmap = Bitmap.createScaledBitmap(rawMap, TILE_SIZE * 13, TILE_SIZE * 13, true);
 
         // Initial player position (top-left tile)
