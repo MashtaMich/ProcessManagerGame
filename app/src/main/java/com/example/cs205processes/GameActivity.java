@@ -5,6 +5,7 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
@@ -26,7 +27,7 @@ import java.util.List;
 public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
         ProcessAdapter.OnProcessInteractionListener,
-        IngredientFetchWorker.ingredientFetchListener{
+        IngredientFetchWorker.ingredientFetchListener {
 
     private static final String TAG = "GameActivity";
     private MediaPlayer mediaPlayer;
@@ -35,7 +36,6 @@ public class GameActivity extends AppCompatActivity implements
     private RecyclerView processRecyclerView;
     private TextView scoreTextView;
     private TextView deadProcessCountTextView;
-    private TextView queueSizeTextView;
 
     private GameView gameView;
     private Game game;
@@ -45,18 +45,16 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> availableIngredientsViews;
     private LinearLayout swapOptionsLayout;
 
-    private List<ImageView> basketViews;
-
     private IngredientFetchWorker ingredientFetcher;
     private Inventory inventory;
     View ingredientBlocker;
-    private int selectedIngredientIndex=-1;
-    private int selectedSwapIndex=-1;
-
+    private int selectedIngredientIndex = -1;
+    private int selectedSwapIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_game);
         mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
         mediaPlayer.setLooping(true); // Enable looping
@@ -64,67 +62,54 @@ public class GameActivity extends AppCompatActivity implements
         hideSystemUI();
 
         try {
-            // 🌟 Init GameView + Game logic
+            // Initialize GameView + Game logic
             gameView = findViewById(R.id.gameView);
             game = new Game(gameView, this);
             gameView.init(game);
 
-            // 🌟 Hook joystick controls to movement
+            // Hook joystick controls to movement
             findViewById(R.id.btnUp).setOnClickListener(v -> game.moveUp());
             findViewById(R.id.btnDown).setOnClickListener(v -> game.moveDown());
             findViewById(R.id.btnLeft).setOnClickListener(v -> game.moveLeft());
             findViewById(R.id.btnRight).setOnClickListener(v -> game.moveRight());
 
-            // 🌟 Init RecyclerView + Stats UI
-            processRecyclerView = findViewById(R.id.processRecyclerView);
+            // Initialize stats display in the new top-right corner container
             scoreTextView = findViewById(R.id.scoreTextView);
             deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
-            queueSizeTextView = findViewById(R.id.queueSizeTextView);
 
+            // Set up process list with compact cards in a horizontal layout
+            processRecyclerView = findViewById(R.id.processRecyclerView);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             processRecyclerView.setLayoutManager(layoutManager);
             processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
             processRecyclerView.setAdapter(processAdapter);
 
-            //Init inventory Views
-            ingredientFetcher=new IngredientFetchWorker();
-            inventory =new Inventory();
+            // Initialize inventory views
+            ingredientFetcher = new IngredientFetchWorker();
+            inventory = new Inventory();
             inventoryViews = new ArrayList<>(List.of(
                     findViewById(R.id.ingredientSlot1),
                     findViewById(R.id.ingredientSlot2),
                     findViewById(R.id.ingredientSlot3)
             ));
-            availableIngredientsViews=new ArrayList<>(List.of(
+            availableIngredientsViews = new ArrayList<>(List.of(
                     findViewById(R.id.swapOption1),
                     findViewById(R.id.swapOption2)
             ));
             swapOptionsLayout = findViewById(R.id.swapOptionsLayout);
-            ingredientBlocker=findViewById(R.id.ingredientBlockerOverlay);
-
-            basketViews = new ArrayList<>(List.of(
-                    findViewById(R.id.basket1),
-                    findViewById(R.id.basket2),
-                    findViewById(R.id.basket3)
-            ));
-
+            ingredientBlocker = findViewById(R.id.ingredientBlockerOverlay);
             initIngredientViews();
 
-            // 🌟 Init GameManager
+            // Initialize GameManager
             gameManager = new GameManager(this, this);
             gameManager.startGame();
 
+            // Set initial values for stats displays
             updateScoreDisplay(0);
             updateDeadProcessCountDisplay(0);
-            updateQueueSizeDisplay(0);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing views: " + e.getMessage());
             e.printStackTrace();
-        }
-    }
-
-    private void updateQueueSizeDisplay(int queueSize) {
-        if (queueSizeTextView != null) {
-            queueSizeTextView.setText(getString(R.string.queue_size_format, queueSize));
         }
     }
 
@@ -140,181 +125,88 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    private void initIngredientViews(){
-        List<Ingredient> initialList=ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
-        Log.d("GameDebug", "Initial ingredients: " + initialList.size()); // Should be 3
+    private void initIngredientViews() {
+        List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(inventory.max_cap);
         inventory.setInitialList(initialList);
         updateInventoryUI();
         updateAvailableUI();
     }
 
-    private void updateAvailableUI(){
+    private void updateAvailableUI() {
         List<Ingredient> swappableIngredients = ingredientFetcher.getAvailableList();
-        for (int i=0;i<availableIngredientsViews.size();i++){
+        for (int i = 0; i < availableIngredientsViews.size(); i++) {
             final int index = i;
-            ImageView avIngView=availableIngredientsViews.get(i);
+            ImageView avIngView = availableIngredientsViews.get(i);
             avIngView.setImageResource(swappableIngredients.get(i).getIconResourceId());
             avIngView.setBackgroundResource(R.drawable.swap_options_normal);
-            avIngView.setOnClickListener(v->{
-                if (selectedIngredientIndex!=-1){
+            avIngView.setOnClickListener(v -> {
+                if (selectedIngredientIndex != -1) {
                     List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
-                    Ingredient dropIngredient=inventory.getByIndex(selectedIngredientIndex);
+                    Ingredient dropIngredient = inventory.getByIndex(selectedIngredientIndex);
                     availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
-                    selectedSwapIndex=index;
-                    for (View imageView:availableIngredientsViews){
+                    selectedSwapIndex = index;
+                    for (View imageView : availableIngredientsViews) {
                         imageView.setEnabled(false);
                     }
-                    for (View imageView:inventoryViews){
+                    for (View imageView : inventoryViews) {
                         imageView.setEnabled(false);
                     }
                     ingredientBlocker.setVisibility(VISIBLE);
-                    ingredientFetcher.exchangeIngredient(dropIngredient,swapOptions.get(index), this);
+                    ingredientFetcher.exchangeIngredient(dropIngredient, swapOptions.get(index), this);
                 }
             });
         }
     }
 
-private void updateInventoryUI() {
-    try {
+    private void updateInventoryUI() {
         List<Ingredient> invHeld = inventory.getHeld();
-        Log.d("GameDebug", "Running updateInventoryUI() with size = " + invHeld.size());
-
-        updateInventoryIcons(invHeld);
-        updateBasketIcons(invHeld);
-        setupInventoryClickListeners(invHeld);
-
-        Log.d("GameDebug", "Finished updateInventoryUI()");
-    } catch (Exception e) {
-        Log.e("GameDebug", "Error in updateInventoryUI: " + e.getMessage(), e);
-    }
-}
-
-private void updateInventoryIcons(List<Ingredient> invHeld) {
-    for (int i = 0; i < inventoryViews.size(); i++) {
-        if (i >= invHeld.size()) break; // Prevent crash
-        inventoryViews.get(i).setImageResource(invHeld.get(i).getIconResourceId());
-        inventoryViews.get(i).setBackgroundResource(R.drawable.inventory_slot_normal);
-    }
-}
-private void updateBasketIcons(List<Ingredient> invHeld) {
-    for (int i = 0; i < basketViews.size(); i++) {
-        if (i >= invHeld.size()) {
-            // Prevent crash
-            Log.d("GameDebug", "Skipping basket index " + i + " due to missing ingredient");
-            continue;
-        }
-
-        Ingredient ingredient = invHeld.get(i);
-        Log.d("GameDebug", "Updating basket " + i + " with " + ingredient.getName());
-
-        int resId;
-        Log.d("BasketUpdate", "Ingredient: " + ingredient.getName());
-        switch (ingredient.getName()) {
-            case "carrot":
-                resId = R.drawable.carrot_basket; break;
-            case "potato":
-                resId = R.drawable.potato_basket; break;
-            case "onion":
-                resId = R.drawable.onion_basket; break;
-            case "cabbage":
-                resId = R.drawable.cabbage_basket; break;
-            case "tomato":
-                resId = R.drawable.tomato_basket; break;
-            default:
-                Log.d("BasketUpdate", "SHOWING EMPTY BASKET");
-                resId = R.drawable.basket; break;
-        }
-
-        basketViews.get(i).setImageResource(resId);
-
-    }
-}
-private void setupInventoryClickListeners(List<Ingredient> invHeld) {
-    for (int i = 0; i < inventoryViews.size(); i++) {
-        if (i >= invHeld.size()) continue;
-
-        final int index = i;
-        ImageView invView = inventoryViews.get(i);
-        Log.d("GameDebug", "Setting listener for inventory index " + i + " (" + invHeld.get(i).getName() + ")");
-
-        invView.setOnClickListener(v -> {
-            Log.d("GameDebug", "Clicked inventory index: " + index);
-            if (selectedIngredientIndex == index) {
-                selectedIngredientIndex = -1;
-                swapOptionsLayout.setVisibility(INVISIBLE);
-                inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
-                disableAll(availableIngredientsViews);
-            } else {
-                if (selectedIngredientIndex!=-1){
-                    inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+        for (int i = 0; i < inventoryViews.size(); i++) {
+            final int index = i;
+            ImageView invView = inventoryViews.get(i);
+            invView.setImageResource(invHeld.get(i).getIconResourceId());
+            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
+            invView.setOnClickListener(v -> {
+                if (selectedIngredientIndex == index) {
+                    selectedIngredientIndex = -1;
+                    swapOptionsLayout.setVisibility(INVISIBLE);
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
+                    for (View imageView : availableIngredientsViews) {
+                        imageView.setEnabled(false);
+                    }
+                } else {
+                    if (selectedIngredientIndex != -1) {
+                        inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
+                    }
+                    selectedIngredientIndex = index;
+                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
+                    swapOptionsLayout.setVisibility(VISIBLE);
+                    for (View imageView : availableIngredientsViews) {
+                        imageView.setEnabled(true);
+                    }
                 }
-                selectedIngredientIndex = index;
-                inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
-                swapOptionsLayout.setVisibility(VISIBLE);
-                enableAll(availableIngredientsViews);
-            }
-        });
+            });
+        }
     }
-}
-private void enableAll(List<? extends View> views) {
-    for (View v : views) v.setEnabled(true);
-}
-
-private void disableAll(List<? extends View> views) {
-    for (View v : views) v.setEnabled(false);
-}
-
-//    private void updateInventoryUI(){
-//        List<Ingredient> invHeld=inventory.getHeld();
-//        for (int i=0;i<inventoryViews.size();i++){
-//            final int index = i;
-//            ImageView invView=inventoryViews.get(i);
-//            invView.setImageResource(invHeld.get(i).getIconResourceId());
-//            invView.setBackgroundResource(R.drawable.inventory_slot_normal);
-//            invView.setOnClickListener(v->{
-//                if (selectedIngredientIndex==index){
-//                    selectedIngredientIndex=-1;
-//                    swapOptionsLayout.setVisibility(INVISIBLE);
-//                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_normal);
-//                    for (View imageView:availableIngredientsViews){
-//                        imageView.setEnabled(false);
-//                    }
-//                }else{
-//                    selectedIngredientIndex = index;
-//                    inventoryViews.get(index).setBackgroundResource(R.drawable.inventory_slot_selected);
-//                    swapOptionsLayout.setVisibility(VISIBLE);
-//                    for (View imageView:availableIngredientsViews){
-//                        imageView.setEnabled(true);
-//                    }
-//                }
-//            });
-//        }
-//    }
 
     @Override
-    public void receiveNewIngredient(Ingredient newIngredient){
-        runOnUiThread(()->{
-            if (newIngredient!=null){
-                inventory.swapIngredientAtIndex(selectedIngredientIndex,newIngredient);
+    public void receiveNewIngredient(Ingredient newIngredient) {
+        runOnUiThread(() -> {
+            if (newIngredient != null) {
+                inventory.swapIngredientAtIndex(selectedIngredientIndex, newIngredient);
             }
-            Log.d("GameDebug", "Calling updateInventoryUI()");
             updateInventoryUI();
-            Log.d("GameDebug", "Completed updateInventoryUI()");
-
             updateAvailableUI();
             inventoryViews.get(selectedIngredientIndex).setBackgroundResource(R.drawable.inventory_slot_normal);
             availableIngredientsViews.get(selectedSwapIndex).setBackgroundResource(R.drawable.swap_options_normal);
-            selectedSwapIndex=-1;
-            selectedIngredientIndex=-1;
-            for (View imageView:inventoryViews){
+            selectedSwapIndex = -1;
+            selectedIngredientIndex = -1;
+            for (View imageView : inventoryViews) {
                 imageView.setEnabled(true);
             }
             ingredientBlocker.setVisibility(GONE);
             swapOptionsLayout.setVisibility(INVISIBLE);
         });
     }
-
-
 
     @Override
     protected void onPause() {
@@ -336,6 +228,7 @@ private void disableAll(List<? extends View> views) {
         if (mediaPlayer != null) {
             mediaPlayer.start(); // Resume playing if it was paused
         }
+        hideSystemUI(); // Re-hide system UI when resuming
     }
 
     @Override
@@ -350,9 +243,46 @@ private void disableAll(List<? extends View> views) {
         }
     }
 
-    @Override
-    public void onQueueChanged(int queueSize) {
-        runOnUiThread(() -> updateQueueSizeDisplay(queueSize));
+    private void hideSystemUI() {
+        WindowInsetsController controller = getWindow().getInsetsController();
+        if (controller != null) {
+            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+        }
+    }
+
+    private void updateMediaPlaybackSpeed(int deadProcessCount) {
+        if (deadProcessCount >= 3) {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop(); // Stop the music
+                mediaPlayer.reset(); // Reset the MediaPlayer to prepare for reuse if needed
+                mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
+                mediaPlayer.start(); // Start playing the audio
+            }
+            return; // Exit the method
+        }
+
+        float speed;
+        switch (deadProcessCount) {
+            case 0:
+                speed = 1.0f; // 0/3 speed
+                break;
+            case 1:
+                speed = 2.0f; // 1/3 speed
+                break;
+            case 2:
+                speed = 3.0f; // 2/3 speed
+                break;
+            default:
+                speed = 1.0f; // Fallback (should not occur)
+                break;
+        }
+
+        if (mediaPlayer != null) {
+            PlaybackParams playbackParams = new PlaybackParams();
+            playbackParams.setSpeed(speed);
+            mediaPlayer.setPlaybackParams(playbackParams);
+            Log.d(TAG, "Playback speed updated to: " + speed);
+        }
     }
 
     @Override
@@ -393,50 +323,10 @@ private void disableAll(List<? extends View> views) {
             }
         });
     }
-    private void hideSystemUI() {
-        WindowInsetsController controller = getWindow().getInsetsController();
-        if (controller != null) {
-            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-        }
-    }
-    private void updateMediaPlaybackSpeed(int deadProcessCount) {
-        if (deadProcessCount >= 3) {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop(); // Stop the music
-                mediaPlayer.reset(); // Reset the MediaPlayer to prepare for reuse if needed
-                mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
-                mediaPlayer.start(); // Start playing the audio
-            }
-            return; // Exit the method
-        }
-
-        float speed;
-        switch (deadProcessCount) {
-            case 0:
-                speed = 1.0f; // 0/3 speed
-                break;
-            case 1:
-                speed = 2.0f; // 1/3 speed
-                break;
-            case 2:
-                speed = 3.0f; // 2/3 speed
-                break;
-            default:
-                speed = 1.0f; // Fallback (should not occur)
-                break;
-        }
-
-        if (mediaPlayer != null) {
-            PlaybackParams playbackParams = new PlaybackParams();
-            playbackParams.setSpeed(speed);
-            mediaPlayer.setPlaybackParams(playbackParams);
-            Log.d(TAG, "Playback speed updated to: " + speed);
-        }
-    }
 
     @Override
     public void onProcessAboutToDie(Process process) {
-        // Optional: vibration is already handled by GameManager
+        // Handled by GameManager (vibration)
     }
 
     @Override
@@ -459,6 +349,7 @@ private void disableAll(List<? extends View> views) {
             }
         });
     }
+
     private void saveHighScore(int score) {
         SharedPreferences sharedPreferences = getSharedPreferences("MyGamePrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -466,17 +357,12 @@ private void disableAll(List<? extends View> views) {
         // Retrieve the current high score
         int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE); // Use Integer.MIN_VALUE as the default
 
-        // Check if the score is negative and if the current high score is the default
-        if (score < 0 && highScore == Integer.MIN_VALUE) {
-            // Store the negative score as high score
-            editor.putInt("highScore", score);
-            editor.apply();
-        } else if (score > highScore) {
-            // Update high score if the new score is greater
+        if (score > highScore) {
             editor.putInt("highScore", score);
             editor.apply();
         }
     }
+
     @Override
     public void onCompleteButtonClicked(Process process) {
         if (gameManager != null) {

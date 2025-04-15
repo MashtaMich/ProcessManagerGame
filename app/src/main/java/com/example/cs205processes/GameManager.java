@@ -8,15 +8,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 
 public class GameManager {
     private static final String TAG = "GameManager";
     private static final int POINTS_PER_COMPLETED_PROCESS = 100;
-    private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 500;
+    private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 300;
     private static final int MAX_DEAD_PROCESSES = 3;
     private static final int TIMER_INTERVAL_MS = 16; // Update more frequently for smoother animation (~60 FPS)
     private static final int MAX_ACTIVE_PROCESSES = 5; // Maximum number of active processes
@@ -30,7 +28,6 @@ public class GameManager {
 
     // Process collections
     private final List<Process> activeProcesses;
-    private final Queue<Process> processQueue; // Queue for pending processes
     private final List<Process> pendingRemovals;
 
     private final List<Recipe> availableRecipes;
@@ -53,14 +50,13 @@ public class GameManager {
         void onScoreChanged(int newScore);
         void onGameOver(int finalScore);
         void onTimerTick(); // Notify UI of every timer tick
-        void onQueueChanged(int queueSize); // Notify about changes in the queue
+
     }
 
     public GameManager(Context context, GameListener listener) {
         this.context = context;
         this.gameListener = listener;
         this.activeProcesses = new ArrayList<>();
-        this.processQueue = new LinkedList<>();
         this.pendingRemovals = new ArrayList<>();
         this.availableRecipes = Recipe.getDefaultRecipes();
         this.score = 0;
@@ -93,7 +89,6 @@ public class GameManager {
         // Clear any existing processes
         synchronized (mutex) {
             activeProcesses.clear();
-            processQueue.clear();
             pendingRemovals.clear();
         }
 
@@ -131,33 +126,6 @@ public class GameManager {
 
                 if (gameListener != null) {
                     gameListener.onProcessAdded(newProcess);
-                }
-            } else {
-                // Otherwise, add to the queue
-                processQueue.add(newProcess);
-                Log.d(TAG, "New process added to queue: " + newProcess.getName() +
-                        ", Queue size: " + processQueue.size());
-
-                if (gameListener != null) {
-                    gameListener.onQueueChanged(processQueue.size());
-                }
-            }
-        }
-    }
-
-    private void checkProcessQueue() {
-        synchronized (mutex) {
-            // Check if we can move processes from queue to active
-            while (!processQueue.isEmpty() && activeProcesses.size() < MAX_ACTIVE_PROCESSES) {
-                Process process = processQueue.poll();
-                activeProcesses.add(process);
-
-                Log.d(TAG, "Process moved from queue to active: " + process.getName() +
-                        ", Queue size: " + processQueue.size());
-
-                if (gameListener != null) {
-                    gameListener.onProcessAdded(process);
-                    gameListener.onQueueChanged(processQueue.size());
                 }
             }
         }
@@ -227,9 +195,6 @@ public class GameManager {
 
         // Now handle any pending removals
         handlePendingRemovals();
-
-        // Check if we can add processes from the queue
-        checkProcessQueue();
     }
 
     private void handleDeadProcess(Process process) {
@@ -237,6 +202,7 @@ public class GameManager {
 
         deadProcessCount++;
         score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
+        if (score < 0) score = 0;
 
         // Add to pending removals
         synchronized (mutex) {
@@ -359,13 +325,6 @@ public class GameManager {
         }
         return processesCopy;
     }
-
-    public int getQueueSize() {
-        synchronized (mutex) {
-            return processQueue.size();
-        }
-    }
-
     public int getScore() {
         return score;
     }
