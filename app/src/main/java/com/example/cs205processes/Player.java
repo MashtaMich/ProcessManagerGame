@@ -11,12 +11,6 @@ public class Player {
         this.y = y;
         this.sprite = null; // Load later
     }
-
-    public void moveUp(int tileSize)    { y -= tileSize; }
-    public void moveDown(int tileSize)  { y += tileSize; }
-    public void moveLeft(int tileSize)  { x -= tileSize; }
-    public void moveRight(int tileSize) { x += tileSize; }
-
     public float getX() { return x; }
     public float getY() { return y; }
 
@@ -30,4 +24,14 @@ public class Player {
         float dy = Math.abs(y - obj.y);
         return dx < tileSize && dy < tileSize;
     }
+
+    public void tryMove(int dx, int dy, int tileSize, Game game) {
+        float nextX = x + dx * tileSize;
+        float nextY = y + dy * tileSize;
+        if (game.canMoveTo(nextX, nextY)) {
+            x = nextX;
+            y = nextY;
+        }
+    }
+
 }

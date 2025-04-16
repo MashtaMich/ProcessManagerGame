@@ -73,6 +73,11 @@ public class GameActivity extends AppCompatActivity implements
             hideSystemUI();
             initializeGameComponents();
 
+            //Interact Button
+            Button interactButton = findViewById(R.id.interactButton);
+            interactButton.setOnClickListener(v -> game.interact());
+
+
             // Link buttons
             Button togglePauseButton = findViewById(R.id.togglePauseButton);
             togglePauseButton.setText("Pause"); // Default state

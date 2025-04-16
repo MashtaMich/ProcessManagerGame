@@ -290,7 +290,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/basket3"
         app:layout_constraintStart_toEndOf="@+id/basket3" />
 
-
+    <!-- Pause Button -->
     <Button
         android:id="@+id/togglePauseButton"
         android:layout_width="79dp"
@@ -303,5 +303,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022" />
+    <!-- Interact Button. Adjust location using marginEnd for xpos and marginBottom for ypos -->
+    <Button
+        android:id="@+id/interactButton"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="Interact"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/purple_200"
+        android:textColor="@android:color/white"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

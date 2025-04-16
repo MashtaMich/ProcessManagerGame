@@ -179,10 +179,8 @@ public class Game {
         return 16;
     }
 
-    public void moveUp()    { player.moveUp(TILE_SIZE); }
-    public void moveDown()  { player.moveDown(TILE_SIZE); }
-    public void moveLeft()  { player.moveLeft(TILE_SIZE); }
-    public void moveRight() { player.moveRight(TILE_SIZE); }
+
+
 
     public void interact() {
         for (Interactable obj : interactables) {
@@ -191,5 +189,19 @@ public class Game {
                 break;
             }
         }
+    }
+
+    //Player movement
+    public void moveUp()    { player.tryMove(0, -1, TILE_SIZE, this); }
+    public void moveDown()  { player.tryMove(0, 1, TILE_SIZE, this); }
+    public void moveLeft()  { player.tryMove(-1, 0, TILE_SIZE, this); }
+    public void moveRight() { player.tryMove(1, 0, TILE_SIZE, this); }
+    public boolean canMoveTo(float nextX, float nextY) {
+        for (Interactable obj : interactables) {
+            if (obj.x == nextX && obj.y == nextY) {
+                return false; // blocked
+            }
+        }
+        return true;
     }
 }
