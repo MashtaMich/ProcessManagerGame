@@ -96,7 +96,7 @@ public class Game {
                         if (val == 2) {  // 2 = spawn tile
                             int col = j % mapWidth;
                             int row = j / mapWidth;
-                            player = new Player(col * TILE_SIZE, row * TILE_SIZE);
+                            player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this);
                         }
                     }
                 } //building object layer
@@ -152,7 +152,7 @@ public class Game {
     public void draw() {
         gameView.useCanvas(canvas -> {
             canvas.drawColor(0xFFFFFFFF);
-
+            //draw floor
             if (tileLayer != null) {
                 for (int y = 0; y < mapHeight; y++) {
                     for (int x = 0; x < mapWidth; x++) {
@@ -165,21 +165,24 @@ public class Game {
                 }
             }
 
+            //draw interactables
             for (Interactable obj : interactables) {
                 obj.draw(canvas, paint, TILE_SIZE);
             }
 
-            canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
+            //draw player
+            player.draw(canvas, paint, TILE_SIZE);
+            //canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
         });
     }
 
-    public void update() {}
+    public void update() {
+        player.update();
+    }
 
     public long getSleepTime() {
         return 16;
     }
-
-
 
 
     public void interact() {
@@ -191,11 +194,16 @@ public class Game {
         }
     }
 
+
+    public Player getPlayer() {
+        return player;
+    }
+
     //Player movement
-    public void moveUp()    { player.tryMove(0, -1, TILE_SIZE, this); }
-    public void moveDown()  { player.tryMove(0, 1, TILE_SIZE, this); }
-    public void moveLeft()  { player.tryMove(-1, 0, TILE_SIZE, this); }
-    public void moveRight() { player.tryMove(1, 0, TILE_SIZE, this); }
+    public void moveUp()    { player.move(0, -1); }
+    public void moveDown()  { player.move(0, 1); }
+    public void moveLeft()  { player.move(-1, 0); }
+    public void moveRight() { player.move(1, 0); }
     public boolean canMoveTo(float nextX, float nextY) {
         for (Interactable obj : interactables) {
             if (obj.x == nextX && obj.y == nextY) {
