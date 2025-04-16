@@ -518,7 +518,7 @@ public class GameActivity extends AppCompatActivity implements
                 updatePlayerInventoryView();
                 potView.setImageResource(R.drawable.empty_pot);
                 Log.d(TAG,"got:"+playerInventory.getHeld().getName());
-            }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook()){
+            }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
                 potFunctions.addIngredient((Ingredient) playerInventory.giveItem());
                 updatePlayerInventoryView();
                 Log.d(TAG,"potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
@@ -692,7 +692,7 @@ public class GameActivity extends AppCompatActivity implements
         runOnUiThread(() -> {
             if (cookedFood!=null){
                 ImageView potFinished=potViews.get(index);
-                potFinished.setImageResource(R.drawable.pot_finished_placeholder);
+                potFinished.setImageResource(R.drawable.pot_finished);
                 potFinished.setEnabled(true);
             }
         });
