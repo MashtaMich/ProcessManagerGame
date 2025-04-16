@@ -1,100 +1,71 @@
 package com.example.cs205processes;
 
+import android.content.Context;
+import android.graphics.*;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONObject;
 
-public class Pot {
-    private final String TAG="Pot";
-    private final List<Ingredient> ingredientsInside;
-    private CookedFood foodDone;
-    private final int maxIngredients;
-    private boolean readyToCook;
-    private final int cookTime=3000;
-    private final Object foodDoneLock = new Object();// to sync available list
-    private final Object ingredientLock=new Object();//ingredient lock
+public class Pot extends Interactable {
+    private enum State { EMPTY, COOKING, DONE }
+    private State state;
+    private Bitmap emptySprite, cookingSprite, doneSprite;
+    private long cookingStartTime;
+    private int cookingDuration = 3000; // ms
 
-    public interface PotListener{
-        void cookIngredientsUpdate(CookedFood foodCooked,int index);
-        void potProgressUpdate(int progress);
-    }
+    public Pot(Context context, float x, float y, JSONObject props) {
+        this.x = x;
+        this.y = y;
 
-    public Pot(){
-        this.ingredientsInside=new ArrayList<>();
-        this.maxIngredients=3;
-        this.readyToCook=false;
-        this.foodDone=null;
-    }
+        try {
+            this.state = State.valueOf(props.optString("state", "empty").toUpperCase());
+            this.cookingDuration = props.optInt("cooking_time", 3000);
 
-    public List<Ingredient> getIngredientsInside(){
-        synchronized (ingredientLock) {
-            return new ArrayList<>(ingredientsInside); // return a copy to avoid concurrency issues
+            emptySprite = loadSprite(context, props.getString("empty_sprite"));
+            cookingSprite = loadSprite(context, props.getString("cooking_sprite"));
+            doneSprite = loadSprite(context, props.getString("done_sprite"));
+
+
+            updateSprite();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public CookedFood getFood(){
-        synchronized (foodDoneLock) {
-            if (this.foodDone != null) {
-                CookedFood food = this.foodDone;
-                this.foodDone = null;
-                return food;
-            }
-            return null;
+    @Override
+    public void onInteract(Player player) {
+        switch (state) {
+            case EMPTY:
+                state = State.COOKING;
+                cookingStartTime = System.currentTimeMillis();
+                updateSprite();
+                break;
+            case DONE:
+                state = State.EMPTY;
+                updateSprite();
+                break;
         }
     }
 
-    public void addIngredient(Ingredient ingredient){
-        synchronized (ingredientLock) {
-            ingredientsInside.add(ingredient);
-            readyToCook = ingredientsInside.size() == maxIngredients;
+    @Override
+    public void draw(Canvas canvas, Paint paint, int TILE_SIZE) {
+        if (sprite == null) {
+            Log.e("DrawDebug", "Missing sprite for " + getClass().getSimpleName());
+            return;
+        }
+        if (state == State.COOKING && System.currentTimeMillis() - cookingStartTime >= cookingDuration) {
+            state = State.DONE;
+            updateSprite();
+        }
+        canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
+    }
+
+    private void updateSprite() {
+        switch (state) {
+            case EMPTY: sprite = emptySprite; break;
+            case COOKING: sprite = cookingSprite; break;
+            case DONE: sprite = doneSprite; break;
         }
     }
 
-    public boolean isReadyToCook(){
-        synchronized (ingredientLock) {
-            return readyToCook;
-        }
-    }
-
-    public boolean gotFood(){
-        synchronized (foodDoneLock) {
-            return foodDone != null;
-        }
-    }
-
-    public int potContainingNum(){
-        synchronized (ingredientLock) {
-            return ingredientsInside.size();
-        }
-    }
-
-    public void cookIngredients(Recipe recipe,PotListener listener,int index){
-        boolean canCook;
-        synchronized (ingredientLock) {
-            canCook = readyToCook;
-            if (canCook) {
-                readyToCook = false;
-            }
-        }
-
-        if (canCook){
-            CookedFood newFood;
-            try{
-                Thread.sleep(cookTime);
-            }catch(InterruptedException e){
-                Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
-            }
-            synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(), R.drawable.placeholder, new ArrayList<>(recipe.getIngredients()));
-                ingredientsInside.clear();
-            }
-            synchronized (foodDoneLock) {
-                this.foodDone = newFood;
-            }
-
-            listener.cookIngredientsUpdate(newFood,index);
-        }
-        listener.cookIngredientsUpdate(null,index);
-    }
 }
