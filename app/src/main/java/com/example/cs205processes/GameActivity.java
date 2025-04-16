@@ -110,12 +110,15 @@ public class GameActivity extends AppCompatActivity implements
     private void initializeGameComponents() {
             // Initialize game view and logic
             gameView = findViewById(R.id.gameView);
-
-            game = new Game(gameView, this);
+            
+            // Initialize playerInventory first
+            playerInventory = new PlayerInventory();
+            
+            // Create game with the playerInventory
+            game = new Game(gameView, this, playerInventory);
             gameView.init(game);
 
             potThreadPool=new PotThreadPool(maxPots);
-
 
             // Set up movement controls
             setupMovementControls();
@@ -214,7 +217,7 @@ public class GameActivity extends AppCompatActivity implements
             // Initialize ingredient fetcher and ingredientInventory
             ingredientFetcher = new IngredientFetchWorker();
             ingredientInventory = new IngredientInventory();
-            playerInventory=new PlayerInventory();
+            // playerInventory is already initialized in initializeGameComponents
             potFunctionsList =new ArrayList<>();
             for (int i=0;i<maxPots;i++){
                 potFunctionsList.add(new PotFunctions());
@@ -566,7 +569,7 @@ public class GameActivity extends AppCompatActivity implements
                 potView.setImageResource(R.drawable.empty_pot);
                 Log.d(TAG,"got:"+playerInventory.getHeld().getName());
             }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
-                potFunctions.addIngredient((Ingredient) playerInventory.giveItem());
+                potFunctions.addIngredient((Ingredient) playerInventory.getAndRemoveItem());
                 updatePlayerInventoryView();
                 Log.d(TAG,"potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
 
