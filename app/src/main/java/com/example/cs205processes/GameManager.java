@@ -8,25 +8,26 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 
 public class GameManager {
     private static final String TAG = "GameManager";
     private static final int POINTS_PER_COMPLETED_PROCESS = 100;
-    private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 500;
+    private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 300;
     private static final int MAX_DEAD_PROCESSES = 3;
-    private static final int TIMER_INTERVAL_MS = 1000; // 1 second interval for timer updates
+    private static final int TIMER_INTERVAL_MS = 16; // Update more frequently for smoother animation (~60 FPS)
     private static final int MAX_ACTIVE_PROCESSES = 5; // Maximum number of active processes
+
+    // Timer utilities for smooth timing
+    private final ElapsedTimer elapsedTimer = new ElapsedTimer();
+    private final DeltaStepper timerStepper;
 
     // Simple mutex for thread synchronization
     private final Object mutex = new Object();
 
     // Process collections
     private final List<Process> activeProcesses;
-    private final Queue<Process> processQueue; // Queue for pending processes
     private final List<Process> pendingRemovals;
 
     private final List<Recipe> availableRecipes;
@@ -41,9 +42,6 @@ public class GameManager {
     private final Context context;
     private final GameListener gameListener;
 
-    /*
-     * logic is in GameView Class
-     */
     public interface GameListener {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
@@ -52,14 +50,13 @@ public class GameManager {
         void onScoreChanged(int newScore);
         void onGameOver(int finalScore);
         void onTimerTick(); // Notify UI of every timer tick
-        void onQueueChanged(int queueSize); // Notify about changes in the queue
+
     }
 
     public GameManager(Context context, GameListener listener) {
         this.context = context;
         this.gameListener = listener;
         this.activeProcesses = new ArrayList<>();
-        this.processQueue = new LinkedList<>();
         this.pendingRemovals = new ArrayList<>();
         this.availableRecipes = Recipe.getDefaultRecipes();
         this.score = 0;
@@ -67,10 +64,20 @@ public class GameManager {
         this.isGameOver = false;
         this.random = new Random();
 
+        // Initialize timer stepper
+        this.timerStepper = new DeltaStepper(1000, this::tickUpdate);
+
         // Create handlers on the main thread
-        // can be used to post tasks to a specific thread
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.gameTickHandler = new Handler(Looper.getMainLooper());
+    }
+
+    // This method updates the UI every second
+    private boolean tickUpdate(long deltaTime) {
+        if (gameListener != null) {
+            gameListener.onTimerTick();
+        }
+        return true;
     }
 
     public void startGame() {
@@ -82,7 +89,6 @@ public class GameManager {
         // Clear any existing processes
         synchronized (mutex) {
             activeProcesses.clear();
-            processQueue.clear();
             pendingRemovals.clear();
         }
 
@@ -110,7 +116,7 @@ public class GameManager {
     }
 
     private void generateNewProcess() {
-        Process newProcess = Process.generateRandomProcess(availableRecipes); // gets a random recipe from available list
+        Process newProcess = Process.generateRandomProcess(availableRecipes);
 
         synchronized (mutex) {
             // Check if we can add directly to active processes
@@ -121,61 +127,38 @@ public class GameManager {
                 if (gameListener != null) {
                     gameListener.onProcessAdded(newProcess);
                 }
-            } else {
-                // Otherwise, add to the queue
-                processQueue.add(newProcess);
-                Log.d(TAG, "New process added to queue: " + newProcess.getName() +
-                        ", Queue size: " + processQueue.size());
-
-                if (gameListener != null) {
-                    gameListener.onQueueChanged(processQueue.size());
-                }
-            }
-        }
-    }
-
-    private void checkProcessQueue() {
-        synchronized (mutex) {
-            // Check if we can move processes from queue to active
-            while (!processQueue.isEmpty() && activeProcesses.size() < MAX_ACTIVE_PROCESSES) {
-                Process process = processQueue.poll();
-                activeProcesses.add(process);
-
-                Log.d(TAG, "Process moved from queue to active: " + process.getName() +
-                        ", Queue size: " + processQueue.size());
-
-                if (gameListener != null) {
-                    gameListener.onProcessAdded(process);
-                    gameListener.onQueueChanged(processQueue.size());
-                }
             }
         }
     }
 
     private void startGameTick() {
-        // Use a fixed-rate timer technique
+        // Reset the elapsed timer
+        elapsedTimer.progress();
+
+        // Use a higher frequency timer for smoother updates
         gameTickRunnable = new Runnable() {
             @Override
             public void run() {
                 if (!isGameOver) {
                     updateProcesses();
 
-                    // Notify the UI about the timer tick so it can update
-                    if (gameListener != null) {
-                        gameListener.onTimerTick();
-                    }
-
-                    // Important: use a fixed rate for timer accuracy
+                    // Schedule the next update
                     gameTickHandler.postDelayed(this, TIMER_INTERVAL_MS);
                 }
             }
         };
 
-        // Start immediately, with precise timing
+        // Start immediately
         gameTickHandler.post(gameTickRunnable);
     }
 
     private void updateProcesses() {
+        // Get elapsed time since last update
+        long delta = elapsedTimer.progress();
+
+        // Update the timer stepper for UI updates
+        timerStepper.update(delta);
+
         // Create a local list of processes to handle in this update
         List<Process> processesToUpdate = new ArrayList<>();
 
@@ -187,7 +170,8 @@ public class GameManager {
         // Process the snapshot without holding the lock
         for (Process process : processesToUpdate) {
             if (!process.isComplete() && !process.isDead()) {
-                process.updateTime(1);
+                // Update each process's timer
+                process.updateTime();
 
                 // Check if process is about to die
                 if (process.isAboutToDie()) {
@@ -211,9 +195,6 @@ public class GameManager {
 
         // Now handle any pending removals
         handlePendingRemovals();
-
-        // Check if we can add processes from the queue
-        checkProcessQueue();
     }
 
     private void handleDeadProcess(Process process) {
@@ -221,6 +202,7 @@ public class GameManager {
 
         deadProcessCount++;
         score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
+        if (score < 0) score = 0;
 
         // Add to pending removals
         synchronized (mutex) {
@@ -322,6 +304,8 @@ public class GameManager {
     public void resumeGame() {
         if (!isGameOver) {
             Log.d(TAG, "Game resumed");
+            // Reset the elapsed timer
+            elapsedTimer.progress();
             scheduleNextProcess();
             startGameTick();
         }
@@ -341,13 +325,6 @@ public class GameManager {
         }
         return processesCopy;
     }
-
-    public int getQueueSize() {
-        synchronized (mutex) {
-            return processQueue.size();
-        }
-    }
-
     public int getScore() {
         return score;
     }
