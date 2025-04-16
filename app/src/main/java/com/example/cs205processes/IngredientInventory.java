@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Inventory {
-    private static final String TAG = "Inventory";
-    int max_cap=3;
-    private List<Ingredient> heldIngredients=new ArrayList<>(max_cap);
+public class IngredientInventory {
+    private static final String TAG = "Ingredient Inventory";
+    int maxCap=3;
+    private List<Ingredient> heldIngredients=new ArrayList<>(maxCap);
 
     public List<Ingredient> getHeld(){
         return this.heldIngredients;
@@ -73,5 +73,5 @@ public class Inventory {
             }
         }
         return true; //Is in held list, have all ingredients for recipe
-        }
     }
+}

@@ -23,6 +23,7 @@ public class IngredientFetchWorker {
 
     public interface ingredientFetchListener{
         void receiveNewIngredient(Ingredient newIngredient);
+        void fetchIngredientProgressUpdate(int progress);
     }
 
     public IngredientFetchWorker(){
@@ -82,7 +83,7 @@ public class IngredientFetchWorker {
             Thread.sleep(fetchTime);
         } catch (InterruptedException e) {
             // handle later
-            Log.d(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
+            Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
         }
         Ingredient result = null;
         // get input ingredient from the available list
@@ -95,7 +96,11 @@ public class IngredientFetchWorker {
                 result = ingredient;
             }
         }
-        Log.d(TAG,"Swapped "+returnIngredient.getName()+" for "+ingredient.getName());
+        if (result != null) {
+            Log.d(TAG,"Swapped "+returnIngredient.getName()+" for "+ingredient.getName());
+        }else{
+            Log.d(TAG,"Failed to swap  "+returnIngredient.getName());
+        }
         listener.receiveNewIngredient(result);
     }
 
@@ -131,7 +136,13 @@ public class IngredientFetchWorker {
     private void resetAvailableList(){
         synchronized (availableLock) {
             this.availableList.clear();
+            //Regenerate available List
+            List<Ingredient> ingredientList = new ArrayList<>();
+            for (int i = 0; i < totalIngredients; i++) {
+                Ingredient ingredient = new Ingredient(i);
+                ingredientList.add(ingredient);
+            }
+            this.availableList = ingredientList;
         }
-        generateIngredientList();
     }
 }

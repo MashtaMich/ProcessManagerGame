@@ -33,4 +33,5 @@
     <string name="fetch_ingredients">Fetch Ingredients</string>
     <string name="ingredient_slot">Ingredient Slot</string>
     <string name="gettable_ingredient">gettable Ingredient</string>
+    <string name="pot_slot">pot slot</string>
 </resources>

@@ -2,31 +2,56 @@ package com.example.cs205processes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class Recipe {
+
+    final static int CARROT = 0;
+    final static int POTATO = 1;
+    final static int ONION = 2;
+    final static int CABBAGE = 3;
+    final static int TOMATO = 4;
+
     private String id;
     private String name;
     private List<Ingredient> ingredients;
-    private String instructions;
 
-    public Recipe(String name, List<Ingredient> ingredients, String instructions) {
+    public Recipe(String name, List<Ingredient> ingredients) {
         this.id = java.util.UUID.randomUUID().toString();
         this.name = name;
         this.ingredients = ingredients;
-        this.instructions = instructions;
     }
 
     public static List<Recipe> getDefaultRecipes() {
         List<Recipe> recipes = new ArrayList<>();
-        List<Ingredient> tomatoSoup = Arrays.asList(
-                new Ingredient(0),
-                new Ingredient(2),
-                new Ingredient(4)
+        List<Ingredient> tomatoSoupIngredients = Arrays.asList(
+                new Ingredient(TOMATO),
+                new Ingredient(CARROT),
+                new Ingredient(ONION)
         );
-        recipes.add(new Recipe("Tomato Soup", tomatoSoup,
-                "Put tomatoes in pot until boiling"));
+        List<Ingredient> veggieStewIngredients = Arrays.asList(
+                new Ingredient(CABBAGE),
+                new Ingredient(POTATO),
+                new Ingredient(CARROT)
+        );
+        List<Ingredient> mashedPotatoIngredients = Arrays.asList(
+                new Ingredient(POTATO),
+                new Ingredient(POTATO),
+                new Ingredient(ONION)
+        );
+        List<Ingredient> saladIngredients = Arrays.asList(
+                new Ingredient(TOMATO),
+                new Ingredient(POTATO),
+                new Ingredient(CARROT)
+        );
+
+        recipes.add(new Recipe("Tomato Soup", tomatoSoupIngredients));
+        recipes.add(new Recipe("Veggie Stew", veggieStewIngredients));
+        recipes.add(new Recipe("Mashed Potato", mashedPotatoIngredients));
+        recipes.add(new Recipe("Salad", saladIngredients));
 
         return recipes;
     }
@@ -44,11 +69,27 @@ public class Recipe {
         return ingredients;
     }
 
-    public String getInstructions() {
-        return instructions;
-    }
-
     public boolean have_all_ingredients(List<Ingredient> inventory_list){
         return new HashSet<>(this.ingredients).containsAll(inventory_list);
+    }
+
+    public boolean canCook(List<Ingredient> potList){
+        return have_all_ingredients(potList) && haveSameNumIngredients(potList);
+    }
+
+    public boolean haveSameNumIngredients(List<Ingredient> potList){
+        Map<Integer,Integer> countMapRecipe=getIngredientCount(ingredients);
+        Map<Integer,Integer> countMapList=getIngredientCount(potList);
+        return countMapRecipe.equals(countMapList);
+    }
+
+    private Map<Integer,Integer> getIngredientCount(List<Ingredient> list){
+        Map<Integer,Integer> countMap=new HashMap<>();
+        for (Ingredient ing:list){
+            int id=ing.getId();
+            countMap.put(id,
+                    countMap.getOrDefault(id,0)+1);
+        }
+        return countMap;
     }
 }
