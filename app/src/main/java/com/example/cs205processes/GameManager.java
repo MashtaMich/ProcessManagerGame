@@ -365,4 +365,7 @@ public class GameManager {
         return !isPaused && !isGameOver;
     }
 
+    public List<Recipe> getAvailableRecipes(){
+        return availableRecipes;
+    }
 }

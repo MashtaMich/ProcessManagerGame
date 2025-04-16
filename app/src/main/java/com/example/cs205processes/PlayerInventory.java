@@ -15,7 +15,7 @@ public class PlayerInventory {
         return held;
     }
 
-    public void grabHeld(FoodItem item){
+    public void grabItem(FoodItem item){
         Log.d(TAG,"Added item to player inventory: "+item.name);
         this.held=item;
     }

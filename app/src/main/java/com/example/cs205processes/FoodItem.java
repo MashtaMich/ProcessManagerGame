@@ -1,5 +1,7 @@
 package com.example.cs205processes;
 
+import androidx.annotation.NonNull;
+
 public class FoodItem {
     protected int id;
     protected String name;
@@ -32,5 +34,11 @@ public class FoodItem {
     @Override
     public int hashCode() {
         return Integer.hashCode(id);
+    }
+
+    @NonNull
+    @Override
+    public String toString(){
+        return "id:"+getId()+",name:"+getName();
     }
 }

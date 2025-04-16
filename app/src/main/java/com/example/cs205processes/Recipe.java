@@ -2,8 +2,10 @@ package com.example.cs205processes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class Recipe {
 
@@ -37,6 +39,7 @@ public class Recipe {
         );
         List<Ingredient> mashedPotatoIngredients = Arrays.asList(
                 new Ingredient(POTATO),
+                new Ingredient(POTATO),
                 new Ingredient(ONION)
         );
         List<Ingredient> saladIngredients = Arrays.asList(
@@ -68,5 +71,25 @@ public class Recipe {
 
     public boolean have_all_ingredients(List<Ingredient> inventory_list){
         return new HashSet<>(this.ingredients).containsAll(inventory_list);
+    }
+
+    public boolean canCook(List<Ingredient> potList){
+        return have_all_ingredients(potList) && haveSameNumIngredients(potList);
+    }
+
+    public boolean haveSameNumIngredients(List<Ingredient> potList){
+        Map<Integer,Integer> countMapRecipe=getIngredientCount(ingredients);
+        Map<Integer,Integer> countMapList=getIngredientCount(potList);
+        return countMapRecipe.equals(countMapList);
+    }
+
+    private Map<Integer,Integer> getIngredientCount(List<Ingredient> list){
+        Map<Integer,Integer> countMap=new HashMap<>();
+        for (Ingredient ing:list){
+            int id=ing.getId();
+            countMap.put(id,
+                    countMap.getOrDefault(id,0)+1);
+        }
+        return countMap;
     }
 }

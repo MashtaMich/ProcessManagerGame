@@ -1,39 +1,100 @@
 package com.example.cs205processes;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pot {
+    private final String TAG="Pot";
     private final List<Ingredient> ingredientsInside;
+    private CookedFood foodDone;
     private final int maxIngredients;
     private boolean readyToCook;
+    private final int cookTime=3000;
+    private final Object foodDoneLock = new Object();// to sync available list
+    private final Object ingredientLock=new Object();//ingredient lock
+
+    public interface PotListener{
+        void cookIngredientsUpdate(CookedFood foodCooked,int index);
+        void potProgressUpdate(int progress);
+    }
 
     public Pot(){
         this.ingredientsInside=new ArrayList<>();
         this.maxIngredients=3;
         this.readyToCook=false;
+        this.foodDone=null;
     }
 
     public List<Ingredient> getIngredientsInside(){
-        return ingredientsInside;
-    }
-
-    private void addIngredient(Ingredient ingredient){
-        ingredientsInside.add(ingredient);
-        readyToCook=ingredientsInside.size()==maxIngredients;
-    }
-
-    private boolean isReadyToCook(){
-        return readyToCook;
-    }
-
-    private CookedFood cookIngredients(Recipe recipe){
-        if (readyToCook){
-            CookedFood newFood=new CookedFood(5,recipe.getName(),R.drawable.placeholder,new ArrayList<>(ingredientsInside));
-            ingredientsInside.clear();
-            readyToCook=false;
-            return newFood;
+        synchronized (ingredientLock) {
+            return new ArrayList<>(ingredientsInside); // return a copy to avoid concurrency issues
         }
-        return null;
+    }
+
+    public CookedFood getFood(){
+        synchronized (foodDoneLock) {
+            if (this.foodDone != null) {
+                CookedFood food = this.foodDone;
+                this.foodDone = null;
+                return food;
+            }
+            return null;
+        }
+    }
+
+    public void addIngredient(Ingredient ingredient){
+        synchronized (ingredientLock) {
+            ingredientsInside.add(ingredient);
+            readyToCook = ingredientsInside.size() == maxIngredients;
+        }
+    }
+
+    public boolean isReadyToCook(){
+        synchronized (ingredientLock) {
+            return readyToCook;
+        }
+    }
+
+    public boolean gotFood(){
+        synchronized (foodDoneLock) {
+            return foodDone != null;
+        }
+    }
+
+    public int potContainingNum(){
+        synchronized (ingredientLock) {
+            return ingredientsInside.size();
+        }
+    }
+
+    public void cookIngredients(Recipe recipe,PotListener listener,int index){
+        boolean canCook;
+        synchronized (ingredientLock) {
+            canCook = readyToCook;
+            if (canCook) {
+                readyToCook = false;
+            }
+        }
+
+        if (canCook){
+            CookedFood newFood;
+            try{
+                Thread.sleep(cookTime);
+            }catch(InterruptedException e){
+                Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
+            }
+            synchronized (ingredientLock) {
+                newFood = new CookedFood(5, recipe.getName(), R.drawable.placeholder, new ArrayList<>(recipe.getIngredients()));
+                ingredientsInside.clear();
+            }
+            synchronized (foodDoneLock) {
+                this.foodDone = newFood;
+            }
+
+            listener.cookIngredientsUpdate(newFood,index);
+        }
+        listener.cookIngredientsUpdate(null,index);
     }
 }

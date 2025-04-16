@@ -63,7 +63,57 @@
         android:paddingTop="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:listitem="@layout/item_process_compact" />
+        tools:listitem="@layout/item_process_compact"
+        android:contentDescription="Process List"/>
+
+    <!-- Pot List -->
+    <FrameLayout
+        android:id="@+id/PotContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:padding="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/basket1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.8">
+
+        <!-- Vertical Pot Stack -->
+        <LinearLayout
+            android:id="@+id/potInventoryLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/potSlot1"
+                android:layout_width="144dp"
+                android:layout_height="74dp"
+                android:layout_margin="2dp"
+                android:src="@drawable/empty_pot"
+                android:scaleType="fitCenter"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/pot_slot" />
+
+            <ImageView
+                android:id="@+id/potSlot2"
+                android:layout_width="144dp"
+                android:layout_height="74dp"
+                android:layout_margin="2dp"
+                android:src="@drawable/empty_pot"
+                android:scaleType="fitCenter"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/pot_slot" />
+        </LinearLayout>
+    </FrameLayout>
+
+
+
 
     <!-- Ingredient List -->
     <FrameLayout
@@ -162,7 +212,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- This must come AFTER inventoryContentLayout so it's on top -->
+        <!-- This must come after inventoryContentLayout so it's on top to block whole framelayout -->
         <View
             android:id="@+id/ingredientBlockerOverlay"
             android:layout_width="wrap_content"
@@ -183,39 +233,63 @@
 
     <ImageView
         android:id="@+id/basket1"
-        android:layout_width="288dp"
-        android:layout_height="145dp"
+        android:layout_width="125dp"
+        android:layout_height="123dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="basket 1"
+        android:scaleType="fitCenter"
+        android:src="@drawable/potato_basket"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.194"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/potato_basket" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageView
         android:id="@+id/basket2"
-        android:layout_width="460dp"
-        android:layout_height="144dp"
+        android:layout_width="125dp"
+        android:layout_height="123dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="basket 2"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/gameView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.413"
         app:layout_constraintStart_toStartOf="@+id/gameView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996"
-        app:srcCompat="@drawable/cabbage_basket" />
+        app:srcCompat="@drawable/cabbage_basket"  />
 
     <ImageView
         android:id="@+id/basket3"
-        android:layout_width="403dp"
-        android:layout_height="143dp"
+        android:layout_width="125dp"
+        android:layout_height="123dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="basket 3"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.768"
+        app:layout_constraintHorizontal_bias="0.66"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996"
         app:srcCompat="@drawable/tomato_basket" />
+
+    <ImageView
+        android:id="@+id/playerInventory"
+        android:layout_width="77dp"
+        android:layout_height="78dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:contentDescription="@string/ingredient_slot"
+        android:focusable="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/button_secondary"
+        app:layout_constraintBottom_toBottomOf="@+id/basket3"
+        app:layout_constraintStart_toEndOf="@+id/basket3" />
+
 
     <Button
         android:id="@+id/togglePauseButton"
