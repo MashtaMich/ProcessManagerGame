@@ -60,6 +60,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
     class ProcessViewHolder extends RecyclerView.ViewHolder {
         private TextView timeRemainingTextView;
+        private TextView recipeName;
         private ProgressBar timeProgressBar;
         private LinearLayout ingredientsContainer;
         private CardView cardView;
@@ -70,6 +71,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
             timeRemainingTextView = itemView.findViewById(R.id.timeRemainingTextView);
             timeProgressBar = itemView.findViewById(R.id.timeProgressBar);
             ingredientsContainer = itemView.findViewById(R.id.ingredientsContainer);
+            recipeName = itemView.findViewById(R.id.recipeName);
         }
 
         public void bind(final Process process) {
@@ -89,6 +91,11 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
             // Display tiny ingredient icons
             displayTinyIngredientIcons(process);
+
+            // Display recipe name
+            recipeName.setText(process.getRecipe().getName());
+
+
         }
 
         private void updateCardBackgroundColor(Process process) {

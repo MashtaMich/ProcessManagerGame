@@ -66,10 +66,22 @@ public class Process {
 
     // This will be called from GameManager
     public void updateTime() {
-        long delta = elapsedTimer.progress();
-        if (delta > 0) {
-            timeStepper.update(delta);
+        // Only update if the timer is not paused
+        if (!elapsedTimer.isPaused()) {
+            long delta = elapsedTimer.progress();
+            if (delta > 0) {
+                timeStepper.update(delta);
+            }
         }
+    }
+    
+    // Add methods to pause and resume the process timer
+    public void pauseTimer() {
+        elapsedTimer.pause();
+    }
+    
+    public void resumeTimer() {
+        elapsedTimer.resume();
     }
 
     public void completeProcess() {

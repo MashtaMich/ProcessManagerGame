@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -64,6 +65,25 @@ public class GameActivity extends AppCompatActivity implements
             mediaPlayer.start();
             hideSystemUI();
             initializeGameComponents();
+
+            // Link buttons
+            Button togglePauseButton = findViewById(R.id.togglePauseButton);
+            togglePauseButton.setText("Pause"); // Default state
+
+            // Set listeners
+            togglePauseButton.setOnClickListener(v -> {
+                if (gameManager.isGameOver()) return; // Don’t allow toggling if game is over
+
+                if (gameManager.isRunning()) {
+                    gameManager.pauseGame();
+                    togglePauseButton.setText("Resume");
+                } else {
+                    gameManager.resumeGame();
+                    togglePauseButton.setText("Pause");
+                }
+            });
+
+
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: " + e.getMessage(), e);
             finish(); // Safely exit the activity if initialization fails
