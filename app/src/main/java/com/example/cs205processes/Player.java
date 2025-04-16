@@ -5,7 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 public class Player {
+    private PlayerInventory inventory;
     private Bitmap sprite;
+    private Bitmap scaledSprite;
     private float x, y;
     private float targetX, targetY;
     private boolean isMoving = false;
@@ -25,6 +27,14 @@ public class Player {
         this.sprite = sprite;
         this.tileSize = tileSize;
         this.game = game;
+        this.inventory = new PlayerInventory(); // Default inventory, will be replaced
+    }
+
+    public void setInventory(PlayerInventory inventory) {
+        this.inventory = inventory;
+    }
+    public PlayerInventory getInventory() {
+        return inventory;
     }
 
     public float getX() { return x; }
@@ -32,10 +42,16 @@ public class Player {
 
     public void draw(Canvas canvas, Paint paint, int tileSize) {
         if (sprite == null) return;
-        canvas.drawBitmap(
-                Bitmap.createScaledBitmap(sprite, tileSize, tileSize, true),
-                x, y, paint
-        );
+        
+        // Create scaled sprite if it doesn't exist or if tileSize changed
+        if (scaledSprite == null || scaledSprite.getWidth() != tileSize) {
+            if (scaledSprite != null) {
+                scaledSprite.recycle(); // Recycle old bitmap to free memory
+            }
+            scaledSprite = Bitmap.createScaledBitmap(sprite, tileSize, tileSize, true);
+        }
+        
+        canvas.drawBitmap(scaledSprite, x, y, paint);
     }
 
 
@@ -45,20 +61,6 @@ public class Player {
         return dx < tileSize && dy < tileSize;
     }
 
-//    public void move(int dx, int dy, int tileSize, Game game) {
-//        if (isMoving) return; // Don't allow move while already sliding
-//
-//        float nextX = x + dx * tileSize;
-//        float nextY = y + dy * tileSize;
-//
-//        if (game.canMoveTo(nextX, nextY)) {
-//            targetX = nextX;
-//            targetY = nextY;
-//            isMoving = true;
-//        } else {
-//            bounce(dx, dy);
-//        }
-//    }
     public void move(int dx, int dy) {
         movementHeld = true;
         queuedDX = dx;
@@ -82,7 +84,7 @@ public class Player {
         int tileRow = (int) (nextY / tileSize);
 
         // Boundary check
-        if (tileCol < 0 || tileCol >= Game.MAP_WIDTH-1 || tileRow < 0 || tileRow >= Game.MAP_HEIGHT) {
+        if (tileCol < 0 || tileCol >= Game.MAP_WIDTH || tileRow < 0 || tileRow >= Game.MAP_HEIGHT) {
             bounce(queuedDX, queuedDY);
             isMoving = false;
             return;

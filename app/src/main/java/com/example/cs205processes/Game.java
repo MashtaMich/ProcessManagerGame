@@ -36,13 +36,16 @@ public class Game {
     private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
     private List<Interactable> interactables = new ArrayList<>();
 
-    public Game(GameView gameView, Context context) {
-        this.gameView = gameView;
-        this.context = context;
+private PlayerInventory playerInventory;
 
-        playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-        loadMapFromJson("map.tmj"); //also handles creation of player
-    }
+public Game(GameView gameView, Context context, PlayerInventory playerInventory) {
+    this.gameView = gameView;
+    this.context = context;
+    this.playerInventory = playerInventory;
+
+    playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
+    loadMapFromJson("map.tmj"); //also handles creation of player
+}
     private void loadMapFromJson(String fileName) {
         try {
             InputStream is = context.getAssets().open(fileName);
@@ -96,7 +99,11 @@ public class Game {
                         if (val == 2) {  // 2 = spawn tile
                             int col = j % mapWidth;
                             int row = j / mapWidth;
+
+
                             player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this);
+                            player.setInventory(playerInventory); // Use the shared inventory
+
                         }
                     }
                 } //building object layer
@@ -172,7 +179,6 @@ public class Game {
 
             //draw player
             player.draw(canvas, paint, TILE_SIZE);
-            //canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
         });
     }
 
@@ -185,11 +191,33 @@ public class Game {
     }
 
 
+    // Called when player presses the 'interact' button (uses proximity check)
     public void interact() {
+        // Use proximity check for button-based interaction
         for (Interactable obj : interactables) {
-            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
+            if (player.isNear(obj, TILE_SIZE)) {
                 obj.onInteract(player);
-                break;
+                Log.d("Interaction", "Proximity interact: " + obj.getClass().getSimpleName());
+                return;
+            }
+        }
+    }
+
+    // Called when screen is tapped
+    public void handleTap(float tapX, float tapY) {
+        // Use direct tap location for tap-based interaction
+        for (Interactable obj : interactables) {
+            RectF bounds = new RectF(
+                    obj.x,
+                    obj.y,
+                    obj.x + TILE_SIZE,
+                    obj.y + TILE_SIZE
+            );
+
+            if (bounds.contains(tapX, tapY)) {
+                obj.onInteract(player);
+                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
+                return;
             }
         }
     }
@@ -205,11 +233,28 @@ public class Game {
     public void moveLeft()  { player.move(-1, 0); }
     public void moveRight() { player.move(1, 0); }
     public boolean canMoveTo(float nextX, float nextY) {
+        // Create a rectangle representing the player's position
+        RectF playerRect = new RectF(
+                nextX,
+                nextY,
+                nextX + TILE_SIZE,
+                nextY + TILE_SIZE
+        );
+        
+        // Check for collision with any interactable object
         for (Interactable obj : interactables) {
-            if (obj.x == nextX && obj.y == nextY) {
-                return false; // blocked
+            RectF objRect = new RectF(
+                    obj.x,
+                    obj.y,
+                    obj.x + TILE_SIZE,
+                    obj.y + TILE_SIZE
+            );
+            
+            // Check if the rectangles intersect
+            if (RectF.intersects(playerRect, objRect)) {
+                return false; // collision detected
             }
         }
-        return true;
+        return true; // no collision
     }
 }
