@@ -5,8 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pot {
-    private final String TAG="Pot";
+public class PotFunctions {
+    private final String TAG="PotFunctions";
     private final List<Ingredient> ingredientsInside;
     private CookedFood foodDone;
     private final int maxIngredients;
@@ -20,7 +20,7 @@ public class Pot {
         void potProgressUpdate(int progress);
     }
 
-    public Pot(){
+    public PotFunctions(){
         this.ingredientsInside=new ArrayList<>();
         this.maxIngredients=3;
         this.readyToCook=false;

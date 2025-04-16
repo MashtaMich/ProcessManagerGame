@@ -16,7 +16,7 @@ public class IngredientFetchWorker {
     private List<Ingredient> availableList=new ArrayList<>(totalIngredients);
     private final int fetchTime =3000;
     private final Random random;
-    // rest of the thread is the ingredient storage
+    // rest of the thread is the ingredient storage room
 
     private final Object availableLock = new Object();// to sync available list
 

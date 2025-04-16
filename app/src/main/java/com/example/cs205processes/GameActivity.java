@@ -29,7 +29,7 @@ public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
         ProcessAdapter.OnProcessInteractionListener,
         IngredientFetchWorker.ingredientFetchListener,
-        Pot.PotListener{
+        PotFunctions.PotListener{
 
     private static final String TAG = "GameActivity";
     private MediaPlayer mediaPlayer;
@@ -54,7 +54,7 @@ public class GameActivity extends AppCompatActivity implements
     private IngredientInventory ingredientInventory;
     private View ingredientBlocker;
     private PlayerInventory playerInventory;
-    private List<Pot> potList;
+    private List<PotFunctions> potFunctionsList;
     private int selectedIngredientIndex=-1;
     private int selectedSwapIndex=-1;
     private final int maxPots=2;
@@ -168,9 +168,9 @@ public class GameActivity extends AppCompatActivity implements
             ingredientFetcher = new IngredientFetchWorker();
             ingredientInventory = new IngredientInventory();
             playerInventory=new PlayerInventory();
-            potList=new ArrayList<>();
+            potFunctionsList =new ArrayList<>();
             for (int i=0;i<maxPots;i++){
-                potList.add(new Pot());
+                potFunctionsList.add(new PotFunctions());
             }
 
             // Initialize view lists
@@ -309,9 +309,7 @@ public class GameActivity extends AppCompatActivity implements
                     avIngView.setImageResource(ingredient.getIconResourceId());
                     avIngView.setBackgroundResource(R.drawable.swap_options_normal);
 
-                    avIngView.setOnClickListener(v -> {
-                        handleAvailableIngredientClick(index);
-                    });
+                    avIngView.setOnClickListener(v -> handleAvailableIngredientClick(index));
                 }
             }
         } catch (Exception e) {
@@ -409,9 +407,7 @@ public class GameActivity extends AppCompatActivity implements
                 ImageView basketView = basketViews.get(index);
                 if (basketView == null) continue;
                 Log.d(TAG,"Adding basket listener at index:"+index);
-                basketView.setOnClickListener(v -> {
-                    handleBasketClick(index);
-                });
+                basketView.setOnClickListener(v -> handleBasketClick(index));
             }
         } catch (Exception e) {
             Log.e(TAG, "Error adding basket listeners: " + e.getMessage(), e);
@@ -506,9 +502,7 @@ public class GameActivity extends AppCompatActivity implements
                 ImageView potView = potViews.get(i);
                 if (potView == null) continue;
                 final int index=i;
-                potView.setOnClickListener(v -> {
-                    handlePotClick(index);
-                });
+                potView.setOnClickListener(v -> handlePotClick(index));
             }
         } catch (Exception e) {
             Log.e(TAG, "Error adding pot listeners: " + e.getMessage(), e);
@@ -517,21 +511,21 @@ public class GameActivity extends AppCompatActivity implements
 
     private void handlePotClick(int index){
         try {
-            Pot pot=potList.get(index);
+            PotFunctions potFunctions = potFunctionsList.get(index);
             ImageView potView=potViews.get(index);
-            if (pot.gotFood() && playerInventory.checkHeldType()==playerInventory.EMPTY){
-                playerInventory.grabItem(pot.getFood());
+            if (potFunctions.gotFood() && playerInventory.checkHeldType()==playerInventory.EMPTY){
+                playerInventory.grabItem(potFunctions.getFood());
                 updatePlayerInventoryView();
                 potView.setImageResource(R.drawable.empty_pot);
                 Log.d(TAG,"got:"+playerInventory.getHeld().getName());
-            }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !pot.isReadyToCook()){
-                pot.addIngredient((Ingredient) playerInventory.giveItem());
+            }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook()){
+                potFunctions.addIngredient((Ingredient) playerInventory.giveItem());
                 updatePlayerInventoryView();
-                Log.d(TAG,"pot has "+pot.getIngredientsInside().size()+" ingredients");
+                Log.d(TAG,"potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
 
-                if (pot.isReadyToCook()){
-                    Log.d(TAG,"pot is ready to cook");
-                    List<Ingredient> inPot=pot.getIngredientsInside();
+                if (potFunctions.isReadyToCook()){
+                    Log.d(TAG,"potFunctions is ready to cook");
+                    List<Ingredient> inPot= potFunctions.getIngredientsInside();
                     Recipe cookRecipe=null;
                     for (Recipe recipe:gameManager.getAvailableRecipes()){
                         if (recipe.canCook(inPot)){
@@ -541,14 +535,13 @@ public class GameActivity extends AppCompatActivity implements
                     }
                     if (cookRecipe==null){
                         //Default waste recipe, no actual recipe then cook
-                        Recipe waste=new Recipe("Waste",new ArrayList<>());
-                        cookRecipe=waste;
+                        cookRecipe=new Recipe("Waste",new ArrayList<>());
                     }
 
                     final Recipe recipeToCook=cookRecipe;
                     potView.setImageResource(R.drawable.cooking_pot);
                     potView.setEnabled(false);
-                    potThreadPool.submit(() -> pot.cookIngredients(recipeToCook, this,index));
+                    potThreadPool.submit(() -> potFunctions.cookIngredients(recipeToCook, this,index));
                 }
             }
         } catch (Exception e) {
@@ -575,9 +568,7 @@ public class GameActivity extends AppCompatActivity implements
 
                 Log.d(TAG, "Setting listener for ingredientInventory index " + i + " (" + invHeld.get(i).getName() + ")");
 
-                invView.setOnClickListener(v -> {
-                    handleInventoryItemClick(index);
-                });
+                invView.setOnClickListener(v -> handleInventoryItemClick(index));
             }
         } catch (Exception e) {
             Log.e(TAG, "Error setting up ingredientInventory click listeners: " + e.getMessage(), e);
