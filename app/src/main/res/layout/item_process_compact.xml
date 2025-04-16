@@ -45,8 +45,8 @@
         <LinearLayout
             android:id="@+id/ingredientsContainer"
             android:layout_width="match_parent"
-            android:layout_height="16dp"
-            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:gravity="start"
             android:orientation="horizontal">
             <!-- Ingredients will be added as tiny icons -->
         </LinearLayout>

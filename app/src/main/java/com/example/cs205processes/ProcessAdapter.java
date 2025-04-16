@@ -131,7 +131,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
                 ingredientIcon.setContentDescription(ingredient.getName());
 
                 // Set tiny size for the icons
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(24, 24);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, 42);
                 params.setMargins(2, 0, 2, 0);
                 ingredientIcon.setLayoutParams(params);
 
