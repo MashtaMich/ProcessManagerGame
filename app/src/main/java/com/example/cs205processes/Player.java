@@ -5,11 +5,17 @@ import android.graphics.*;
 public class Player {
     private float x, y;
     private Bitmap sprite;
+    private PlayerInventory inventory;
 
     public Player(float x, float y) {
         this.x = x;
         this.y = y;
         this.sprite = null; // Load later
+        this.inventory = new PlayerInventory(); // Default inventory, will be replaced
+    }
+    
+    public void setInventory(PlayerInventory inventory) {
+        this.inventory = inventory;
     }
 
     public void moveUp(int tileSize)    { y -= tileSize; }
@@ -30,4 +36,9 @@ public class Player {
         float dy = Math.abs(y - obj.y);
         return dx < tileSize && dy < tileSize;
     }
+
+    public PlayerInventory getInventory() {
+        return inventory;
+    }
+
 }

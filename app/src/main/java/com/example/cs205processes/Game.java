@@ -36,13 +36,16 @@ public class Game {
     private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
     private List<Interactable> interactables = new ArrayList<>();
 
-    public Game(GameView gameView, Context context) {
-        this.gameView = gameView;
-        this.context = context;
+private PlayerInventory playerInventory;
 
-        playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-        loadMapFromJson("map.tmj"); //also handles creation of player
-    }
+public Game(GameView gameView, Context context, PlayerInventory playerInventory) {
+    this.gameView = gameView;
+    this.context = context;
+    this.playerInventory = playerInventory;
+
+    playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
+    loadMapFromJson("map.tmj"); //also handles creation of player
+}
     private void loadMapFromJson(String fileName) {
         try {
             InputStream is = context.getAssets().open(fileName);
@@ -97,6 +100,7 @@ public class Game {
                             int col = j % mapWidth;
                             int row = j / mapWidth;
                             player = new Player(col * TILE_SIZE, row * TILE_SIZE);
+                            player.setInventory(playerInventory); // Use the shared inventory
                         }
                     }
                 } //building object layer
@@ -184,11 +188,30 @@ public class Game {
     public void moveLeft()  { player.moveLeft(TILE_SIZE); }
     public void moveRight() { player.moveRight(TILE_SIZE); }
 
-    public void interact() {
+//    public void interact() {
+//        for (Interactable obj : interactables) {
+//            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
+//                obj.onInteract(player);
+//                break;
+//            }
+//        }
+//    }
+    /*
+     * sends to the respective interactables logic
+     */
+    public void handleTap(float tapX, float tapY) {
         for (Interactable obj : interactables) {
-            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
+            RectF bounds = new RectF(
+                    obj.x,
+                    obj.y,
+                    obj.x + TILE_SIZE,
+                    obj.y + TILE_SIZE
+            );
+
+            if (bounds.contains(tapX, tapY)) {
                 obj.onInteract(player);
-                break;
+                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
+                return;
             }
         }
     }

@@ -86,7 +86,7 @@ public class PotFunctions {
                 Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
             }
             synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(), R.drawable.placeholder, new ArrayList<>(recipe.getIngredients()));
+                newFood = new CookedFood(5, recipe.getName(), R.drawable.pot_finished, new ArrayList<>(recipe.getIngredients()));
                 ingredientsInside.clear();
             }
             synchronized (foodDoneLock) {
