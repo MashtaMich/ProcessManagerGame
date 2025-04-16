@@ -1,73 +1,189 @@
 package com.example.cs205processes;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.content.Context;
+import android.graphics.*;
 import android.util.DisplayMetrics;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class Game {
-
     public interface CanvasCallback {
         void draw(Canvas canvas);
     }
 
     private final GameView gameView;
     private final Paint paint = new Paint();
+    public static final int TILE_SIZE = 120;
+    public static final int MAP_WIDTH = 20;
+    public static final int MAP_HEIGHT = 9;
+    public static final int SCREEN_WIDTH = TILE_SIZE * MAP_WIDTH;   // 2400
+    public static final int SCREEN_HEIGHT = TILE_SIZE * MAP_HEIGHT; // 1080
 
-    private final Bitmap playerBitmap;
-    private final Bitmap mapBitmap;
-    private float playerX, playerY;
+    private final Context context;
 
-    private final int TILE_SIZE;
+    private Player player;
+    private Bitmap playerBitmap;
+
+    private int mapWidth;
+    private int mapHeight;
+    private int[][] tileLayer;
+    private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
+    private List<Interactable> interactables = new ArrayList<>();
 
     public Game(GameView gameView, Context context) {
         this.gameView = gameView;
+        this.context = context;
 
-        // Get screen size
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-        int TILES_PER_ROW = 13;
-
-
-        // Use smaller dimension to calculate tile size
-        TILE_SIZE = (int)Math.ceil(Math.min(screenWidth, screenHeight) / (double)TILES_PER_ROW);
-
-        // Scale player to 1 tile
-        Bitmap rawPlayer = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-        playerBitmap = Bitmap.createScaledBitmap(rawPlayer, TILE_SIZE, TILE_SIZE, true);
-
-        // Load map and scale it to 13x13 tiles
-        Bitmap rawMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.cookhouse);
-        mapBitmap = Bitmap.createScaledBitmap(rawMap, TILE_SIZE * 13, TILE_SIZE * 13, true);
-
-        // Initial player position (top-left tile)
-        playerX = TILE_SIZE;
-        playerY = TILE_SIZE;
+        loadPlayerSprite();
+        loadMapFromJson("map.tmj");
     }
 
-    public void update() {
-        // Add logic like collision here later
+    private void loadPlayerSprite() {
+        playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
+        player = new Player(TILE_SIZE, TILE_SIZE); // default start
+    }
+
+    private void loadMapFromJson(String fileName) {
+        try {
+            InputStream is = context.getAssets().open(fileName);
+            String jsonStr = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            JSONObject root = new JSONObject(jsonStr);
+
+            mapWidth = root.getInt("width");
+            mapHeight = root.getInt("height");
+
+            JSONArray tilesets = root.getJSONArray("tilesets");
+            for (int i = 0; i < tilesets.length(); i++) {
+                JSONObject tileset = tilesets.getJSONObject(i);
+                int firstgid = tileset.getInt("firstgid");
+                String source = tileset.getString("source");
+
+                String imageName = null;
+                switch (source) {
+                    case "normal floor.tsx": imageName = "floor.png"; break;
+                    case "spawn_tile.tsx": imageName = "floor_spawn.png"; break;
+                    case "rubbishbin_closed.tsx": imageName = "rubbishbin_closed.png"; break;
+                    case "pot_empty.tsx": imageName = "pot_empty.png"; break;
+                    case "basket.tsx": imageName = "basket.png"; break;
+                }
+
+                if (imageName == null) continue;
+
+                Bitmap tileSheet = BitmapFactory.decodeStream(context.getAssets().open("tiles/" + imageName));
+                int tileSize = TILE_SIZE;
+                int columns = tileSheet.getWidth() / tileSize;
+                int rows = tileSheet.getHeight() / tileSize;
+                int tileId = firstgid;
+
+                for (int y = 0; y < rows; y++) {
+                    for (int x = 0; x < columns; x++) {
+                        Bitmap tile = Bitmap.createBitmap(tileSheet, x * tileSize, y * tileSize, tileSize, tileSize);
+                        tileIdToBitmap.put(tileId++, tile);
+                    }
+                }
+            }
+
+            JSONArray layers = root.getJSONArray("layers");
+            for (int i = 0; i < layers.length(); i++) {
+                JSONObject layer = layers.getJSONObject(i);
+                //building my floor layer
+                if (layer.getString("type").equals("tilelayer") && layer.getString("name").equals("Floor")) {
+                    JSONArray data = layer.getJSONArray("data");
+                    tileLayer = new int[mapHeight][mapWidth];
+                    for (int j = 0; j < data.length(); j++) {
+                        tileLayer[j / mapWidth][j % mapWidth] = data.getInt(j);
+                    }
+                } //building object layer
+                else if (layer.getString("type").equals("objectgroup") &&
+                        layer.getString("name").equals("Interactables")) {
+                    JSONArray objects = layer.getJSONArray("objects");
+                    //go through each object, extract its details and add to list of interactables
+                    for (int j = 0; j < objects.length(); j++) {
+                        JSONObject obj = objects.getJSONObject(j);
+                        JSONObject props = extractProperties(obj);
+                        String type = props.optString("type", "").toLowerCase();
+                        float x = (float) obj.getDouble("x");
+                        float y = (float) obj.getDouble("y") - TILE_SIZE;
+
+                        switch (type) {
+                            case "pot":
+                                interactables.add(new Pot(context, x, y, props));
+                                break;
+                            case "rubbishbin":
+                                interactables.add(new RubbishBin(context, x, y, props));
+                                break;
+                            case "basket":
+                                interactables.add(new Basket(context, x, y, props));
+                                break;
+                        }
+                        Log.d("ObjectPos", type + ": x=" + x + ", y=" + y);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JSONObject extractProperties(JSONObject obj) throws org.json.JSONException {
+        JSONObject out = new JSONObject();
+        if (obj.has("properties")) {
+            JSONArray props = obj.getJSONArray("properties");
+            for (int i = 0; i < props.length(); i++) {
+                JSONObject p = props.getJSONObject(i);
+                out.put(p.getString("name"), p.get("value"));
+            }
+        }
+        return out;
     }
 
     public void draw() {
         gameView.useCanvas(canvas -> {
-            canvas.drawColor(0xFFFFFFFF); // Clear screen
-            canvas.drawBitmap(mapBitmap, null, new Rect(0, 0, canvas.getWidth(), canvas.getHeight()), paint);
-            canvas.drawBitmap(playerBitmap, playerX, playerY, paint);
+            canvas.drawColor(0xFFFFFFFF);
+
+            if (tileLayer != null) {
+                for (int y = 0; y < mapHeight; y++) {
+                    for (int x = 0; x < mapWidth; x++) {
+                        int tileId = tileLayer[y][x];
+                        Bitmap bmp = tileIdToBitmap.get(tileId);
+                        if (bmp != null) {
+                            canvas.drawBitmap(bmp, x * TILE_SIZE, y * TILE_SIZE, paint);
+                        }
+                    }
+                }
+            }
+
+            for (Interactable obj : interactables) {
+                obj.draw(canvas, paint, TILE_SIZE);
+            }
+
+            canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
         });
     }
 
+    public void update() {}
+
     public long getSleepTime() {
-        return 16; // ~60 FPS
+        return 16;
     }
 
-    // Movement controls (1 tile per tap)
-    public void moveUp()    { playerY -= TILE_SIZE; }
-    public void moveDown()  { playerY += TILE_SIZE; }
-    public void moveLeft()  { playerX -= TILE_SIZE; }
-    public void moveRight() { playerX += TILE_SIZE; }
+    public void moveUp()    { player.moveUp(TILE_SIZE); }
+    public void moveDown()  { player.moveDown(TILE_SIZE); }
+    public void moveLeft()  { player.moveLeft(TILE_SIZE); }
+    public void moveRight() { player.moveRight(TILE_SIZE); }
+
+    public void interact() {
+        for (Interactable obj : interactables) {
+            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
+                obj.onInteract(player);
+                break;
+            }
+        }
+    }
 }
