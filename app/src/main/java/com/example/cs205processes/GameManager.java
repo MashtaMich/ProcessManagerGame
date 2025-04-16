@@ -306,6 +306,14 @@ public class GameManager {
             gameTickHandler.removeCallbacks(gameTickRunnable);
         }
         elapsedTimer.pause();
+        
+        // Pause all active process timers
+        synchronized (mutex) {
+            for (Process process : activeProcesses) {
+                process.pauseTimer();
+            }
+        }
+        
         isPaused = true;
     }
 
@@ -313,6 +321,14 @@ public class GameManager {
         if (!isGameOver && isPaused) {
             Log.d(TAG, "Game resumed");
             elapsedTimer.resume();
+            
+            // Resume all active process timers
+            synchronized (mutex) {
+                for (Process process : activeProcesses) {
+                    process.resumeTimer();
+                }
+            }
+            
             scheduleNextProcess();
             startGameTick();
             isPaused = false;
