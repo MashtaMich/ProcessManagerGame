@@ -47,7 +47,7 @@ public class Recipe {
 
         recipes.add(new Recipe("Tomato Soup", tomatoSoupIngredients));
         recipes.add(new Recipe("Veggie Stew", veggieStewIngredients));
-        recipes.add(new Recipe("mashedPotato", mashedPotatoIngredients));
+        recipes.add(new Recipe("Mashed Potato", mashedPotatoIngredients));
         recipes.add(new Recipe("Salad", saladIngredients));
 
         return recipes;
