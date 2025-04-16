@@ -36,13 +36,4 @@ public class RubbishBin extends Interactable {
             }, 500);
         }
     }
-
-    @Override
-    public void draw(Canvas canvas, Paint paint, int TILE_SIZE) {
-        if (sprite == null) {
-            Log.e("DrawDebug", "Missing sprite for " + getClass().getSimpleName());
-            return;
-        }
-        canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
-    }
 }

@@ -50,8 +50,6 @@ public class Pot extends Interactable {
     @Override
     public void draw(Canvas canvas, Paint paint, int TILE_SIZE) {
         if (sprite == null) {
-            paint.setColor(Color.MAGENTA);
-            canvas.drawRect(x, y, x + TILE_SIZE, y + TILE_SIZE, paint);
             Log.e("DrawDebug", "Missing sprite for " + getClass().getSimpleName());
             return;
         }

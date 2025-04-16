@@ -9,7 +9,13 @@ public abstract class Interactable {
     public Bitmap sprite;
 
     public abstract void onInteract(Player player);
-    public abstract void draw(Canvas canvas, Paint paint, int TILE_SIZE);
+    public void draw(Canvas canvas, Paint paint, int TILE_SIZE) {
+        if (sprite == null) {
+            Log.e("DrawDebug", "Missing sprite for " + getClass().getSimpleName());
+            return;
+        }
+        canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
+    }
 
     protected Bitmap loadSprite(Context context, String filename) {
         Log.d("LoadSprite", "Attempting to load sprite: " + filename);
@@ -21,7 +27,6 @@ public abstract class Interactable {
             return fallbackRedSquareBitmap();
         }
     }
-
     private Bitmap fallbackRedSquareBitmap() {
         int size = 120;
         Bitmap bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
@@ -31,6 +36,4 @@ public abstract class Interactable {
         canvas.drawRect(0, 0, size, size, paint);
         return bmp;
     }
-
-
 }

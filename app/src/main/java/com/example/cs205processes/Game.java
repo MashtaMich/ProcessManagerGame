@@ -40,15 +40,9 @@ public class Game {
         this.gameView = gameView;
         this.context = context;
 
-        loadPlayerSprite();
-        loadMapFromJson("map.tmj");
-    }
-
-    private void loadPlayerSprite() {
         playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-        player = new Player(TILE_SIZE, TILE_SIZE); // default start
+        loadMapFromJson("map.tmj"); //also handles creation of player
     }
-
     private void loadMapFromJson(String fileName) {
         try {
             InputStream is = context.getAssets().open(fileName);
@@ -97,7 +91,13 @@ public class Game {
                     JSONArray data = layer.getJSONArray("data");
                     tileLayer = new int[mapHeight][mapWidth];
                     for (int j = 0; j < data.length(); j++) {
+                        int val = data.getInt(j);
                         tileLayer[j / mapWidth][j % mapWidth] = data.getInt(j);
+                        if (val == 2) {  // 2 = spawn tile
+                            int col = j % mapWidth;
+                            int row = j / mapWidth;
+                            player = new Player(col * TILE_SIZE, row * TILE_SIZE);
+                        }
                     }
                 } //building object layer
                 else if (layer.getString("type").equals("objectgroup") &&
@@ -120,6 +120,12 @@ public class Game {
                                 break;
                             case "basket":
                                 interactables.add(new Basket(context, x, y, props));
+                                break;
+                            case "table":
+                                interactables.add(new Table(context, x, y, props));
+                                break;
+                            case "submission_zone":
+                                interactables.add(new SubmissionZone(context, x, y, props));
                                 break;
                         }
                         Log.d("ObjectPos", type + ": x=" + x + ", y=" + y);
