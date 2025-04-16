@@ -36,16 +36,13 @@ public class Game {
     private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
     private List<Interactable> interactables = new ArrayList<>();
 
-private PlayerInventory playerInventory;
+    public Game(GameView gameView, Context context) {
+        this.gameView = gameView;
+        this.context = context;
 
-public Game(GameView gameView, Context context, PlayerInventory playerInventory) {
-    this.gameView = gameView;
-    this.context = context;
-    this.playerInventory = playerInventory;
-
-    playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-    loadMapFromJson("map.tmj"); //also handles creation of player
-}
+        playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
+        loadMapFromJson("map.tmj"); //also handles creation of player
+    }
     private void loadMapFromJson(String fileName) {
         try {
             InputStream is = context.getAssets().open(fileName);
@@ -99,8 +96,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
                         if (val == 2) {  // 2 = spawn tile
                             int col = j % mapWidth;
                             int row = j / mapWidth;
-                            player = new Player(col * TILE_SIZE, row * TILE_SIZE);
-                            player.setInventory(playerInventory); // Use the shared inventory
+                            player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this);
                         }
                     }
                 } //building object layer
@@ -156,7 +152,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
     public void draw() {
         gameView.useCanvas(canvas -> {
             canvas.drawColor(0xFFFFFFFF);
-
+            //draw floor
             if (tileLayer != null) {
                 for (int y = 0; y < mapHeight; y++) {
                     for (int x = 0; x < mapWidth; x++) {
@@ -169,50 +165,51 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
                 }
             }
 
+            //draw interactables
             for (Interactable obj : interactables) {
                 obj.draw(canvas, paint, TILE_SIZE);
             }
 
-            canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
+            //draw player
+            player.draw(canvas, paint, TILE_SIZE);
+            //canvas.drawBitmap(Bitmap.createScaledBitmap(playerBitmap, TILE_SIZE, TILE_SIZE, true), player.getX(), player.getY(), paint);
         });
     }
 
-    public void update() {}
+    public void update() {
+        player.update();
+    }
 
     public long getSleepTime() {
         return 16;
     }
 
-    public void moveUp()    { player.moveUp(TILE_SIZE); }
-    public void moveDown()  { player.moveDown(TILE_SIZE); }
-    public void moveLeft()  { player.moveLeft(TILE_SIZE); }
-    public void moveRight() { player.moveRight(TILE_SIZE); }
 
-//    public void interact() {
-//        for (Interactable obj : interactables) {
-//            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
-//                obj.onInteract(player);
-//                break;
-//            }
-//        }
-//    }
-    /*
-     * sends to the respective interactables logic
-     */
-    public void handleTap(float tapX, float tapY) {
+    public void interact() {
         for (Interactable obj : interactables) {
-            RectF bounds = new RectF(
-                    obj.x,
-                    obj.y,
-                    obj.x + TILE_SIZE,
-                    obj.y + TILE_SIZE
-            );
-
-            if (bounds.contains(tapX, tapY)) {
+            if (Math.abs(obj.x - player.getX()) < TILE_SIZE && Math.abs(obj.y - player.getY()) < TILE_SIZE) {
                 obj.onInteract(player);
-                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
-                return;
+                break;
             }
         }
+    }
+
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    //Player movement
+    public void moveUp()    { player.move(0, -1); }
+    public void moveDown()  { player.move(0, 1); }
+    public void moveLeft()  { player.move(-1, 0); }
+    public void moveRight() { player.move(1, 0); }
+    public boolean canMoveTo(float nextX, float nextY) {
+        for (Interactable obj : interactables) {
+            if (obj.x == nextX && obj.y == nextY) {
+                return false; // blocked
+            }
+        }
+        return true;
     }
 }

@@ -9,7 +9,9 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
@@ -32,6 +34,9 @@ public class GameActivity extends AppCompatActivity implements
         PotFunctions.PotListener{
 
     private static final String TAG = "GameActivity";
+
+    private Handler moveHandler = new Handler();         // ✅ Add this here
+    private Runnable moveRunnable;
     private MediaPlayer mediaPlayer;
     private GameManager gameManager;
     private ProcessAdapter processAdapter;
@@ -72,6 +77,11 @@ public class GameActivity extends AppCompatActivity implements
             mediaPlayer.start();
             hideSystemUI();
             initializeGameComponents();
+
+            //Interact Button
+            Button interactButton = findViewById(R.id.interactButton);
+            interactButton.setOnClickListener(v -> game.interact());
+
 
             // Link buttons
             Button togglePauseButton = findViewById(R.id.togglePauseButton);
@@ -128,18 +138,55 @@ public class GameActivity extends AppCompatActivity implements
             updateDeadProcessCountDisplay(0);
     }
 
+//    private void setupMovementControls() {
+//
+//            View btnUp = findViewById(R.id.btnUp);
+//            View btnDown = findViewById(R.id.btnDown);
+//            View btnLeft = findViewById(R.id.btnLeft);
+//            View btnRight = findViewById(R.id.btnRight);
+//
+//            if (btnUp != null) btnUp.setOnClickListener(v -> game.moveUp());
+//            if (btnDown != null) btnDown.setOnClickListener(v -> game.moveDown());
+//            if (btnLeft != null) btnLeft.setOnClickListener(v -> game.moveLeft());
+//            if (btnRight != null) btnRight.setOnClickListener(v -> game.moveRight());
+//    }
     private void setupMovementControls() {
+        View btnUp = findViewById(R.id.btnUp);
+        View btnDown = findViewById(R.id.btnDown);
+        View btnLeft = findViewById(R.id.btnLeft);
+        View btnRight = findViewById(R.id.btnRight);
 
-            View btnUp = findViewById(R.id.btnUp);
-            View btnDown = findViewById(R.id.btnDown);
-            View btnLeft = findViewById(R.id.btnLeft);
-            View btnRight = findViewById(R.id.btnRight);
-
-            if (btnUp != null) btnUp.setOnClickListener(v -> game.moveUp());
-            if (btnDown != null) btnDown.setOnClickListener(v -> game.moveDown());
-            if (btnLeft != null) btnLeft.setOnClickListener(v -> game.moveLeft());
-            if (btnRight != null) btnRight.setOnClickListener(v -> game.moveRight());
+        setupHoldMovement(btnUp, () -> game.moveUp());
+        setupHoldMovement(btnDown, () -> game.moveDown());
+        setupHoldMovement(btnLeft, () -> game.moveLeft());
+        setupHoldMovement(btnRight, () -> game.moveRight());
     }
+
+    private void setupHoldMovement(View button, Runnable movementAction) {
+        button.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    v.performClick();  // ✅ Accessibility fix
+                    moveRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            movementAction.run();
+                            moveHandler.postDelayed(this, 150);
+                        }
+                    };
+                    moveRunnable.run();
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    moveHandler.removeCallbacks(moveRunnable);
+                    game.getPlayer().stopMovement();
+                    return true;
+            }
+            return false;
+        });
+    }
+
 
     private void initializeUIComponents() {
         try {
