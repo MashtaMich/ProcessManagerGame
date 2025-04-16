@@ -9,18 +9,19 @@
     android:background="@color/gameBackground">
 
     <!-- Game canvas -->
+
+    <!-- Minimal Stats (Top Right) -->
     <com.example.cs205processes.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <!-- Minimal Stats (Top Right) -->
     <LinearLayout
         android:id="@+id/statsContainer"
         android:layout_width="wrap_content"
@@ -215,5 +216,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996"
         app:srcCompat="@drawable/tomato_basket" />
+
+    <Button
+        android:id="@+id/togglePauseButton"
+        android:layout_width="79dp"
+        android:layout_height="49dp"
+        android:text="Resume"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="@+id/gameView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.861"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

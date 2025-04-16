@@ -42,6 +42,8 @@ public class GameManager {
     private final Context context;
     private final GameListener gameListener;
 
+    private boolean isPaused = false;
+
     public interface GameListener {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
@@ -106,7 +108,7 @@ public class GameManager {
         Log.d(TAG, "Scheduling next process in " + spawnDelay + "ms");
 
         processSpawnRunnable = () -> {
-            if (!isGameOver) {
+            if (!isGameOver & !isPaused) {
                 generateNewProcess();
                 scheduleNextProcess();
             }
@@ -139,7 +141,7 @@ public class GameManager {
         gameTickRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!isGameOver) {
+                if (!isGameOver && !isPaused) {
                     updateProcesses();
 
                     // Schedule the next update
@@ -297,17 +299,23 @@ public class GameManager {
 
     public void pauseGame() {
         Log.d(TAG, "Game paused");
-        mainHandler.removeCallbacks(processSpawnRunnable);
-        gameTickHandler.removeCallbacks(gameTickRunnable);
+        if (processSpawnRunnable != null) {
+            mainHandler.removeCallbacks(processSpawnRunnable);
+        }
+        if (gameTickRunnable != null) {
+            gameTickHandler.removeCallbacks(gameTickRunnable);
+        }
+        elapsedTimer.pause();
+        isPaused = true;
     }
 
     public void resumeGame() {
-        if (!isGameOver) {
+        if (!isGameOver && isPaused) {
             Log.d(TAG, "Game resumed");
-            // Reset the elapsed timer
-            elapsedTimer.progress();
+            elapsedTimer.resume();
             scheduleNextProcess();
             startGameTick();
+            isPaused = false;
         }
     }
 
@@ -336,4 +344,9 @@ public class GameManager {
     public boolean isGameOver() {
         return isGameOver;
     }
+
+    public boolean isRunning() {
+        return !isPaused && !isGameOver;
+    }
+
 }

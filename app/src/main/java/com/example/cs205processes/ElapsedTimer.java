@@ -1,21 +1,24 @@
 package com.example.cs205processes;
 
 public class ElapsedTimer {
-    private long updateStartTime = 0L;
-    private boolean initialized = false;
-
-    public long getUpdateStartTime() {
-        return updateStartTime;
-    }
+    private long lastTimestamp = System.currentTimeMillis();
+    private boolean paused = false;
 
     public long progress() {
-        final long now = System.currentTimeMillis();
-        if (!initialized) {
-            initialized = true;
-            updateStartTime = now;
-        }
-        final long delta = now - updateStartTime;
-        updateStartTime = now;
+        if (paused) return 0;
+
+        long now = System.currentTimeMillis();
+        long delta = now - lastTimestamp;
+        lastTimestamp = now;
         return delta;
+    }
+
+    public void pause() {
+        paused = true;
+    }
+
+    public void resume() {
+        lastTimestamp = System.currentTimeMillis(); // Reset time tracking
+        paused = false;
     }
 }
