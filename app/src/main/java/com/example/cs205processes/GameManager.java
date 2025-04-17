@@ -48,7 +48,6 @@ public class GameManager {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
         void onProcessDied(Process process);
-        void onProcessAboutToDie(Process process);
         void onScoreChanged(int newScore);
         void onGameOver(int finalScore);
         void onTimerTick(); // Notify UI of every timer tick
@@ -175,19 +174,6 @@ public class GameManager {
                 // Update each process's timer
                 process.updateTime();
 
-                // Check if process is about to die
-                if (process.isAboutToDie()) {
-                    if (gameListener != null) {
-                        gameListener.onProcessAboutToDie(process);
-                    }
-
-                    // Vibrate the device
-                    Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                    if (vibrator != null && vibrator.hasVibrator()) {
-                        vibrator.vibrate(500); // Vibrate for 500ms
-                    }
-                }
-
                 // Check if process died during this update
                 if (process.isDead()) {
                     handleDeadProcess(process);
@@ -306,7 +292,7 @@ public class GameManager {
             gameTickHandler.removeCallbacks(gameTickRunnable);
         }
         elapsedTimer.pause();
-        
+
         // Pause all active process timers
         synchronized (mutex) {
             for (Process process : activeProcesses) {

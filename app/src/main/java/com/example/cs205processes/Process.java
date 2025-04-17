@@ -93,12 +93,6 @@ public class Process {
         }
     }
 
-    public boolean isAboutToDie() {
-        synchronized (mutex) {
-            return timeRemaining <= 10 && !isComplete && !isDead;
-        }
-    }
-
     // Getters with thread-safe access
     public String getId() {
         return id;
