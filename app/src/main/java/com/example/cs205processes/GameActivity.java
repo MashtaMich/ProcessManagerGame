@@ -16,8 +16,11 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +38,7 @@ public class GameActivity extends AppCompatActivity implements
 
     private static final String TAG = "GameActivity";
 
-    private Handler moveHandler = new Handler();         // ✅ Add this here
+    private Handler moveHandler = new Handler();
     private Runnable moveRunnable;
     private MediaPlayer mediaPlayer;
     private GameManager gameManager;
@@ -65,6 +68,10 @@ public class GameActivity extends AppCompatActivity implements
     private final int maxPots=2;
     private PotThreadPool potThreadPool;
     private ImageView playerInventoryView;
+    private SeekBar volumeSeekBar;
+    private SharedPreferences sharedPreferences;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +79,40 @@ public class GameActivity extends AppCompatActivity implements
         try {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             setContentView(R.layout.activity_game);
+            volumeSeekBar = findViewById(R.id.volumeSeekBar);
+            sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+            int savedVolume = sharedPreferences.getInt("volume", 100);
+            volumeSeekBar.setProgress(savedVolume);  // Convert 0.0-1.0 to 0-100
+            float volume = savedVolume / 100f;
             mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
             mediaPlayer.setLooping(true);
+            mediaPlayer.setVolume(volume,volume); // Set initial volume
             mediaPlayer.start();
+
             hideSystemUI();
             initializeGameComponents();
+
+            // Add a listener to update the volume when the SeekBar is moved
+            volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {                float newVolume = progress / 100f;
+                    mediaPlayer.setVolume(newVolume, newVolume);
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("volume", progress);
+                    editor.apply();
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
 
             //Interact Button
             Button interactButton = findViewById(R.id.interactButton);
@@ -88,21 +124,44 @@ public class GameActivity extends AppCompatActivity implements
             // Link buttons
             Button togglePauseButton = findViewById(R.id.togglePauseButton);
             togglePauseButton.setText("Pause"); // Default state
+            LinearLayout pauseMenu = findViewById(R.id.pauseMenu);
+            LinearLayout settingsMenu = findViewById(R.id.SettingsMenu);
+            Button resume = findViewById(R.id.btnResume);
+            Button save = findViewById(R.id.btnSave);
+            Button settings = findViewById(R.id.btnSettings);
+            ImageButton back = findViewById(R.id.backButton);
 
-            // Set listeners
+           // Set listeners
             togglePauseButton.setOnClickListener(v -> {
                 if (gameManager.isGameOver()) return; // Don’t allow toggling if game is over
 
                 if (gameManager.isRunning()) {
                     gameManager.pauseGame();
-                    togglePauseButton.setText("Resume");
-                } else {
-                    gameManager.resumeGame();
-                    togglePauseButton.setText("Pause");
+                    pauseMenu.setVisibility(View.VISIBLE);
                 }
             });
+            resume.setOnClickListener(v -> {
+                // Resume the game and hide the pause menu
+                gameManager.resumeGame();
+                pauseMenu.setVisibility(View.GONE);  // Hide the pause menu
+            });
+            // Set up the save game button functionality in the pause menu
+            save.setOnClickListener(v -> {
+                // Add save game functionality here
+            });
+            // Set up the settings button functionality in the pause menu
+            settings.setOnClickListener(v -> {
+                // Open the settings activity or show settings dialog
+                settingsMenu.setVisibility(View.VISIBLE);
+                pauseMenu.setVisibility(GONE);
+                back.setVisibility(VISIBLE);
 
-
+            });
+            back.setOnClickListener(v -> {
+                settingsMenu.setVisibility(View.GONE);
+                pauseMenu.setVisibility(View.VISIBLE);
+                back.setVisibility(View.GONE);
+            });
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: " + e.getMessage(), e);
             finish(); // Safely exit the activity if initialization fails

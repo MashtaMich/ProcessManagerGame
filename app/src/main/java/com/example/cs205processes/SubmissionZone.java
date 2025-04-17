@@ -3,13 +3,20 @@ package com.example.cs205processes;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.os.VibratorManager;
 import android.util.Log;
 import org.json.JSONObject;
 
 import java.util.List;
 
 public class SubmissionZone extends Interactable {
+
+    private Context context;
     public SubmissionZone(Context context, float x, float y, JSONObject props) {
+        this.context = context;
         this.x = x;
         this.y = y;
         try {
@@ -77,6 +84,13 @@ public class SubmissionZone extends Interactable {
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
             Log.d("SubmissionZone", "Nothing to submit or invalid item. HeldType: " + heldType);
+            VibratorManager vibratorManager = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+            Vibrator vibrator = vibratorManager.getDefaultVibrator();
+            if (vibrator != null && vibrator.hasVibrator()){
+                VibrationEffect effect = VibrationEffect.createOneShot(300,VibrationEffect.DEFAULT_AMPLITUDE);
+                vibrator.vibrate(effect);
+            }
+
         }
     }
 

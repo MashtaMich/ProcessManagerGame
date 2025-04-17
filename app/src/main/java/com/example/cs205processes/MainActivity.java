@@ -1,5 +1,8 @@
 package com.example.cs205processes;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
@@ -13,6 +16,11 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,11 +32,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MyGamePrefs";
     private MediaPlayer mediaPlayer;
     private TextView highScoreTextView;
-    private SharedPreferences preferences;
+    private SeekBar volumeSeekBar;
+    private LinearLayout settingMenu;
+    private ImageButton back;
+    private SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        int savedVolume = sharedPreferences.getInt("volume", 100);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         highScoreTextView = findViewById(R.id.highScore1);
@@ -36,17 +50,44 @@ public class MainActivity extends AppCompatActivity {
 
         mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
         mediaPlayer.setLooping(true); // Enable looping
+        mediaPlayer.setVolume(savedVolume / 100f, savedVolume / 100f); // Set initial volume
         mediaPlayer.start(); // Start playing the audio
         hideSystemUI();
 
-        // Initialize preferences
-        preferences = getSharedPreferences("ProcessManagerPrefs", MODE_PRIVATE);
+        // Initialize SeekBar
+        volumeSeekBar = findViewById(R.id.volumeSeekBar);
+        volumeSeekBar.setProgress(savedVolume);
+        // Set up SeekBar listener to update volume
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // Update MediaPlayer volume as user changes the SeekBar
+                mediaPlayer.setVolume(progress / 100f, progress / 100f);
+
+                // Save the new volume setting to SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("volume", progress);
+                editor.apply(); // Apply changes to SharedPreferences asynchronously
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Optional: Handle start of touch on SeekBar (if needed)
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Optional: Handle stop of touch on SeekBar (if needed)
+            }
+        });
 
         // Initialize buttons
         startGameButton = findViewById(R.id.StartGame);
         howToPlayButton = findViewById(R.id.HowToPlay);
         loadGameButton = findViewById(R.id.LoadGame);
         settingsButton = findViewById(R.id.Settings);
+        settingMenu = findViewById(R.id.SettingsMenu);
+        back = findViewById(R.id.backButton);
 
         // Set button click listeners
         setupButtonListeners();
@@ -89,6 +130,14 @@ public class MainActivity extends AppCompatActivity {
                 showSettingsDialog();
             }
         });
+        // Back button - goes back to main menu
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                settingMenu.setVisibility(GONE);
+                back.setVisibility(GONE);
+            }
+        });
     }
 
     private void showHowToPlayDialog() {
@@ -114,11 +163,13 @@ public class MainActivity extends AppCompatActivity {
     private void showSettingsDialog() {
         // In a real app, you might implement a more complex settings dialog
         // or launch a separate Settings Activity
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Settings");
-        builder.setMessage("Settings options would go here.");
-        builder.setPositiveButton("Close", null);
-        builder.show();
+        settingMenu.setVisibility(View.VISIBLE);
+        back.setVisibility(VISIBLE);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Settings");
+//        builder.setMessage("Settings options would go here.");
+//        builder.setPositiveButton("Close", null);
+//        builder.show();
     }
     private void hideSystemUI() {
         WindowInsetsController controller = getWindow().getInsetsController();
