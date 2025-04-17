@@ -877,11 +877,6 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onProcessAboutToDie(Process process) {
-        // Optional: vibration is already handled by GameManager
-    }
-
-    @Override
     public void onScoreChanged(int newScore) {
         runOnUiThread(() -> {
             try {
