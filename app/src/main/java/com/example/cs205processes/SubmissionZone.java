@@ -56,6 +56,7 @@ public class SubmissionZone extends Interactable {
                 CookedFood food = (CookedFood) heldItem;
 
                 if (food.getMadeWith() == null) {
+                    triggerVibration();
                     return;
                 }
 
@@ -64,18 +65,25 @@ public class SubmissionZone extends Interactable {
                 if (getRecipe != null) {
                     GameManager manager = player.getGame().getGameManager();
                     List<Process> active = manager.getActiveProcesses();
+                    boolean submitted = false;
                     for (Process process : active) {
                         if (!process.isComplete() && !process.isDead() &&
                                 process.getRecipe().getName().equals(food.getName())) {
 
                             manager.completeProcess(process.getId()); // removes it next tick + updates UI
+                            submitted = true;
                             break;
                         }
                     }
-                    player.getInventory().getAndRemoveItem();
+                    if (submitted) {
+                        player.getInventory().getAndRemoveItem();
+                    } else {
+                        triggerVibration();  // ❗Correct recipe, but not matching any active process
+                    }
 
 
-
+                }else {
+                    triggerVibration();
                 }
             } catch (ClassCastException e) {
                 Log.e("SubmissionZone", "ClassCastException: " + e.getMessage());
@@ -84,14 +92,26 @@ public class SubmissionZone extends Interactable {
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
             Log.d("SubmissionZone", "Nothing to submit or invalid item. HeldType: " + heldType);
-            VibratorManager vibratorManager = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
-            Vibrator vibrator = vibratorManager.getDefaultVibrator();
-            if (vibrator != null && vibrator.hasVibrator()){
-                VibrationEffect effect = VibrationEffect.createOneShot(300,VibrationEffect.DEFAULT_AMPLITUDE);
-                vibrator.vibrate(effect);
-            }
-
+            triggerVibration();
         }
     }
+
+    private void triggerVibration() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31+
+            VibratorManager vibratorManager = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+            Vibrator vibrator = vibratorManager.getDefaultVibrator();
+            if (vibrator != null && vibrator.hasVibrator()) {
+                VibrationEffect effect = VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE);
+                vibrator.vibrate(effect);
+            }
+        } else {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null && vibrator.hasVibrator()) {
+                VibrationEffect effect = VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE);
+                vibrator.vibrate(effect);
+            }
+        }
+    }
+
 
 }

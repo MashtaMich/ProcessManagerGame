@@ -334,6 +334,56 @@
                          "name":"type",
                          "type":"string",
                          "value":"table"
+                        },
+                        {
+                         "name":"table_cabbage_sprite",
+                         "type":"string",
+                         "value":"table_cabbage.png"
+                        },
+                        {
+                         "name":"table_carrot_sprite",
+                         "type":"string",
+                         "value":"table_carrot.png"
+                        },
+                        {
+                         "name":"table_onion_sprite",
+                         "type":"string",
+                         "value":"table_onion.png"
+                        },
+                        {
+                         "name":"table_potato_sprite",
+                         "type":"string",
+                         "value":"table_potato.png"
+                        },
+                        {
+                         "name":"table_tomato_sprite",
+                         "type":"string",
+                         "value":"table_tomato.png"
+                        },
+                        {
+                         "name":"table_mashed potato_sprite",
+                         "type":"string",
+                         "value":"table_mashedpotato.png"
+                        },
+                        {
+                          "name":"table_tomato soup_sprite",
+                          "type":"string",
+                          "value":"table_tomatosoup.png"
+                        },
+                        {
+                          "name":"table_veggie stew_sprite",
+                          "type":"string",
+                          "value":"table_veggiestew.png"
+                        },
+                        {
+                         "name":"table_salad_sprite",
+                         "type":"string",
+                         "value":"table_salad.png"
+                        },
+                        {
+                         "name":"table_trash_sprite",
+                         "type":"string",
+                         "value":"table_trash.png"
                         }],
                  "rotation":0,
                  "type":"",
@@ -357,7 +407,57 @@
                          "name":"type",
                          "type":"string",
                          "value":"table"
-                        }],
+                        },
+                        {
+                         "name":"table_cabbage_sprite",
+                         "type":"string",
+                         "value":"table_cabbage.png"
+                        },
+                         {
+                          "name":"table_carrot_sprite",
+                          "type":"string",
+                          "value":"table_carrot.png"
+                         },
+                         {
+                          "name":"table_onion_sprite",
+                          "type":"string",
+                          "value":"table_onion.png"
+                         },
+                         {
+                          "name":"table_potato_sprite",
+                          "type":"string",
+                          "value":"table_potato.png"
+                         },
+                         {
+                          "name":"table_tomato_sprite",
+                          "type":"string",
+                          "value":"table_tomato.png"
+                         },
+                         {
+                          "name":"table_mashed potato_sprite",
+                          "type":"string",
+                          "value":"table_mashedpotato.png"
+                         },
+                         {
+                          "name":"table_tomato soup_sprite",
+                          "type":"string",
+                          "value":"table_tomatosoup.png"
+                         },
+                         {
+                          "name":"table_veggie stew_sprite",
+                          "type":"string",
+                          "value":"table_veggiestew.png"
+                         },
+                         {
+                         "name":"table_salad_sprite",
+                         "type":"string",
+                         "value":"table_salad.png"
+                         },
+                         {
+                         "name":"table_trash_sprite",
+                         "type":"string",
+                         "value":"table_trash.png"
+                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -380,7 +480,57 @@
                          "name":"type",
                          "type":"string",
                          "value":"table"
-                        }],
+                        },
+                        {
+                         "name":"table_cabbage_sprite",
+                         "type":"string",
+                         "value":"table_cabbage.png"
+                        },
+                         {
+                          "name":"table_carrot_sprite",
+                          "type":"string",
+                          "value":"table_carrot.png"
+                         },
+                         {
+                          "name":"table_onion_sprite",
+                          "type":"string",
+                          "value":"table_onion.png"
+                         },
+                         {
+                          "name":"table_potato_sprite",
+                          "type":"string",
+                          "value":"table_potato.png"
+                         },
+                         {
+                          "name":"table_tomato_sprite",
+                          "type":"string",
+                          "value":"table_tomato.png"
+                         },
+                         {
+                          "name":"table_mashed potato_sprite",
+                          "type":"string",
+                          "value":"table_mashedpotato.png"
+                         },
+                         {
+                          "name":"table_tomato soup_sprite",
+                          "type":"string",
+                          "value":"table_tomatosoup.png"
+                         },
+                         {
+                          "name":"table_veggie stew_sprite",
+                          "type":"string",
+                          "value":"table_veggiestew.png"
+                         },
+                         {
+                         "name":"table_salad_sprite",
+                         "type":"string",
+                         "value":"table_salad.png"
+                         },
+                         {
+                         "name":"table_trash_sprite",
+                         "type":"string",
+                         "value":"table_trash.png"
+                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
