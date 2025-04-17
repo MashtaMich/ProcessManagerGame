@@ -195,32 +195,33 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
     public void interact() {
         // Use proximity check for button-based interaction
         for (Interactable obj : interactables) {
+            Log.d("Interact", "inside for loop");
             if (player.isNear(obj, TILE_SIZE)) {
                 obj.onInteract(player);
-                Log.d("Interaction", "Proximity interact: " + obj.getClass().getSimpleName());
+                Log.d("Interact", "Proximity interact: " + obj.getClass().getSimpleName());
                 return;
             }
         }
     }
 
     // Called when screen is tapped
-    public void handleTap(float tapX, float tapY) {
-        // Use direct tap location for tap-based interaction
-        for (Interactable obj : interactables) {
-            RectF bounds = new RectF(
-                    obj.x,
-                    obj.y,
-                    obj.x + TILE_SIZE,
-                    obj.y + TILE_SIZE
-            );
-
-            if (bounds.contains(tapX, tapY)) {
-                obj.onInteract(player);
-                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
-                return;
-            }
-        }
-    }
+//    public void handleTap(float tapX, float tapY) {
+//        // Use direct tap location for tap-based interaction
+//        for (Interactable obj : interactables) {
+//            RectF bounds = new RectF(
+//                    obj.x,
+//                    obj.y,
+//                    obj.x + TILE_SIZE,
+//                    obj.y + TILE_SIZE
+//            );
+//
+//            if (bounds.contains(tapX, tapY)) {
+//                obj.onInteract(player);
+//                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
+//                return;
+//            }
+//        }
+//    }
 
 
     public Player getPlayer() {
