@@ -75,10 +75,10 @@
         android:layout_marginBottom="8dp"
         android:elevation="4dp"
         android:padding="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/basket1"
+        app:layout_constraintBottom_toTopOf="@+id/joystickInclude"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8">
+        app:layout_constraintVertical_bias="0.3">
 
         <!-- Vertical Pot Stack -->
         <LinearLayout
@@ -231,64 +231,63 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
-    <ImageView
-        android:id="@+id/basket1"
-        android:layout_width="125dp"
-        android:layout_height="123dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="basket 1"
-        android:scaleType="fitCenter"
-        android:src="@drawable/potato_basket"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.194"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+<!--    <ImageView-->
+<!--        android:id="@+id/basket1"-->
+<!--        android:layout_width="125dp"-->
+<!--        android:layout_height="123dp"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:contentDescription="basket 1"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        android:src="@drawable/potato_basket"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.194"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="1.0" />-->
 
-    <ImageView
-        android:id="@+id/basket2"
-        android:layout_width="125dp"
-        android:layout_height="123dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="basket 2"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="@+id/gameView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.413"
-        app:layout_constraintStart_toStartOf="@+id/gameView"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.996"
-        app:srcCompat="@drawable/cabbage_basket"  />
+<!--    <ImageView-->
+<!--        android:id="@+id/basket2"-->
+<!--        android:layout_width="125dp"-->
+<!--        android:layout_height="123dp"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:contentDescription="basket 2"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/gameView"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.413"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/gameView"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.996"-->
+<!--        app:srcCompat="@drawable/cabbage_basket"  />-->
 
-    <ImageView
-        android:id="@+id/basket3"
-        android:layout_width="125dp"
-        android:layout_height="123dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="basket 3"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.66"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.996"
-        app:srcCompat="@drawable/tomato_basket" />
+<!--    <ImageView-->
+<!--        android:id="@+id/basket3"-->
+<!--        android:layout_width="125dp"-->
+<!--        android:layout_height="123dp"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:contentDescription="basket 3"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.66"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.996"-->
+<!--        app:srcCompat="@drawable/tomato_basket" />-->
 
     <ImageView
         android:id="@+id/playerInventory"
-        android:layout_width="77dp"
-        android:layout_height="78dp"
-        android:layout_marginStart="69dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:clickable="true"
         android:contentDescription="@string/ingredient_slot"
         android:focusable="true"
         android:scaleType="centerInside"
         android:src="@drawable/button_secondary"
-        app:layout_constraintBottom_toBottomOf="@+id/basket3"
-        app:layout_constraintStart_toEndOf="@+id/basket3" />
+        app:layout_constraintEnd_toEndOf="@+id/ingredientInventoryContainer"
+        app:layout_constraintTop_toBottomOf="@+id/ingredientInventoryContainer" />
+
 
     <!-- Pause Button -->
     <Button
@@ -308,16 +307,16 @@
         android:id="@+id/interactButton"
         android:layout_width="120dp"
         android:layout_height="60dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="30dp"
+        android:backgroundTint="@color/purple_200"
         android:text="Interact"
+        android:textColor="@android:color/white"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:backgroundTint="@color/purple_200"
-        android:textColor="@android:color/white"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

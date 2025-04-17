@@ -52,7 +52,7 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> availableIngredientsViews;
     private LinearLayout swapOptionsLayout;
 
-    private List<ImageView> basketViews;
+//    private List<ImageView> basketViews;
     private List<ImageView> potViews;
 
     private IngredientFetchWorker ingredientFetcher;
@@ -252,15 +252,15 @@ public class GameActivity extends AppCompatActivity implements
             if (option1 != null) availableIngredientsViews.add((ImageView) option1);
             if (option2 != null) availableIngredientsViews.add((ImageView) option2);
 
-            // Initialize basket views
-            basketViews = new ArrayList<>();
-            View basket1 = findViewById(R.id.basket1);
-            View basket2 = findViewById(R.id.basket2);
-            View basket3 = findViewById(R.id.basket3);
-
-            if (basket1 != null) basketViews.add((ImageView) basket1);
-            if (basket2 != null) basketViews.add((ImageView) basket2);
-            if (basket3 != null) basketViews.add((ImageView) basket3);
+//            // Initialize basket views
+//            basketViews = new ArrayList<>();
+//            View basket1 = findViewById(R.id.basket1);
+//            View basket2 = findViewById(R.id.basket2);
+//            View basket3 = findViewById(R.id.basket3);
+//
+//            if (basket1 != null) basketViews.add((ImageView) basket1);
+//            if (basket2 != null) basketViews.add((ImageView) basket2);
+//            if (basket3 != null) basketViews.add((ImageView) basket3);
 
             //initialize pot views
             potViews=new ArrayList<>();
@@ -314,7 +314,7 @@ public class GameActivity extends AppCompatActivity implements
             }
 
             ingredientInventory.setInitialList(initialList);
-            initializeBasketListeners();
+            //initializeBasketListeners();
             initializePotListeners();
             updateInventoryUI();
             updateAvailableUI();
@@ -324,7 +324,7 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     private void updatePlayerInventoryView(){
-        if (playerInventory.checkHeldType()!=playerInventory.EMPTY){
+        if (playerInventory.checkHeldType()!= PlayerInventory.EMPTY){
             playerInventoryView.setImageResource(playerInventory.getHeld().getIconResourceId());
         }else{
             playerInventoryView.setImageResource(R.drawable.button_secondary);
@@ -444,97 +444,99 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    private void initializeBasketListeners(){
-        try {
-            if (basketViews == null) {
-                return;
-            }
+//    private void initializeBasketListeners(){
+//        try {
+//            if (basketViews == null) {
+//                return;
+//            }
+//
+//            for (int i = 0; i < basketViews.size(); i++) {
+//                final int index=i;
+//                ImageView basketView = basketViews.get(index);
+//                if (basketView == null) continue;
+//                Log.d(TAG,"Adding basket listener at index:"+index);
+//                basketView.setOnClickListener(v -> handleBasketClick(index));
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error adding basket listeners: " + e.getMessage(), e);
+//        }
+//    }
 
-            for (int i = 0; i < basketViews.size(); i++) {
-                final int index=i;
-                ImageView basketView = basketViews.get(index);
-                if (basketView == null) continue;
-                Log.d(TAG,"Adding basket listener at index:"+index);
-                basketView.setOnClickListener(v -> handleBasketClick(index));
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error adding basket listeners: " + e.getMessage(), e);
-        }
-    }
-
-    private void handleBasketClick(int index){
-        Log.d(TAG,"clicked on basket index:"+index);
-        List<Ingredient> invHeld=ingredientInventory.getHeld();
-        try {
-            if (playerInventory.checkHeldType()== PlayerInventory.EMPTY){
-                Ingredient ingredientGrab=invHeld.get(index);
-                playerInventory.grabItem(new Ingredient(ingredientGrab.getId()));
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error handling basket click: " + e.getMessage(), e);
-            resetSelectionState();
-        }
-    }
+//    private void handleBasketClick(int index){
+//        Log.d(TAG,"clicked on basket index:"+index);
+//        List<Ingredient> invHeld=ingredientInventory.getHeld();
+//        try {
+//            if (playerInventory.checkHeldType()== PlayerInventory.EMPTY){
+//                Ingredient ingredientGrab=invHeld.get(index);
+//                playerInventory.grabItem(new Ingredient(ingredientGrab.getId()));
+//            }
+//        } catch (Exception e) {
+//            Log.e(TAG, "Error handling basket click: " + e.getMessage(), e);
+//            resetSelectionState();
+//        }
+//    }
 
     private void updateBasketIcons(List<Ingredient> invHeld) {
         try {
-            game.basketUpdate(invHeld);
-            if (basketViews == null || invHeld == null) {
+
+            if (invHeld == null) {
                 return;
             }
 
-            for (int i = 0; i < basketViews.size(); i++) {
-                ImageView basketView = basketViews.get(i);
-                if (basketView == null) continue;
+            game.basketUpdate(invHeld);
 
-                if (i >= invHeld.size()) {
-                    // Set default basket image
-                    basketView.setImageResource(R.drawable.basket);
-                    continue;
-                }
-
-                Ingredient ingredient = invHeld.get(i);
-                if (ingredient == null) {
-                    basketView.setImageResource(R.drawable.basket);
-                    continue;
-                }
-
-                Log.d(TAG, "Updating basket " + i + " with " + ingredient.getName());
-                int resId;
-
-                try {
-                    switch (ingredient.getName()) {
-                        case "carrot":
-                            resId = R.drawable.carrot_basket;
-                            break;
-                        case "potato":
-                            resId = R.drawable.potato_basket;
-                            break;
-                        case "onion":
-                            resId = R.drawable.onion_basket;
-                            break;
-                        case "cabbage":
-                            resId = R.drawable.cabbage_basket;
-                            break;
-                        case "tomato":
-                            resId = R.drawable.tomato_basket;
-                            break;
-                        default:
-                            Log.d(TAG, "SHOWING EMPTY BASKET");
-                            resId = R.drawable.basket;
-                            break;
-                    }
-                    basketView.setImageResource(resId);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error setting basket image: " + e.getMessage(), e);
-                    // Fallback to default basket
-                    try {
-                        basketView.setImageResource(R.drawable.basket);
-                    } catch (Exception ex) {
-                        Log.e(TAG, "Error setting fallback basket image: " + ex.getMessage(), ex);
-                    }
-                }
-            }
+//            for (int i = 0; i < basketViews.size(); i++) {
+//                ImageView basketView = basketViews.get(i);
+//                if (basketView == null) continue;
+//
+//                if (i >= invHeld.size()) {
+//                    // Set default basket image
+//                    basketView.setImageResource(R.drawable.basket);
+//                    continue;
+//                }
+//
+//                Ingredient ingredient = invHeld.get(i);
+//                if (ingredient == null) {
+//                    basketView.setImageResource(R.drawable.basket);
+//                    continue;
+//                }
+//
+//                Log.d(TAG, "Updating basket " + i + " with " + ingredient.getName());
+//                int resId;
+//
+//                try {
+//                    switch (ingredient.getName()) {
+//                        case "carrot":
+//                            resId = R.drawable.carrot_basket;
+//                            break;
+//                        case "potato":
+//                            resId = R.drawable.potato_basket;
+//                            break;
+//                        case "onion":
+//                            resId = R.drawable.onion_basket;
+//                            break;
+//                        case "cabbage":
+//                            resId = R.drawable.cabbage_basket;
+//                            break;
+//                        case "tomato":
+//                            resId = R.drawable.tomato_basket;
+//                            break;
+//                        default:
+//                            Log.d(TAG, "SHOWING EMPTY BASKET");
+//                            resId = R.drawable.basket;
+//                            break;
+//                    }
+//                    basketView.setImageResource(resId);
+//                } catch (Exception e) {
+//                    Log.e(TAG, "Error setting basket image: " + e.getMessage(), e);
+//                    // Fallback to default basket
+//                    try {
+//                        basketView.setImageResource(R.drawable.basket);
+//                    } catch (Exception ex) {
+//                        Log.e(TAG, "Error setting fallback basket image: " + ex.getMessage(), ex);
+//                    }
+//                }
+//            }
         } catch (Exception e) {
             Log.e(TAG, "Error updating basket icons: " + e.getMessage(), e);
         }
@@ -561,11 +563,11 @@ public class GameActivity extends AppCompatActivity implements
         try {
             PotFunctions potFunctions = potFunctionsList.get(index);
             ImageView potView=potViews.get(index);
-            if (potFunctions.gotFood() && playerInventory.checkHeldType()==playerInventory.EMPTY){
+            if (potFunctions.gotFood() && playerInventory.checkHeldType()== PlayerInventory.EMPTY){
                 playerInventory.grabItem(potFunctions.getFood());
                 potView.setImageResource(R.drawable.empty_pot);
                 Log.d(TAG,"got:"+playerInventory.getHeld().getName());
-            }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
+            }else if (playerInventory.checkHeldType()== PlayerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
                 potFunctions.addIngredient((Ingredient) playerInventory.getAndRemoveItem());
                 Log.d(TAG,"potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
 
