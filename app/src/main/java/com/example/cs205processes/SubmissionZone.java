@@ -22,10 +22,10 @@ public class SubmissionZone extends Interactable {
     /*
      * check correct
      */
-    private boolean checkCorrectIngredientsForRecipe(String recipeName, List<Ingredient> submittedIngredients) {
+    private Recipe checkCorrectIngredientsForRecipe(String recipeName, List<Ingredient> submittedIngredients) {
         if (recipeName == null || submittedIngredients == null) {
             Log.e("SubmissionZone", "Recipe name or ingredients list is null");
-            return false;
+            return null;
         }
         
         Log.d("SubmissionZone", "Checking recipe: " + recipeName);
@@ -36,12 +36,12 @@ public class SubmissionZone extends Interactable {
             if (recipe.getName().equals(recipeName)) {
                 boolean result = recipe.canCook(submittedIngredients);
                 Log.d("SubmissionZone", "Recipe match found, canCook result: " + result);
-                return result;
+                return recipe;
             }
         }
         
         Log.d("SubmissionZone", "No matching recipe found for: " + recipeName);
-        return false;
+        return null;
     }
     @Override
     public void onInteract(Player player) {
@@ -82,12 +82,12 @@ public class SubmissionZone extends Interactable {
                 
                 Log.d("SubmissionZone", "Food ingredients: " + food.getMadeWith().size());
                 
-                boolean isCorrect = checkCorrectIngredientsForRecipe(food.getName(), food.getMadeWith());
-                Log.d("SubmissionZone", "Recipe check result: " + isCorrect);
+                Recipe getRecipe = checkCorrectIngredientsForRecipe(food.getName(), food.getMadeWith());
+                if ( getRecipe != null ) Log.d("SubmissionZone", "Recipe check result, name of recipe is: " + getRecipe.getName());
                 Log.d("SubmissionZone", "Correct: " + food.getName());
 
                 // IMPLEMENT MY LOGIC HERE -> Submit the dish, e.g., score++ && remove from process queue
-                if (isCorrect) {
+                if (getRecipe != null) {
                     FoodItem removedItem = player.getInventory().getAndRemoveItem();
                     Log.d("SubmissionZone", "Removed item: " + (removedItem != null ? removedItem.getName() : "null"));
                     Log.d("SubmissionZone", "Remove: " + food.getName());
