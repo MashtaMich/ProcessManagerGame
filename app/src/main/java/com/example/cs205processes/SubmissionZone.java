@@ -3,6 +3,9 @@ package com.example.cs205processes;
 
 import android.content.Context;
 import android.graphics.*;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -56,7 +59,7 @@ public class SubmissionZone extends Interactable {
                 CookedFood food = (CookedFood) heldItem;
 
                 if (food.getMadeWith() == null) {
-                    triggerVibration();
+                    playNotificationSound();
                     return;
                 }
 
@@ -78,12 +81,12 @@ public class SubmissionZone extends Interactable {
                     if (submitted) {
                         player.getInventory().getAndRemoveItem();
                     } else {
-                        triggerVibration();  // ❗Correct recipe, but not matching any active process
+                        playNotificationSound();  // ❗Correct recipe, but not matching any active process
                     }
 
 
                 }else {
-                    triggerVibration();
+                    playNotificationSound();
                 }
             } catch (ClassCastException e) {
                 Log.e("SubmissionZone", "ClassCastException: " + e.getMessage());
@@ -92,26 +95,22 @@ public class SubmissionZone extends Interactable {
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
             Log.d("SubmissionZone", "Nothing to submit or invalid item. HeldType: " + heldType);
-            triggerVibration();
+            playNotificationSound();
         }
     }
 
-    private void triggerVibration() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31+
-            VibratorManager vibratorManager = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
-            Vibrator vibrator = vibratorManager.getDefaultVibrator();
-            if (vibrator != null && vibrator.hasVibrator()) {
-                VibrationEffect effect = VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE);
-                vibrator.vibrate(effect);
+    private void playNotificationSound() {
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(context, notification);
+            if (r != null) {
+                r.play();
             }
-        } else {
-            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            if (vibrator != null && vibrator.hasVibrator()) {
-                VibrationEffect effect = VibrationEffect.createOneShot(300, VibrationEffect.DEFAULT_AMPLITUDE);
-                vibrator.vibrate(effect);
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
 
 
 }
