@@ -7,6 +7,41 @@ public class Ingredient extends FoodItem {
         setNameAndImage(id);
     }
 
+    public Ingredient(String name){
+        super(name);
+        setIdAndImage(name);
+    }
+
+    private void setIdAndImage(String name) {
+        switch (name) {
+            case "carrot":
+                this.id = 0;
+                this.iconResourceId = R.drawable.carrot;
+                break;
+            case "potato":
+                this.id = 1;
+                this.iconResourceId = R.drawable.potato;
+                break;
+            case "onion":
+                this.id = 2;
+                this.iconResourceId = R.drawable.onion;
+                break;
+            case "cabbage":
+                this.id = 3;
+                this.iconResourceId = R.drawable.cabbage;
+                break;
+            case "tomato":
+                this.id=4;
+                this.iconResourceId = R.drawable.tomato;
+                break;
+            default:
+                this.name = "invalid";
+                this.id=-1;
+                this.iconResourceId = R.drawable.placeholder;
+                break;
+        }
+    }
+
     private void setNameAndImage(int id) {
         switch (id) {
             case 0:
