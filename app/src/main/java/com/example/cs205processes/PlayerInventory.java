@@ -34,19 +34,20 @@ public class PlayerInventory {
     public int checkHeldType() {
         if (held == null) {
             System.out.println("Nothing is being held.");
-            Log.d("HELDTYPE","Player holding nothing");
+            Log.d("HELDTYPE", "Player holding nothing");
             return EMPTY;
         } else if (held instanceof Ingredient) {
             System.out.println("Holding an ingredient: " + held.getName());
-            Log.d("HELDTYPE","Player holding Ingredient");
+            Log.d("HELDTYPE", "Player holding Ingredient: " + held.getName());
             return INGREDIENT;
         } else if (held instanceof CookedFood) {
             System.out.println("Holding cooked food: " + held.getName());
-            Log.d("HELDTYPE","Player holding Cooked Food");
+            Log.d("HELDTYPE", "Player holding Cooked Food: " + held.getName());
+            Log.d("HELDTYPE", "Class: " + held.getClass().getName());
             return COOKED;
         } else {
             System.out.println("Unknown item held.");
-            Log.d("HELDTYPE","Error player holding unknown");
+            Log.d("HELDTYPE", "Error player holding unknown type: " + held.getClass().getName());
             return INVALID;
         }
     }

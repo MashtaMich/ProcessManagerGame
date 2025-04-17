@@ -22,41 +22,61 @@ public class SubmissionZone extends Interactable {
     /*
      * check correct
      */
-    private boolean checkCorrectIngredientsForRecipe(String recipeName, List<Ingredient> submittedIngredients) {
+    private Recipe checkCorrectIngredientsForRecipe(String recipeName, List<Ingredient> submittedIngredients) {
+        if (recipeName == null || submittedIngredients == null) {
+            return null;
+        }
         for (Recipe recipe : Recipe.getDefaultRecipes()) {
             if (recipe.getName().equals(recipeName)) {
-                return recipe.canCook(submittedIngredients);
+                boolean result = recipe.canCook(submittedIngredients);
+                return recipe;
             }
         }
-        return false;
+        return null;
     }
     @Override
     public void onInteract(Player player) {
-        // Logic: check if held dish is valid for an order
-        Log.d("SubmissionZone", "Attempted to submit dish");
+        if (player == null || player.getInventory() == null) {
+            return;
+        }
+        
+        // Get the held item type
         int heldType = player.getInventory().checkHeldType();
+        FoodItem heldItem = player.getInventory().getHeld();
 
-        Log.d("SubmissionZone", "COOKED constant value: " + PlayerInventory.COOKED);
-        Log.d("SubmissionZone", "Actual heldType value: " + heldType);
-        Log.d("SubmissionZone", "Is held item null? " + (player.getInventory().getHeld() == null));
-        Log.d("SubmissionZone", "Condition result: " + (heldType == PlayerInventory.COOKED && player.getInventory().getHeld() != null));
+        if (heldType == PlayerInventory.COOKED && heldItem != null) {
+            try {
+                CookedFood food = (CookedFood) heldItem;
 
-        if (heldType == PlayerInventory.COOKED && player.getInventory().getHeld() != null) {
-            CookedFood food = (CookedFood) player.getInventory().getHeld();
-            Log.d("SubmissionZone", "Getting food: " + food.getName());
+                if (food.getMadeWith() == null) {
+                    return;
+                }
 
-            boolean isCorrect = checkCorrectIngredientsForRecipe(food.getName(), food.getMadeWith());
-            Log.d("SubmissionZone", "Correct : " + food.getName());
+                Recipe getRecipe = checkCorrectIngredientsForRecipe(food.getName(), food.getMadeWith());
 
-            // IMPLEMENT MY LOGIC HERE -> Submit the dish, e.g., score++ && remove from process queue
-            if ( isCorrect ) {
-                player.getInventory().getAndRemoveItem();
-                Log.d("SubmissionZone", "Remove : " + food.getName());
+                if (getRecipe != null) {
+                    GameManager manager = player.getGame().getGameManager();
+                    List<Process> active = manager.getActiveProcesses();
+                    for (Process process : active) {
+                        if (!process.isComplete() && !process.isDead() &&
+                                process.getRecipe().getName().equals(food.getName())) {
+
+                            manager.completeProcess(process.getId()); // removes it next tick + updates UI
+                            break;
+                        }
+                    }
+                    player.getInventory().getAndRemoveItem();
+
+
+
+                }
+            } catch (ClassCastException e) {
+                Log.e("SubmissionZone", "ClassCastException: " + e.getMessage());
+                e.printStackTrace();
             }
-
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
-            Log.d("SubmissionZone", "Nothing to submit or invalid item.");
+            Log.d("SubmissionZone", "Nothing to submit or invalid item. HeldType: " + heldType);
         }
     }
 
