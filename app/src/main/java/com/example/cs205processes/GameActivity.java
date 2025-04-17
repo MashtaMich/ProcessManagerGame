@@ -133,6 +133,7 @@ public class GameActivity extends AppCompatActivity implements
 
             // Initialize game manager
             gameManager = new GameManager(this, this);
+        game.setGameManager(gameManager);
             gameManager.startGame();
 
             // Set initial values for statistics

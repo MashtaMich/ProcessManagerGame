@@ -144,5 +144,9 @@ public class Player {
         }, duration);
     }
 
+    public Game getGame() {
+        return game;
+    }
+
 
 }

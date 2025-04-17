@@ -16,8 +16,9 @@ public class Game {
     public interface CanvasCallback {
         void draw(Canvas canvas);
     }
-
     private final GameView gameView;
+
+    private GameManager gameManager;
     private final Paint paint = new Paint();
     public static final int TILE_SIZE = 120;
     public static final int MAP_WIDTH = 20;
@@ -193,17 +194,14 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
 
     // Called when player presses the 'interact' button (uses proximity check)
     public void interact() {
-        Log.d("Interact", "interact() method called");
-        Log.d("Interact", "Player position: x=" + player.getX() + ", y=" + player.getY());
-        
+
         // Use proximity check for button-based interaction
         for (Interactable obj : interactables) {
-            Log.d("Interact", "Checking interactable: " + obj.getClass().getSimpleName() + " at x=" + obj.x + ", y=" + obj.y);
-            
+
             float dx = Math.abs(player.getX() - obj.x);
             float dy = Math.abs(player.getY() - obj.y);
             Log.d("Interact", "Distance: dx=" + dx + ", dy=" + dy + ", threshold=" + TILE_SIZE);
-            
+
             if (player.isNear(obj, TILE_SIZE)) {
                 Log.d("Interact", "Player is near " + obj.getClass().getSimpleName());
                 obj.onInteract(player);
@@ -213,28 +211,16 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
                 Log.d("Interact", "Player is NOT near " + obj.getClass().getSimpleName());
             }
         }
-        
         Log.d("Interact", "No nearby interactable found");
     }
 
-    // Called when screen is tapped
-//    public void handleTap(float tapX, float tapY) {
-//        // Use direct tap location for tap-based interaction
-//        for (Interactable obj : interactables) {
-//            RectF bounds = new RectF(
-//                    obj.x,
-//                    obj.y,
-//                    obj.x + TILE_SIZE,
-//                    obj.y + TILE_SIZE
-//            );
-//
-//            if (bounds.contains(tapX, tapY)) {
-//                obj.onInteract(player);
-//                Log.d("Interaction", "Tapped on: " + obj.getClass().getSimpleName());
-//                return;
-//            }
-//        }
-//    }
+    public void setGameManager(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
+
+    public GameManager getGameManager() {
+        return gameManager;
+    }
 
 
     public Player getPlayer() {
