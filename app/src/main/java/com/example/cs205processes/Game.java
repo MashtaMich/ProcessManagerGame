@@ -39,12 +39,14 @@ public class Game {
     private List<Pot> pots=new ArrayList<>();
     private List<Basket> baskets=new ArrayList<>();
 
-private PlayerInventory playerInventory;
+    private PlayerInventory playerInventory;
+    private PotThreadPool potThreadPool;
 
-public Game(GameView gameView, Context context, PlayerInventory playerInventory) {
+public Game(GameView gameView, Context context, PlayerInventory playerInventory,PotThreadPool potThreadPool) {
     this.gameView = gameView;
     this.context = context;
     this.playerInventory = playerInventory;
+    this.potThreadPool=potThreadPool;
 
     playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
     loadMapFromJson("map.tmj"); //also handles creation of player
@@ -104,8 +106,8 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
                             int row = j / mapWidth;
 
 
-                            player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this);
-                            player.setInventory(playerInventory); // Use the shared inventory
+                            player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this,playerInventory);
+                            //player.setInventory(playerInventory); // Use the shared inventory
 
                         }
                     }
@@ -123,7 +125,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
 
                         switch (type) {
                             case "pot":
-                                Pot pot=new Pot(context,x,y,props);
+                                Pot pot=new Pot(context,x,y,props,potThreadPool);
                                 interactables.add(pot);
                                 pots.add(pot);
                                 break;

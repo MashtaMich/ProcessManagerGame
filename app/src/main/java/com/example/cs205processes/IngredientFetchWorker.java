@@ -80,7 +80,10 @@ public class IngredientFetchWorker {
 
     private void fetchIngredient(Ingredient returnIngredient,Ingredient ingredient, ingredientFetchListener listener) {
         try {
-            Thread.sleep(fetchTime);
+            for (int i=1;i<=fetchTime/1000;i++){
+                Thread.sleep(1000);
+                listener.fetchIngredientProgressUpdate(i);
+            }
         } catch (InterruptedException e) {
             // handle later
             Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
@@ -102,6 +105,7 @@ public class IngredientFetchWorker {
             Log.d(TAG,"Failed to swap  "+returnIngredient.getName());
         }
         listener.receiveNewIngredient(result);
+        listener.fetchIngredientProgressUpdate(fetchTime/1000+1);
     }
 
     public void returnIngredients(List<Ingredient> ingredients){

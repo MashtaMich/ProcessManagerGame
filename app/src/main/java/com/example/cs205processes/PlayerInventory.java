@@ -2,6 +2,8 @@ package com.example.cs205processes;
 
 import android.util.Log;
 
+import java.util.List;
+
 public class PlayerInventory {
     private static final String TAG = "Player Inventory";
 
@@ -10,6 +12,11 @@ public class PlayerInventory {
     public static final int COOKED=2;
     public static final int INVALID=-1;
     private FoodItem held;
+    private final List<Recipe> recipeList;
+
+    public PlayerInventory(List<Recipe> recipeList){
+        this.recipeList=recipeList;
+    }
 
     public FoodItem getHeld(){
         return held;
@@ -18,6 +25,10 @@ public class PlayerInventory {
     public void grabItem(FoodItem item){
         Log.d(TAG,"Added item to player inventory: "+item.name);
         this.held=item;
+    }
+
+    public List<Recipe> getRecipeList(){
+        return recipeList;
     }
 
     public FoodItem getAndRemoveItem(){

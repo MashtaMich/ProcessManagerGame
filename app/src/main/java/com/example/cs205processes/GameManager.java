@@ -55,12 +55,12 @@ public class GameManager {
 
     }
 
-    public GameManager(Context context, GameListener listener) {
+    public GameManager(Context context, GameListener listener,List<Recipe> recipeList) {
         this.context = context;
         this.gameListener = listener;
         this.activeProcesses = new ArrayList<>();
         this.pendingRemovals = new ArrayList<>();
-        this.availableRecipes = Recipe.getDefaultRecipes();
+        this.availableRecipes = recipeList;
         this.score = 0;
         this.deadProcessCount = 0;
         this.isGameOver = false;
