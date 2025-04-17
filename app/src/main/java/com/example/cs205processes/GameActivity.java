@@ -80,7 +80,9 @@ public class GameActivity extends AppCompatActivity implements
 
             //Interact Button
             Button interactButton = findViewById(R.id.interactButton);
+            Log.d("Interact", "setting a listener");
             interactButton.setOnClickListener(v -> game.interact());
+            Log.d("Interact", "done with listening and passing logic to game.interact()");
 
 
             // Link buttons
@@ -132,6 +134,7 @@ public class GameActivity extends AppCompatActivity implements
 
             // Initialize game manager
             gameManager = new GameManager(this, this);
+        game.setGameManager(gameManager);
             gameManager.startGame();
 
             // Set initial values for statistics
