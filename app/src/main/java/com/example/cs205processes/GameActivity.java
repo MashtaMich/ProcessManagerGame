@@ -118,6 +118,7 @@ public class GameActivity extends AppCompatActivity implements
             game = new Game(gameView, this, playerInventory);
             gameView.init(game);
 
+            // Set up pool for PotFunctions calls
             potThreadPool=new PotThreadPool(maxPots);
 
             // Set up movement controls
@@ -210,14 +211,12 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-
-
     private void initializeInventory() {
         try {
             // Initialize ingredient fetcher and ingredientInventory
             ingredientFetcher = new IngredientFetchWorker();
             ingredientInventory = new IngredientInventory();
-            // playerInventory is already initialized in initializeGameComponents
+            // playerInventory is initialized in initializeGameComponents
             potFunctionsList =new ArrayList<>();
             for (int i=0;i<maxPots;i++){
                 potFunctionsList.add(new PotFunctions());
@@ -330,7 +329,6 @@ public class GameActivity extends AppCompatActivity implements
         }else{
             playerInventoryView.setImageResource(R.drawable.button_secondary);
         }
-
     }
 
     private void updateAvailableUI() {
@@ -468,10 +466,9 @@ public class GameActivity extends AppCompatActivity implements
         Log.d(TAG,"clicked on basket index:"+index);
         List<Ingredient> invHeld=ingredientInventory.getHeld();
         try {
-            if (playerInventory.checkHeldType()==playerInventory.EMPTY){
+            if (playerInventory.checkHeldType()== PlayerInventory.EMPTY){
                 Ingredient ingredientGrab=invHeld.get(index);
                 playerInventory.grabItem(new Ingredient(ingredientGrab.getId()));
-                updatePlayerInventoryView();
             }
         } catch (Exception e) {
             Log.e(TAG, "Error handling basket click: " + e.getMessage(), e);
@@ -481,6 +478,7 @@ public class GameActivity extends AppCompatActivity implements
 
     private void updateBasketIcons(List<Ingredient> invHeld) {
         try {
+            game.basketUpdate(invHeld);
             if (basketViews == null || invHeld == null) {
                 return;
             }
@@ -565,12 +563,10 @@ public class GameActivity extends AppCompatActivity implements
             ImageView potView=potViews.get(index);
             if (potFunctions.gotFood() && playerInventory.checkHeldType()==playerInventory.EMPTY){
                 playerInventory.grabItem(potFunctions.getFood());
-                updatePlayerInventoryView();
                 potView.setImageResource(R.drawable.empty_pot);
                 Log.d(TAG,"got:"+playerInventory.getHeld().getName());
             }else if (playerInventory.checkHeldType()==playerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
                 potFunctions.addIngredient((Ingredient) playerInventory.getAndRemoveItem());
-                updatePlayerInventoryView();
                 Log.d(TAG,"potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
 
                 if (potFunctions.isReadyToCook()){
@@ -893,6 +889,7 @@ public class GameActivity extends AppCompatActivity implements
         runOnUiThread(() -> {
             try {
                 if (gameManager != null && processAdapter != null) {
+                    updatePlayerInventoryView();
                     processAdapter.updateProcesses(gameManager.getActiveProcesses());
                 }
             } catch (Exception e) {

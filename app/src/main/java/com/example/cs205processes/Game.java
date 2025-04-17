@@ -35,6 +35,8 @@ public class Game {
     private int[][] tileLayer;
     private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
     private List<Interactable> interactables = new ArrayList<>();
+    private List<Pot> pots=new ArrayList<>();
+    private List<Basket> baskets=new ArrayList<>();
 
 private PlayerInventory playerInventory;
 
@@ -120,13 +122,17 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
 
                         switch (type) {
                             case "pot":
-                                interactables.add(new Pot(context, x, y, props));
+                                Pot pot=new Pot(context,x,y,props);
+                                interactables.add(pot);
+                                pots.add(pot);
                                 break;
                             case "rubbishbin":
                                 interactables.add(new RubbishBin(context, x, y, props));
                                 break;
                             case "basket":
-                                interactables.add(new Basket(context, x, y, props));
+                                Basket basket=new Basket(context,x,y,props);
+                                interactables.add(basket);
+                                baskets.add(basket);
                                 break;
                             case "table":
                                 interactables.add(new Table(context, x, y, props));
@@ -142,6 +148,16 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void basketUpdate(List<Ingredient> ingredients){
+        for (int i=0;i<baskets.size();i++){
+            baskets.get(i).setIngredient(ingredients.get(i).getName());
+        }
+    }
+
+    public Pot getPot(int index){
+        return pots.get(index);
     }
 
     private JSONObject extractProperties(JSONObject obj) throws org.json.JSONException {

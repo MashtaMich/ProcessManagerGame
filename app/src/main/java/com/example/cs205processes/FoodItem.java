@@ -7,6 +7,10 @@ public class FoodItem {
     protected String name;
     protected int iconResourceId;
 
+    public FoodItem(String name) {
+        this.name = name;
+    }
+
     public FoodItem(int id) {
         this.id = id;
     }
@@ -28,12 +32,12 @@ public class FoodItem {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         FoodItem that = (FoodItem) o;
-        return this.id == that.getId();
+        return this.name.equals(that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(id);
+        return this.name.hashCode();
     }
 
     @NonNull
