@@ -11,20 +11,20 @@ public class PotFunctions {
     private CookedFood foodDone;
     private final int maxIngredients;
     private boolean readyToCook;
-    private final int cookTime=3000;
+    private final int cookTime;
     private final Object foodDoneLock = new Object();// to sync available list
     private final Object ingredientLock=new Object();//ingredient lock
 
     public interface PotListener{
-        void cookIngredientsUpdate(CookedFood foodCooked,int index);
         void potProgressUpdate(int progress);
     }
 
-    public PotFunctions(){
+    public PotFunctions(int cookTime){
         this.ingredientsInside=new ArrayList<>();
         this.maxIngredients=3;
         this.readyToCook=false;
         this.foodDone=null;
+        this.cookTime=cookTime;
     }
 
     public List<Ingredient> getIngredientsInside(){
@@ -69,7 +69,45 @@ public class PotFunctions {
         }
     }
 
-    public void cookIngredients(Recipe recipe,PotListener listener,int index){
+    public void cookIngredients(Recipe recipe,PotListener listener){
+        boolean canCook;
+        synchronized (ingredientLock) {
+            canCook = readyToCook;
+            if (canCook) {
+                readyToCook = false;
+            }
+        }
+
+        if (canCook){
+            CookedFood newFood;
+
+            // Start cooking the ingredients
+            int progress = 0; // Progress will be every 1 second
+
+            try {
+                while (progress<cookTime/1000){
+                    Thread.sleep(1000);
+                    progress++;
+                    listener.potProgressUpdate(progress);
+                }
+            } catch (InterruptedException e) {
+                // handle later
+                Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
+            }
+
+            synchronized (ingredientLock) {
+                newFood = new CookedFood(5, recipe.getName(), R.drawable.done_pot, new ArrayList<>(recipe.getIngredients()));
+                ingredientsInside.clear();
+            }
+            synchronized (foodDoneLock) {
+                this.foodDone = newFood;
+            }
+
+            listener.potProgressUpdate(progress+1);
+        }
+    }
+
+    public void cookIngredients(Recipe recipe){
         boolean canCook;
         synchronized (ingredientLock) {
             canCook = readyToCook;
@@ -86,15 +124,12 @@ public class PotFunctions {
                 Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
             }
             synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(), R.drawable.pot_finished, new ArrayList<>(recipe.getIngredients()));
+                newFood = new CookedFood(5, recipe.getName(), R.drawable.done_pot, new ArrayList<>(recipe.getIngredients()));
                 ingredientsInside.clear();
             }
             synchronized (foodDoneLock) {
                 this.foodDone = newFood;
             }
-
-            listener.cookIngredientsUpdate(newFood,index);
         }
-        listener.cookIngredientsUpdate(null,index);
     }
 }

@@ -20,7 +20,7 @@ public class Player {
 
 
 
-    public Player(float x, float y, Bitmap sprite, int tileSize, Game game) {
+    public Player(float x, float y, Bitmap sprite, int tileSize, Game game,PlayerInventory playerInventory) {
         this.x = x;
         this.y = y;
         this.targetX = x;
@@ -28,7 +28,7 @@ public class Player {
         this.sprite = sprite;
         this.tileSize = tileSize;
         this.game = game;
-        this.inventory = new PlayerInventory(); // Default inventory, will be replaced
+        this.inventory = playerInventory;
     }
 
     public void setInventory(PlayerInventory inventory) {

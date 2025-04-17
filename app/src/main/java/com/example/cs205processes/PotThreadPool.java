@@ -13,4 +13,9 @@ public class PotThreadPool {
     public void submit(final Runnable task) {
         pool.submit(task);
     }
+
+    //To help with game end
+    public void shutdown() {
+        pool.shutdown();
+    }
 }
