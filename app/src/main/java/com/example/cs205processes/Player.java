@@ -57,16 +57,20 @@ public class Player {
 
 
     public boolean isNear(Interactable obj, int tileSize) {
-        float dx = Math.abs(x - obj.x);
-        float dy = Math.abs(y - obj.y);
-        
-        // Use a more lenient distance check (1.5 tiles)
-        float threshold = tileSize * 1.5f;
-        boolean isNear = dx < threshold && dy < threshold;
-        
-        Log.d("Player", "isNear check: dx=" + dx + ", dy=" + dy + ", threshold=" + threshold + ", result=" + isNear);
-        return isNear;
+        int thisTileX = Math.round(x / tileSize);
+        int thisTileY = Math.round(y / tileSize);
+        int objTileX = Math.round(obj.x / tileSize);
+        int objTileY = Math.round(obj.y / tileSize);
+
+        int dx = Math.abs(thisTileX - objTileX);
+        int dy = Math.abs(thisTileY - objTileY);
+
+        boolean isAdjacent = (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
+
+        Log.d("Player", "isNear check: player=(" + thisTileX + "," + thisTileY + "), obj=(" + objTileX + "," + objTileY + "), result=" + isAdjacent);
+        return isAdjacent;
     }
+
 
     public void move(int dx, int dy) {
         movementHeld = true;
