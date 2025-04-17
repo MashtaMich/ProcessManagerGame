@@ -109,7 +109,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
         }
 
         private void updateProgressBarColor(Process process) {
-            if (process.getTimeRemaining() < 5) {
+            if (process.getTimeRemaining() < 10) {
                 timeProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progress_critical));
                 timeRemainingTextView.setTextColor(context.getResources().getColor(R.color.progressCritical));
             } else if (process.getTimeRemaining() < process.getTimeLimit() / 2) {
