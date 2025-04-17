@@ -16,4 +16,8 @@ public class CookedFood extends FoodItem {
     public List<Ingredient> getMadeWith(){
         return madeWith;
     }
+
+    private void getIconResourceIdFromName(String name){
+
+    }
 }

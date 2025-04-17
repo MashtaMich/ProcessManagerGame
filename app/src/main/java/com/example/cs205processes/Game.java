@@ -37,16 +37,17 @@ public class Game {
     private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
     private List<Interactable> interactables = new ArrayList<>();
     private List<Pot> pots=new ArrayList<>();
-    private List<Basket> baskets=new ArrayList<>();
 
     private PlayerInventory playerInventory;
     private PotThreadPool potThreadPool;
+    private BasketManager basketManager;
 
-public Game(GameView gameView, Context context, PlayerInventory playerInventory,PotThreadPool potThreadPool) {
+public Game(GameView gameView, Context context, PlayerInventory playerInventory,PotThreadPool potThreadPool,BasketManager basketManager) {
     this.gameView = gameView;
     this.context = context;
     this.playerInventory = playerInventory;
     this.potThreadPool=potThreadPool;
+    this.basketManager=basketManager;
 
     playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
     loadMapFromJson("map.tmj"); //also handles creation of player
@@ -135,7 +136,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                             case "basket":
                                 Basket basket=new Basket(context,x,y,props);
                                 interactables.add(basket);
-                                baskets.add(basket);
+                                basketManager.registerBasket(basket);
                                 break;
                             case "table":
                                 interactables.add(new Table(context, x, y, props));
@@ -151,16 +152,6 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void basketUpdate(List<Ingredient> ingredients){
-        for (int i=0;i<baskets.size();i++){
-            baskets.get(i).setIngredient(ingredients.get(i).getName());
-        }
-    }
-
-    public Pot getPot(int index){
-        return pots.get(index);
     }
 
     private JSONObject extractProperties(JSONObject obj) throws org.json.JSONException {

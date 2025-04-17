@@ -16,11 +16,11 @@ public class Pot extends Interactable {
     PotFunctions potFunctions;
     private State state;
     private Bitmap emptySprite, cookingSprite, doneSprite;
-    private long cookingStartTime;
     private int cookingDuration = 3000; // ms
     //Shared pot thread pool
     private final PotThreadPool potThreadPool;
     private final Context context;
+    private final Object stateLock = new Object();
 
     public Pot(Context context, float x, float y, JSONObject props,PotThreadPool potThreadPool) {
         this.x = x;
@@ -47,52 +47,55 @@ public class Pot extends Interactable {
     @Override
     public void onInteract(Player player) {
         PlayerInventory inventory=player.getInventory();
-        switch (state) {
-            case EMPTY:
-                try {
-                    if (inventory.checkHeldType()== PlayerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
-                        potFunctions.addIngredient((Ingredient) inventory.getAndRemoveItem());
-                        Log.d("Pot","potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
+        synchronized (stateLock) {
+            switch (state) {
+                case EMPTY:
+                    try {
+                        if (inventory.checkHeldType()== PlayerInventory.INGREDIENT && !potFunctions.isReadyToCook() && !potFunctions.gotFood()){
+                            potFunctions.addIngredient((Ingredient) inventory.getAndRemoveItem());
+                            Log.d("Pot","potFunctions has "+ potFunctions.getIngredientsInside().size()+" ingredients");
 
-                        if (potFunctions.isReadyToCook()){
-                            Log.d("Pot","potFunctions is ready to cook");
-                            List<Ingredient> inPot= potFunctions.getIngredientsInside();
-                            Recipe cookRecipe=null;
-                            for (Recipe recipe:inventory.getRecipeList()){
-                                if (recipe.canCook(inPot)){
-                                    cookRecipe=recipe;
-                                    break;
+                            if (potFunctions.isReadyToCook()){
+                                Log.d("Pot","potFunctions is ready to cook");
+                                List<Ingredient> inPot= potFunctions.getIngredientsInside();
+                                Recipe cookRecipe=null;
+                                for (Recipe recipe:inventory.getRecipeList()){
+                                    if (recipe.canCook(inPot)){
+                                        cookRecipe=recipe;
+                                        break;
+                                    }
                                 }
-                            }
-                            if (cookRecipe==null){
-                                //Default waste recipe, no actual recipe then cook
-                                cookRecipe=new Recipe("Waste",new ArrayList<>());
-                            }
+                                if (cookRecipe==null){
+                                    //Default waste recipe, no actual recipe then cook
+                                    cookRecipe=new Recipe("Waste",new ArrayList<>());
+                                }
 
-                            state = State.COOKING;
-                            cookingStartTime = System.currentTimeMillis();
+                                state = State.COOKING;
 
-                            updateSprite();
-                            final Recipe recipeToCook=cookRecipe;
-                            potThreadPool.submit(() -> {
-                                potFunctions.cookIngredients(recipeToCook,(GameActivity)context);
-                                state=State.DONE;
                                 updateSprite();
-                            });
+                                final Recipe recipeToCook=cookRecipe;
+                                potThreadPool.submit(() -> {
+                                    potFunctions.cookIngredients(recipeToCook,(GameActivity)context);
+                                    synchronized (stateLock) {
+                                        state=State.DONE;
+                                    }
+                                    updateSprite();
+                                });
+                            }
                         }
+                    } catch (Exception e) {
+                        Log.e("Pot", "Error handling pot put in Ingredient: " + e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    Log.e("Pot", "Error handling pot put in Ingredient: " + e.getMessage(), e);
-                }
-                break;
-            case DONE:
-                if (potFunctions.gotFood() && inventory.checkHeldType()== PlayerInventory.EMPTY){
-                    inventory.grabItem(potFunctions.getFood());
-                    state = State.EMPTY;
-                    updateSprite();
-                    Log.d("Pot","got:"+inventory.getHeld().getName());
-                }
-                break;
+                    break;
+                case DONE:
+                    if (potFunctions.gotFood() && inventory.checkHeldType()== PlayerInventory.EMPTY){
+                        inventory.grabItem(potFunctions.getFood());
+                        state = State.EMPTY;
+                        updateSprite();
+                        Log.d("Pot","got:"+inventory.getHeld().getName());
+                    }
+                    break;
+            }
         }
     }
 
@@ -102,18 +105,22 @@ public class Pot extends Interactable {
             Log.e("DrawDebug", "Missing sprite for " + getClass().getSimpleName());
             return;
         }
-//        if (state == State.COOKING && System.currentTimeMillis() - cookingStartTime >= cookingDuration) {
-//            state = State.DONE;
-//            updateSprite();
-//        }
         canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
     }
 
     private void updateSprite() {
-        switch (state) {
-            case EMPTY: sprite = emptySprite; break;
-            case COOKING: sprite = cookingSprite; break;
-            case DONE: sprite = doneSprite; break;
+        synchronized (stateLock) {
+            switch (state) {
+                case EMPTY:
+                    sprite = emptySprite;
+                    break;
+                case COOKING:
+                    sprite = cookingSprite;
+                    break;
+                case DONE:
+                    sprite = doneSprite;
+                    break;
+            }
         }
     }
 

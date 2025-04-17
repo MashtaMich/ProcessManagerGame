@@ -10,7 +10,6 @@ public class PotFunctions {
     private final List<Ingredient> ingredientsInside;
     private CookedFood foodDone;
     private final int maxIngredients;
-    private boolean readyToCook;
     private final int cookTime;
     private final Object foodDoneLock = new Object();// to sync available list
     private final Object ingredientLock=new Object();//ingredient lock
@@ -22,9 +21,14 @@ public class PotFunctions {
     public PotFunctions(int cookTime){
         this.ingredientsInside=new ArrayList<>();
         this.maxIngredients=3;
-        this.readyToCook=false;
         this.foodDone=null;
         this.cookTime=cookTime;
+    }
+
+    public boolean isReadyToCook() {
+        synchronized (ingredientLock) {
+            return ingredientsInside.size() == maxIngredients;
+        }
     }
 
     public List<Ingredient> getIngredientsInside(){
@@ -47,13 +51,6 @@ public class PotFunctions {
     public void addIngredient(Ingredient ingredient){
         synchronized (ingredientLock) {
             ingredientsInside.add(ingredient);
-            readyToCook = ingredientsInside.size() == maxIngredients;
-        }
-    }
-
-    public boolean isReadyToCook(){
-        synchronized (ingredientLock) {
-            return readyToCook;
         }
     }
 
@@ -72,10 +69,7 @@ public class PotFunctions {
     public void cookIngredients(Recipe recipe,PotListener listener){
         boolean canCook;
         synchronized (ingredientLock) {
-            canCook = readyToCook;
-            if (canCook) {
-                readyToCook = false;
-            }
+            canCook=isReadyToCook();
         }
 
         if (canCook){
@@ -104,32 +98,6 @@ public class PotFunctions {
             }
 
             listener.potProgressUpdate(progress+1);
-        }
-    }
-
-    public void cookIngredients(Recipe recipe){
-        boolean canCook;
-        synchronized (ingredientLock) {
-            canCook = readyToCook;
-            if (canCook) {
-                readyToCook = false;
-            }
-        }
-
-        if (canCook){
-            CookedFood newFood;
-            try{
-                Thread.sleep(cookTime);
-            }catch(InterruptedException e){
-                Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
-            }
-            synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(), R.drawable.done_pot, new ArrayList<>(recipe.getIngredients()));
-                ingredientsInside.clear();
-            }
-            synchronized (foodDoneLock) {
-                this.foodDone = newFood;
-            }
         }
     }
 }

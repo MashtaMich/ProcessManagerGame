@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -34,7 +33,9 @@ public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
         ProcessAdapter.OnProcessInteractionListener,
         IngredientFetchWorker.ingredientFetchListener,
-        PotFunctions.PotListener{
+        IngredientBasketFiller.BasketFillListener,
+        PotFunctions.PotListener
+        {
 
     private static final String TAG = "GameActivity";
 
@@ -59,7 +60,6 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> potViews;
 
     private IngredientFetchWorker ingredientFetcher;
-    private IngredientInventory ingredientInventory;
     private View ingredientBlocker;
     private PlayerInventory playerInventory;
     private int selectedIngredientIndex=-1;
@@ -69,6 +69,9 @@ public class GameActivity extends AppCompatActivity implements
     private ImageView playerInventoryView;
     private SeekBar volumeSeekBar;
     private SharedPreferences sharedPreferences;
+    private IngredientQueue ingredientQueue;
+    private IngredientBasketFiller basketFiller;
+    private BasketManager basketManager;
 
 
 
@@ -175,11 +178,15 @@ public class GameActivity extends AppCompatActivity implements
             List<Recipe> recipeList=Recipe.getDefaultRecipes();
             playerInventory = new PlayerInventory(recipeList);
 
+            //Initialize basketManager
+            basketManager=new BasketManager(3);
+
             // Set up pool for PotFunctions calls
             potThreadPool=new PotThreadPool(maxPots);
+            ingredientQueue=new IngredientQueue(3);
             
             // Create game with the playerInventory
-            game = new Game(gameView, this, playerInventory,potThreadPool);
+            game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
             gameView.init(game);
 
             // Set up movement controls
@@ -276,8 +283,9 @@ public class GameActivity extends AppCompatActivity implements
     private void initializeInventory() {
         try {
             // Initialize ingredient fetcher and ingredientInventory
-            ingredientFetcher = new IngredientFetchWorker();
-            ingredientInventory = new IngredientInventory();
+            Log.d(TAG,""+basketManager);
+            basketFiller=new IngredientBasketFiller(ingredientQueue,basketManager);
+            ingredientFetcher = new IngredientFetchWorker(ingredientQueue,basketFiller);
             // playerInventory is initialized in initializeGameComponents
 
             // Initialize view lists
@@ -310,23 +318,6 @@ public class GameActivity extends AppCompatActivity implements
             if (option1 != null) availableIngredientsViews.add((ImageView) option1);
             if (option2 != null) availableIngredientsViews.add((ImageView) option2);
 
-//            // Initialize basket views
-//            basketViews = new ArrayList<>();
-//            View basket1 = findViewById(R.id.basket1);
-//            View basket2 = findViewById(R.id.basket2);
-//            View basket3 = findViewById(R.id.basket3);
-//
-//            if (basket1 != null) basketViews.add((ImageView) basket1);
-//            if (basket2 != null) basketViews.add((ImageView) basket2);
-//            if (basket3 != null) basketViews.add((ImageView) basket3);
-
-            //initialize pot views
-//            potViews=new ArrayList<>();
-//            View pot1=findViewById(R.id.potSlot1);
-//            View pot2=findViewById(R.id.potSlot2);
-//            if (pot1 != null) potViews.add((ImageView) pot1);
-//            if (pot2 != null) potViews.add((ImageView) pot2);
-
             // Get other UI elements
             swapOptionsLayout = findViewById(R.id.swapOptionsLayout);
             ingredientBlocker = findViewById(R.id.ingredientBlockerOverlay);
@@ -358,12 +349,12 @@ public class GameActivity extends AppCompatActivity implements
 
     private void initIngredientViews() {
         try {
-            if (ingredientInventory == null || ingredientFetcher == null) {
+            if (ingredientFetcher == null) {
                 Log.e(TAG, "ingredientInventory or ingredientFetcher is null");
                 return;
             }
 
-            List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(ingredientInventory.maxCap);
+            List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(this);
             Log.d(TAG, "Initial ingredients: " + initialList.size());
 
             if (initialList.isEmpty()) {
@@ -371,11 +362,7 @@ public class GameActivity extends AppCompatActivity implements
                 return;
             }
 
-            ingredientInventory.setInitialList(initialList);
-            //initializeBasketListeners();
-//            initializePotListeners();
-            updateInventoryUI();
-            updateAvailableUI();
+            setupInventoryClickListeners();
         } catch (Exception e) {
             Log.e(TAG, "Error initializing ingredient views: " + e.getMessage(), e);
         }
@@ -425,11 +412,11 @@ public class GameActivity extends AppCompatActivity implements
 
     private void handleAvailableIngredientClick(int index) {
         try {
-            if (selectedIngredientIndex != -1 && ingredientInventory != null && ingredientFetcher != null) {
+            if (selectedIngredientIndex != -1 && ingredientFetcher != null) {
                 List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
 
-                if (swapOptions != null && index < swapOptions.size() && selectedIngredientIndex < ingredientInventory.heldItemCount()) {
-                    Ingredient dropIngredient = ingredientInventory.getByIndex(selectedIngredientIndex);
+                if (swapOptions != null && index < swapOptions.size() && selectedIngredientIndex < basketManager.getBasketCount()) {
+                    Ingredient dropIngredient = basketManager.getIngredientFromBasket(selectedIngredientIndex);
 
                     if (index < availableIngredientsViews.size()) {
                         availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
@@ -441,8 +428,13 @@ public class GameActivity extends AppCompatActivity implements
                     if (ingredientBlocker != null) {
                         ingredientBlocker.setVisibility(VISIBLE);
                     }
+                    Log.d(TAG,"Made it to exchange, exchanging "+dropIngredient.getName());
+                    try{
+                        ingredientFetcher.exchangeIngredient(dropIngredient, swapOptions.get(index), this);
+                    }catch(Exception e){
+                        Log.e(TAG,"Failed to fetch ingredient:"+e.getLocalizedMessage());
+                    }
 
-                    ingredientFetcher.exchangeIngredient(dropIngredient, swapOptions.get(index), this);
                 }
             }
         } catch (Exception e) {
@@ -460,19 +452,10 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-    private void updateInventoryUI() {
+    private void updateInventoryUI(List<Ingredient> invHeld) {
         try {
-            if (ingredientInventory == null) {
-                Log.e(TAG, "ingredientInventory is null");
-                return;
-            }
-
-            List<Ingredient> invHeld = ingredientInventory.getHeld();
-            Log.d(TAG, "Running updateInventoryUI() with size = " + invHeld.size());
-
             updateInventoryIcons(invHeld);
-            updateBasketIcons(invHeld);
-            setupInventoryClickListeners(invHeld);
+            setupInventoryClickListeners();
 
             Log.d(TAG, "Finished updateInventoryUI()");
         } catch (Exception e) {
@@ -502,69 +485,18 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
-//    private void initializeBasketListeners(){
-//        try {
-//            if (basketViews == null) {
-//                return;
-//            }
-//
-//            for (int i = 0; i < basketViews.size(); i++) {
-//                final int index=i;
-//                ImageView basketView = basketViews.get(index);
-//                if (basketView == null) continue;
-//                Log.d(TAG,"Adding basket listener at index:"+index);
-//                basketView.setOnClickListener(v -> handleBasketClick(index));
-//            }
-//        } catch (Exception e) {
-//            Log.e(TAG, "Error adding basket listeners: " + e.getMessage(), e);
-//        }
-//    }
-
-//    private void handleBasketClick(int index){
-//        Log.d(TAG,"clicked on basket index:"+index);
-//        List<Ingredient> invHeld=ingredientInventory.getHeld();
-//        try {
-//            if (playerInventory.checkHeldType()== PlayerInventory.EMPTY){
-//                Ingredient ingredientGrab=invHeld.get(index);
-//                playerInventory.grabItem(new Ingredient(ingredientGrab.getId()));
-//            }
-//        } catch (Exception e) {
-//            Log.e(TAG, "Error handling basket click: " + e.getMessage(), e);
-//            resetSelectionState();
-//        }
-//    }
-
-    private void updateBasketIcons(List<Ingredient> invHeld) {
+    private void setupInventoryClickListeners() {
         try {
-
-            if (invHeld == null) {
-                return;
-            }
-
-            game.basketUpdate(invHeld);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error updating basket icons: " + e.getMessage(), e);
-        }
-    }
-
-    private void setupInventoryClickListeners(List<Ingredient> invHeld) {
-        try {
-            if (inventoryViews == null || invHeld == null) {
+            if (inventoryViews == null) {
                 return;
             }
 
             for (int i = 0; i < inventoryViews.size(); i++) {
-                if (i >= invHeld.size()) {
-                    continue;
-                }
 
                 final int index = i;
                 ImageView invView = inventoryViews.get(i);
 
                 if (invView == null) continue;
-
-                Log.d(TAG, "Setting listener for ingredientInventory index " + i + " (" + invHeld.get(i).getName() + ")");
 
                 invView.setOnClickListener(v -> handleInventoryItemClick(index));
             }
@@ -644,45 +576,37 @@ public class GameActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void receiveNewIngredient(Ingredient newIngredient) {
-        runOnUiThread(() -> {
-            try {
-                if (newIngredient != null && ingredientInventory != null && selectedIngredientIndex >= 0 && selectedIngredientIndex < ingredientInventory.heldItemCount()) {
-                    ingredientInventory.swapIngredientAtIndex(selectedIngredientIndex, newIngredient);
-                }
-
-                Log.d(TAG, "Calling updateInventoryUI()");
-                updateInventoryUI();
-                Log.d(TAG, "Completed updateInventoryUI()");
-                updateAvailableUI();
-
-                // Reset selection states safely
-                resetSelectionState();
-
-                // Re-enable ingredientInventory items
-                enableAll(inventoryViews);
-
-                // Hide UI elements
-                if (ingredientBlocker != null) {
-                    ingredientBlocker.setVisibility(GONE);
-                }
-
-                if (swapOptionsLayout != null) {
-                    swapOptionsLayout.setVisibility(INVISIBLE);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error in receiveNewIngredient: " + e.getMessage(), e);
-                resetSelectionState();
-            }
-        });
-    }
-
-    @Override
     public void fetchIngredientProgressUpdate(int progress){
         //Add progress updater for ingredient fetch
         runOnUiThread(() -> {
             Log.d(TAG,"Received progress update for ingredient:"+progress);
         });
+    }
+
+    @Override
+    public void finishedBasketFilling(List<Ingredient> fillOrder){
+            runOnUiThread(() -> {
+                try {
+                    updateAvailableUI();
+                    updateInventoryUI(fillOrder);
+                    // Reset selection states safely
+                    resetSelectionState();
+
+                    // Re-enable ingredientInventory items
+                    enableAll(inventoryViews);
+
+                    // Hide UI elements
+                    if (ingredientBlocker != null) {
+                        ingredientBlocker.setVisibility(GONE);
+                    }
+
+                    if (swapOptionsLayout != null) {
+                        swapOptionsLayout.setVisibility(INVISIBLE);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error in finish basket filling: " + e.getMessage(), e);
+                }
+            });
     }
 
     @Override
@@ -724,8 +648,6 @@ public class GameActivity extends AppCompatActivity implements
             Log.e(TAG, "Error resetting selection state: " + e.getMessage(), e);
         }
     }
-
-
 
     @Override
     protected void onPause() {

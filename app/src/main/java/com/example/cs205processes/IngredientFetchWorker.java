@@ -10,27 +10,31 @@ import java.util.concurrent.Executors;
 
 public class IngredientFetchWorker {
     // to simulate a worker maintaining the ingredient storage
-    private static final String TAG = "IngredientFetcher";
+    private static final String TAG = "Ingredient Fetcher";
+    private final IngredientBasketFiller basketFiller;
     private final ExecutorService executor= Executors.newSingleThreadExecutor();
     private final int totalIngredients =5;
     private List<Ingredient> availableList=new ArrayList<>(totalIngredients);
+    private List<Ingredient> usedList=new ArrayList<>();
     private final int fetchTime =3000;
     private final Random random;
     // rest of the thread is the ingredient storage room
-
+    private final IngredientQueue queue;
     private final Object availableLock = new Object();// to sync available list
+    private final int maxCap=3;
 
 
     public interface ingredientFetchListener{
-        void receiveNewIngredient(Ingredient newIngredient);
         void fetchIngredientProgressUpdate(int progress);
     }
 
-    public IngredientFetchWorker(){
+    public IngredientFetchWorker(IngredientQueue queue,IngredientBasketFiller basketFiller){
         // fill the available list
         Log.d(TAG, "Initializing ingredient list");
         generateIngredientList();
+        this.queue=queue;
         this.random=new Random();
+        this.basketFiller=basketFiller;
     }
 
     private void generateIngredientList(){
@@ -51,52 +55,87 @@ public class IngredientFetchWorker {
     }
 
     public void exchangeIngredient(Ingredient returnIngredient,Ingredient getIngredient,ingredientFetchListener listener){
-        executor.submit(()->{
-            fetchIngredient(returnIngredient,getIngredient,listener);
-        });
+
+            executor.submit(()->{
+                try{
+                    fetchIngredient(returnIngredient,getIngredient,listener);
+                }catch(Exception e){
+                    Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
+                }
+            });
+
     }
 
-    public List<Ingredient> generateIngredientsRandom(Integer get_number){
+    public void updateBaskets(ingredientFetchListener listener){
+            executor.submit(()->{
+                try{
+                    updatingBaskets();
+                    basketFiller.startFilling((IngredientBasketFiller.BasketFillListener) listener);
+                }catch(Exception e){
+                    Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
+                }
+            });
+
+    }
+
+    private void updatingBaskets() {
+        try{
+            if (usedList.size()!=3){
+                Log.e(TAG,"Used list is not correct size");
+                return;
+            }
+            for (Ingredient ingredient:usedList){
+                queue.put(ingredient);
+            }
+        }catch(InterruptedException e){
+            Log.e(TAG, "filler interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+    }
+
+    public List<Ingredient> generateIngredientsRandom(ingredientFetchListener listener){
         //Done to generate the initial inventory
         //Get number depends on the max_cap in Inventory class
-        List<Ingredient> result=new ArrayList<>();
         // get random ingredients from the available list
         synchronized (availableLock) {
-            for (int i = 0; i < get_number; i++) {
+            for (int i = 0; i < maxCap; i++) {
                 if (availableList.isEmpty()) {
                     break;
                 }
 
                 int randomIndex = random.nextInt(availableList.size());
-                Ingredient ingredient = availableList.get(randomIndex);
-                result.add(ingredient);
 
                 // remove ingredient to prevent duplicates
-                availableList.remove(randomIndex);
+                usedList.add(availableList.remove(randomIndex));
             }
         }
-        return result;
+        updateBaskets(listener);
+        return usedList;
     }
 
     private void fetchIngredient(Ingredient returnIngredient,Ingredient ingredient, ingredientFetchListener listener) {
+        Log.d(TAG,"Starting fetch");
         try {
             for (int i=1;i<=fetchTime/1000;i++){
-                Thread.sleep(1000);
-                listener.fetchIngredientProgressUpdate(i);
+                    Thread.sleep(1000);
+                    listener.fetchIngredientProgressUpdate(i);
             }
         } catch (InterruptedException e) {
-            // handle later
-            Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
+                // handle later
+                Log.e(TAG,"Error at fetch Ingredient "+e.getLocalizedMessage());
         }
         Ingredient result = null;
         // get input ingredient from the available list
         synchronized (availableLock) {
             //replace ingredient to fetch from inventory
-            if (!availableList.contains(returnIngredient) && availableList.contains(ingredient)) {
+            if (usedList.contains(returnIngredient) && availableList.contains(ingredient)) {
                 int swapItemIndex=availableList.indexOf(ingredient);
                 availableList.set(swapItemIndex,returnIngredient);
 
                 result = ingredient;
+                swapItemIndex=usedList.indexOf(returnIngredient);
+                usedList.set(swapItemIndex,result);
             }
         }
         if (result != null) {
@@ -104,49 +143,9 @@ public class IngredientFetchWorker {
         }else{
             Log.d(TAG,"Failed to swap  "+returnIngredient.getName());
         }
-        listener.receiveNewIngredient(result);
+
         listener.fetchIngredientProgressUpdate(fetchTime/1000+1);
-    }
-
-    public void returnIngredients(List<Ingredient> ingredients){
-        synchronized (availableLock) {
-            for (int i=0;i<ingredients.size();i++){
-                Ingredient ingredient=ingredients.get(i);
-                if (!availableList.contains(ingredient)){
-                    availableList.add(ingredient);
-                }
-            }
-        }
-    }
-
-    public void returnIngredient(Ingredient ingredient){
-        synchronized (availableLock) {
-            if (!availableList.contains(ingredient)){
-                availableList.add(ingredient);
-            }
-        }
-        Log.d(TAG, "Added "+ingredient.getName());
-    }
-
-    public Ingredient getIngredient(Ingredient ingredient){
-        //For testing
-        synchronized (availableLock) {
-            availableList.remove(ingredient);
-        }
-        Log.d(TAG, "Removed and returned "+ingredient.getName());
-        return ingredient;
-    }
-
-    private void resetAvailableList(){
-        synchronized (availableLock) {
-            this.availableList.clear();
-            //Regenerate available List
-            List<Ingredient> ingredientList = new ArrayList<>();
-            for (int i = 0; i < totalIngredients; i++) {
-                Ingredient ingredient = new Ingredient(i);
-                ingredientList.add(ingredient);
-            }
-            this.availableList = ingredientList;
-        }
+        Log.d(TAG,"Starting update Baskets");
+        updateBaskets(listener);
     }
 }
