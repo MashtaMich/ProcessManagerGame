@@ -3,6 +3,7 @@ package com.example.cs205processes;
 import android.graphics.*;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 public class Player {
     private PlayerInventory inventory;
@@ -58,7 +59,13 @@ public class Player {
     public boolean isNear(Interactable obj, int tileSize) {
         float dx = Math.abs(x - obj.x);
         float dy = Math.abs(y - obj.y);
-        return dx < tileSize && dy < tileSize;
+        
+        // Use a more lenient distance check (1.5 tiles)
+        float threshold = tileSize * 1.5f;
+        boolean isNear = dx < threshold && dy < threshold;
+        
+        Log.d("Player", "isNear check: dx=" + dx + ", dy=" + dy + ", threshold=" + threshold + ", result=" + isNear);
+        return isNear;
     }
 
     public void move(int dx, int dy) {

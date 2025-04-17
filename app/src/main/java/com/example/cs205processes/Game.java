@@ -193,15 +193,28 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory)
 
     // Called when player presses the 'interact' button (uses proximity check)
     public void interact() {
+        Log.d("Interact", "interact() method called");
+        Log.d("Interact", "Player position: x=" + player.getX() + ", y=" + player.getY());
+        
         // Use proximity check for button-based interaction
         for (Interactable obj : interactables) {
-            Log.d("Interact", "inside for loop");
+            Log.d("Interact", "Checking interactable: " + obj.getClass().getSimpleName() + " at x=" + obj.x + ", y=" + obj.y);
+            
+            float dx = Math.abs(player.getX() - obj.x);
+            float dy = Math.abs(player.getY() - obj.y);
+            Log.d("Interact", "Distance: dx=" + dx + ", dy=" + dy + ", threshold=" + TILE_SIZE);
+            
             if (player.isNear(obj, TILE_SIZE)) {
+                Log.d("Interact", "Player is near " + obj.getClass().getSimpleName());
                 obj.onInteract(player);
                 Log.d("Interact", "Proximity interact: " + obj.getClass().getSimpleName());
                 return;
+            } else {
+                Log.d("Interact", "Player is NOT near " + obj.getClass().getSimpleName());
             }
         }
+        
+        Log.d("Interact", "No nearby interactable found");
     }
 
     // Called when screen is tapped
