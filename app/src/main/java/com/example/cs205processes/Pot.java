@@ -174,4 +174,7 @@ public class Pot extends Interactable {
         return potFunctions.getIngredientsInside();
     }
 
+    public State getState(){
+        return this.state;
+    }
 }

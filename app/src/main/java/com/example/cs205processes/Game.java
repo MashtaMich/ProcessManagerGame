@@ -156,6 +156,10 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
         }
     }
 
+    public List<Pot> getPots(){
+        return pots;
+    }
+
     private JSONObject extractProperties(JSONObject obj) throws org.json.JSONException {
         JSONObject out = new JSONObject();
         if (obj.has("properties")) {

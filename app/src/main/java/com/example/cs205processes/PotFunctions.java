@@ -13,6 +13,7 @@ public class PotFunctions {
     private final int cookTime;
     private final Object foodDoneLock = new Object();// to sync available list
     private final Object ingredientLock=new Object();//ingredient lock
+    private Recipe recipeCooking;
 
     public interface PotListener{//To send to UI thread in GameActivity
         void potProgressUpdate(int progress);
@@ -74,6 +75,7 @@ public class PotFunctions {
 
         if (canCook){
             CookedFood newFood;
+            this.recipeCooking=recipe;
 
             // Start cooking the ingredients
             int progress = 0; // Progress will be every 1 second
@@ -90,11 +92,47 @@ public class PotFunctions {
 
             synchronized (ingredientLock) {
                 newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
-                ingredientsInside.clear();
+                this.ingredientsInside.clear();
             }
             synchronized (foodDoneLock) {
                 this.foodDone = newFood;
             }
+            this.recipeCooking=null;
+
+            listener.potProgressUpdate(progress+1);
+        }
+    }
+
+    public void restartCooking(Recipe recipe,PotListener listener,Integer progress){
+        boolean canCook;
+        synchronized (ingredientLock) {
+            canCook=isReadyToCook();
+        }
+
+        if (canCook){
+            CookedFood newFood;
+            this.recipeCooking=recipe;
+
+            // restart cooking the ingredients
+
+            try {
+                while (progress<cookTime/1000){
+                    Thread.sleep(1000);
+                    progress++;
+                    listener.potProgressUpdate(progress);
+                }
+            } catch (InterruptedException e) {
+                Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
+            }
+
+            synchronized (ingredientLock) {
+                newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
+                this.ingredientsInside.clear();
+            }
+            synchronized (foodDoneLock) {
+                this.foodDone = newFood;
+            }
+            this.recipeCooking=null;
 
             listener.potProgressUpdate(progress+1);
         }
