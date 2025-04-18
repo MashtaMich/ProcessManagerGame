@@ -56,15 +56,13 @@ public class GameActivity extends AppCompatActivity implements
     private List<ImageView> availableIngredientsViews;
     private LinearLayout swapOptionsLayout;
 
-//    private List<ImageView> basketViews;
-    private List<ImageView> potViews;
-
     private IngredientFetchWorker ingredientFetcher;
     private View ingredientBlocker;
     private PlayerInventory playerInventory;
     private int selectedIngredientIndex=-1;
     private int selectedSwapIndex=-1;
     private final int maxPots=2;
+    private final int maxIngredients=3;
     private PotThreadPool potThreadPool;
     private ImageView playerInventoryView;
     private SeekBar volumeSeekBar;
@@ -179,11 +177,11 @@ public class GameActivity extends AppCompatActivity implements
             playerInventory = new PlayerInventory(recipeList);
 
             //Initialize basketManager
-            basketManager=new BasketManager(3);
+            basketManager=new BasketManager(maxIngredients);
 
             // Set up pool for PotFunctions calls
             potThreadPool=new PotThreadPool(maxPots);
-            ingredientQueue=new IngredientQueue(3);
+            ingredientQueue=new IngredientQueue(maxIngredients);
             
             // Create game with the playerInventory
             game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
@@ -416,7 +414,7 @@ public class GameActivity extends AppCompatActivity implements
                 List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
 
                 if (swapOptions != null && index < swapOptions.size() && selectedIngredientIndex < basketManager.getBasketCount()) {
-                    Ingredient dropIngredient = basketManager.getIngredientFromBasket(selectedIngredientIndex);
+                    Ingredient dropIngredient = basketManager.getIngredientFromBasket(maxIngredients-1-selectedIngredientIndex);
 
                     if (index < availableIngredientsViews.size()) {
                         availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);
@@ -455,7 +453,6 @@ public class GameActivity extends AppCompatActivity implements
     private void updateInventoryUI(List<Ingredient> invHeld) {
         try {
             updateInventoryIcons(invHeld);
-            setupInventoryClickListeners();
 
             Log.d(TAG, "Finished updateInventoryUI()");
         } catch (Exception e) {

@@ -17,7 +17,7 @@ public class Game {
         void draw(Canvas canvas);
     }
     private final GameView gameView;
-
+    private String TAG="Game";
     private GameManager gameManager;
     private final Paint paint = new Paint();
     public static final int TILE_SIZE = 120;
@@ -103,11 +103,12 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                         int val = data.getInt(j);
                         tileLayer[j / mapWidth][j % mapWidth] = data.getInt(j);
                         if (val == 2) {  // 2 = spawn tile
+                            Log.d(TAG, "Found player spawn tile");
                             int col = j % mapWidth;
                             int row = j / mapWidth;
 
 
-                            player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this,playerInventory);
+                            this.player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this,playerInventory);
                             //player.setInventory(playerInventory); // Use the shared inventory
 
                         }
@@ -149,8 +150,9 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                     }
                 }
             }
+            Log.d(TAG,"Successfully loaded map");
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG,"Failed to set up map:"+e.getLocalizedMessage());
         }
     }
 

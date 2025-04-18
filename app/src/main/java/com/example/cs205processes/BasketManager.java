@@ -30,7 +30,7 @@ public class BasketManager {
         Log.d(TAG,"Updating basket content");
         if (basketIndex > -1 && basketIndex < baskets.size()) {
             baskets.get(basketIndex).setIngredient(ingredient.getName().toLowerCase());
-            Log.d(TAG, "Updated basket " + basketIndex+1 + " to: " + ingredient.getName());
+            Log.d(TAG, "Updated basket " + (basketIndex+1) + " to: " + ingredient.getName());
         }
     }
 

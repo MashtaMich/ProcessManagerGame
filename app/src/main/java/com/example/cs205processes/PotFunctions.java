@@ -90,7 +90,7 @@ public class PotFunctions {
             }
 
             synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(), R.drawable.done_pot, new ArrayList<>(recipe.getIngredients()));
+                newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
                 ingredientsInside.clear();
             }
             synchronized (foodDoneLock) {

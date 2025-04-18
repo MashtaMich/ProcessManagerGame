@@ -68,6 +68,31 @@
                  "name":"pot2",
                  "properties":[
                         {
+                         "name":"cabbage",
+                         "type":"string",
+                         "value":"cabbage.png"
+                        },
+                        {
+                         "name":"carrot",
+                         "type":"string",
+                         "value":"carrot.png"
+                        },
+                        {
+                         "name":"onion",
+                         "type":"string",
+                         "value":"onion.png"
+                        },
+                        {
+                         "name":"potato",
+                         "type":"string",
+                         "value":"potato.png"
+                        },
+                        {
+                         "name":"tomato",
+                         "type":"string",
+                         "value":"tomato.png"
+                        },
+                        {
                          "name":"cooking_sprite",
                          "type":"string",
                          "value":"pot_cooking.png"
@@ -105,6 +130,31 @@
                  "id":6,
                  "name":"pot1",
                  "properties":[
+                        {
+                         "name":"cabbage",
+                         "type":"string",
+                         "value":"cabbage.png"
+                        },
+                        {
+                         "name":"carrot",
+                         "type":"string",
+                         "value":"carrot.png"
+                        },
+                        {
+                         "name":"onion",
+                         "type":"string",
+                         "value":"onion.png"
+                        },
+                        {
+                         "name":"potato",
+                         "type":"string",
+                         "value":"potato.png"
+                        },
+                        {
+                         "name":"tomato",
+                         "type":"string",
+                         "value":"tomato.png"
+                        },
                         {
                          "name":"cooking_sprite",
                          "type":"string",

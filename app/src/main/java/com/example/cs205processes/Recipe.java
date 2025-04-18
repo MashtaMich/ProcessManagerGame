@@ -18,6 +18,7 @@ public class Recipe {
     private String id;
     private String name;
     private List<Ingredient> ingredients;
+    protected int iconResourceId;
 
     public Recipe(String name, List<Ingredient> ingredients) {
         this.id = java.util.UUID.randomUUID().toString();
@@ -69,12 +70,12 @@ public class Recipe {
         return ingredients;
     }
 
-    public boolean have_all_ingredients(List<Ingredient> inventory_list){
-        return new HashSet<>(this.ingredients).containsAll(inventory_list);
+    public boolean haveAllIngredients(List<Ingredient> inventoryList){
+        return new HashSet<>(this.ingredients).containsAll(inventoryList);
     }
 
     public boolean canCook(List<Ingredient> potList){
-        return have_all_ingredients(potList) && haveSameNumIngredients(potList);
+        return haveAllIngredients(potList) && haveSameNumIngredients(potList);
     }
 
     public boolean haveSameNumIngredients(List<Ingredient> potList){

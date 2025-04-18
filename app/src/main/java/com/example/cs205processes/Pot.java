@@ -8,14 +8,17 @@ import android.widget.ImageView;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class Pot extends Interactable {
+    private String TAG="pot";
     private enum State { EMPTY, COOKING, DONE }
-    PotFunctions potFunctions;
+    private PotFunctions potFunctions;
     private State state;
     private Bitmap emptySprite, cookingSprite, doneSprite;
+    private HashMap<String,Bitmap> ingredientSprites=new HashMap<>();
     private int cookingDuration = 3000; // ms
     //Shared pot thread pool
     private final PotThreadPool potThreadPool;
@@ -33,15 +36,29 @@ public class Pot extends Interactable {
             this.state = State.valueOf(props.optString("state", "empty").toUpperCase());
             this.cookingDuration = props.optInt("cooking_time", 3000);
 
-            emptySprite = loadSprite(context, props.getString("empty_sprite"));
-            cookingSprite = loadSprite(context, props.getString("cooking_sprite"));
-            doneSprite = loadSprite(context, props.getString("done_sprite"));
+            loadSprites(context,props);
 
 
             updateSprite();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG,"Error at setting up pot:"+e.getLocalizedMessage());
         }
+    }
+
+    private void loadSprites(Context context,JSONObject props){
+        try{
+            this.emptySprite = loadSprite(context, props.getString("empty_sprite"));
+            this.cookingSprite = loadSprite(context, props.getString("cooking_sprite"));
+            this.doneSprite = loadSprite(context, props.getString("done_sprite"));
+            ingredientSprites.put("carrot",loadSprite(context,props.getString("carrot")));
+            ingredientSprites.put("potato",loadSprite(context,props.getString("potato")));
+            ingredientSprites.put("onion",loadSprite(context,props.getString("onion")));
+            ingredientSprites.put("cabbage",loadSprite(context,props.getString("cabbage")));
+            ingredientSprites.put("tomato",loadSprite(context,props.getString("tomato")));
+        }catch (Exception e){
+            Log.e(TAG,"Error at setting up pot sprites:"+e.getLocalizedMessage());
+        }
+
     }
 
     @Override
@@ -84,7 +101,7 @@ public class Pot extends Interactable {
                             }
                         }
                     } catch (Exception e) {
-                        Log.e("Pot", "Error handling pot put in Ingredient: " + e.getMessage(), e);
+                        Log.e(TAG, "Error handling pot put in Ingredient: " + e.getMessage(), e);
                     }
                     break;
                 case DONE:
@@ -92,7 +109,7 @@ public class Pot extends Interactable {
                         inventory.grabItem(potFunctions.getFood());
                         state = State.EMPTY;
                         updateSprite();
-                        Log.d("Pot","got:"+inventory.getHeld().getName());
+                        Log.d(TAG,"got:"+inventory.getHeld().getName());
                     }
                     break;
             }
@@ -106,7 +123,34 @@ public class Pot extends Interactable {
             return;
         }
         canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
+        List<Ingredient> ingredients = potFunctions.getIngredientsInside();
+        if (!ingredients.isEmpty()) {
+            drawIngredientsAbovePot(canvas, paint, TILE_SIZE, ingredients);
+        }
     }
+
+    private void drawIngredientsAbovePot(Canvas canvas, Paint paint, int TILE_SIZE, List<Ingredient> ingredients) {
+        //3 icons above pot max since capacity is 3, so tile size/3
+        int iconSize = TILE_SIZE / 3;
+        int padding = 5;//To prevent the objects from being overlapping
+        int startX = (int) x;
+        int startY = (int) (y - iconSize - padding); // move above pot
+
+        for (int i = 0; i < ingredients.size(); i++) {
+            String ingredientName = ingredients.get(i).getName();
+            Bitmap icon = ingredientSprites.get(ingredientName);
+
+            if (icon != null) {
+                Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, iconSize, iconSize, true);
+                canvas.drawBitmap(scaledIcon, startX + i * (iconSize + padding), startY, paint);
+            } else {
+                // draw placeholder if missing icon
+                paint.setColor(Color.RED);
+                canvas.drawRect(startX + i * (iconSize + padding), startY, startX + i * (iconSize + padding) + iconSize, startY + iconSize, paint);
+            }
+        }
+    }
+
 
     private void updateSprite() {
         synchronized (stateLock) {
