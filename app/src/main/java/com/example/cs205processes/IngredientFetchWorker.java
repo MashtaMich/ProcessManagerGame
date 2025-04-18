@@ -18,7 +18,6 @@ public class IngredientFetchWorker {
     private List<Ingredient> usedList=new ArrayList<>();
     private final int fetchTime =3000;
     private final Random random;
-    // rest of the thread is the ingredient storage room
     private final IngredientQueue queue;
     private final Object availableLock = new Object();// to sync available list
     private final int maxCap=3;
@@ -95,9 +94,6 @@ public class IngredientFetchWorker {
     }
 
     public List<Ingredient> generateIngredientsRandom(ingredientFetchListener listener){
-        //Done to generate the initial inventory
-        //Get number depends on the max_cap in Inventory class
-        // get random ingredients from the available list
         synchronized (availableLock) {
             for (int i = 0; i < maxCap; i++) {
                 if (availableList.isEmpty()) {

@@ -23,8 +23,6 @@ public class ElapsedTimer {
 
     public void resume() {
         if (paused) {
-            // When resuming, update the lastTimestamp to the current time
-            // This effectively ignores the time that passed while paused
             lastTimestamp = System.currentTimeMillis();
             paused = false;
         }

@@ -72,21 +72,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return false;
     }
 
-    /*
-     * To detect if user has clicked on any region that has interactables
-     */
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//            float tapX = event.getX();
-//            float tapY = event.getY();
-//
-//            game.handleTap(tapX, tapY); // forward to Game.java
-//        }
-//        return true;
-//    }
-
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         // No-op for now. Required by SurfaceHolder.Callback.

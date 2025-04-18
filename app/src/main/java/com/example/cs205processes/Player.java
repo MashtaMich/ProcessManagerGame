@@ -18,8 +18,6 @@ public class Player {
     private int tileSize = 120;
     private Game game;
 
-
-
     public Player(float x, float y, Bitmap sprite, int tileSize, Game game,PlayerInventory playerInventory) {
         this.x = x;
         this.y = y;
@@ -140,8 +138,6 @@ public class Player {
             y += moveSpeed * dy / dist;
         }
     }
-
-
 
     public void bounce(float dx, float dy) {
         final float bounceDist = 10f; // how much to nudge
