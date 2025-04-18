@@ -198,6 +198,8 @@ public class GameActivity extends AppCompatActivity implements
             state.setScore(gameManager.getScore());
             state.setDeadProcessCount(gameManager.getDeadProcessCount());
 
+            FoodItem heldItem = playerInventory.getHeld();
+
             // Save minimal process information
             List<GameState.ProcessInfo> processInfos = new ArrayList<>();
             for (Process process : gameManager.getActiveProcesses()) {
@@ -214,6 +216,36 @@ public class GameActivity extends AppCompatActivity implements
             // Save to SharedPreferences as a simple solution
             SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
+
+            if (heldItem != null) {
+                int itemType = playerInventory.checkHeldType();
+
+                // Save item type
+                editor.putInt("heldItemType", itemType);
+
+                // Save item ID and name
+                editor.putInt("heldItemId", heldItem.getId());
+                editor.putString("heldItemName", heldItem.getName());
+
+                // For cooked food, save ingredients
+                if (itemType == PlayerInventory.COOKED && heldItem instanceof CookedFood) {
+                    CookedFood cookedFood = (CookedFood) heldItem;
+                    List<Ingredient> ingredients = cookedFood.getMadeWith();
+
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        editor.putInt("heldItemIngredientsCount", ingredients.size());
+
+                        for (int i = 0; i < ingredients.size(); i++) {
+                            Ingredient ingredient = ingredients.get(i);
+                            editor.putInt("heldItemIngredient_" + i + "_id", ingredient.getId());
+                            editor.putString("heldItemIngredient_" + i + "_name", ingredient.getName());
+                        }
+                    }
+                }
+            } else {
+                // Nothing held
+                editor.putInt("heldItemType", PlayerInventory.EMPTY);
+            }
 
             // Convert to JSON or serialized string
             // For simplicity, just save the core data individually
@@ -251,6 +283,43 @@ public class GameActivity extends AppCompatActivity implements
 
             // Update game manager (safely)
             gameManager.setScore(score);
+
+            int heldItemType = prefs.getInt("heldItemType", PlayerInventory.EMPTY);
+            playerInventory.getAndRemoveItem();
+
+            if (heldItemType != PlayerInventory.EMPTY) {
+                int itemId = prefs.getInt("heldItemId", 0);
+                String itemName = prefs.getString("heldItemName", "");
+
+                FoodItem itemToHold = null;
+
+                if (heldItemType == PlayerInventory.INGREDIENT) {
+                    // Create a simple ingredient
+                    itemToHold = new Ingredient(itemId);
+                }
+                else if (heldItemType == PlayerInventory.COOKED) {
+                    // Get ingredients for cooked food
+                    int ingredientsCount = prefs.getInt("heldItemIngredientsCount", 0);
+                    List<Ingredient> ingredients = new ArrayList<>();
+
+                    for (int i = 0; i < ingredientsCount; i++) {
+                        int ingId = prefs.getInt("heldItemIngredient_" + i + "_id", 0);
+                        Ingredient ingredient = new Ingredient(ingId);
+                        ingredients.add(ingredient);
+                    }
+
+                    // Create cooked food
+                    itemToHold = new CookedFood(itemId, itemName, ingredients);
+                }
+
+                // If valid item was created, add to inventory
+                if (itemToHold != null) {
+                    playerInventory.grabItem(itemToHold);
+                }
+            }
+
+            // Make sure the player inventory view is updated
+            updatePlayerInventoryView();
 
             // Update UI
             updateScoreDisplay(score);
