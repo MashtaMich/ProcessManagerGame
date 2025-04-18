@@ -208,6 +208,13 @@ public class GameManager {
         }
     }
 
+    public void setDeadProcessCount(int count) {
+        this.deadProcessCount = count;
+
+        if (deadProcessCount >= MAX_DEAD_PROCESSES && !isGameOver) {
+            endGame();
+        }
+    }
     private void handlePendingRemovals() {
         synchronized (mutex) {
             if (!pendingRemovals.isEmpty()) {

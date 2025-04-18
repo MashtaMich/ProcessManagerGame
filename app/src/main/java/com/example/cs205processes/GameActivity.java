@@ -187,43 +187,26 @@ public class GameActivity extends AppCompatActivity implements
     // Simple save method
     private void saveGameState() {
         try {
-            // Create a basic GameState
-            GameState state = new GameState();
-            // Save player position
-            Player player = game.getPlayer();
-            state.setPlayerX(player.getX());
-            state.setPlayerY(player.getY());
-
-            // Save score and progress
-            state.setScore(gameManager.getScore());
-            state.setDeadProcessCount(gameManager.getDeadProcessCount());
-
-            FoodItem heldItem = playerInventory.getHeld();
-
-            // Save minimal process information
-            List<GameState.ProcessInfo> processInfos = new ArrayList<>();
-            for (Process process : gameManager.getActiveProcesses()) {
-                if (!process.isComplete() && !process.isDead()) {
-                    processInfos.add(new GameState.ProcessInfo(
-                            process.getRecipe().getName(),
-                            process.getTimeRemaining(),
-                            process.getTimeLimit()
-                    ));
-                }
-            }
-            state.setActiveProcesses(processInfos);
-
-            // Save to SharedPreferences as a simple solution
+            // Get SharedPreferences and create an editor
             SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
 
+            // Save player position
+            Player player = game.getPlayer();
+            editor.putFloat("playerX", player.getX());
+            editor.putFloat("playerY", player.getY());
+
+            // Save score and progress
+            int score = gameManager.getScore();
+            int deadProcessCount = gameManager.getDeadProcessCount();
+            editor.putInt("score", score);
+            editor.putInt("deadProcessCount", deadProcessCount);
+
+            // Save Player inventory
+            FoodItem heldItem = playerInventory.getHeld();
             if (heldItem != null) {
                 int itemType = playerInventory.checkHeldType();
-
-                // Save item type
                 editor.putInt("heldItemType", itemType);
-
-                // Save item ID and name
                 editor.putInt("heldItemId", heldItem.getId());
                 editor.putString("heldItemName", heldItem.getName());
 
@@ -243,50 +226,96 @@ public class GameActivity extends AppCompatActivity implements
                     }
                 }
             } else {
-                // Nothing held
                 editor.putInt("heldItemType", PlayerInventory.EMPTY);
             }
 
-            // Convert to JSON or serialized string
-            // For simplicity, just save the core data individually
-            editor.putFloat("playerX", state.getPlayerX());
-            editor.putFloat("playerY", state.getPlayerY());
-            editor.putInt("score", state.getScore());
-            editor.putInt("deadProcessCount", state.getDeadProcessCount());
-            editor.putInt("processCount", processInfos.size());
+            // Save Table items
+            List<Table> tables = game.getTables();
+            editor.putInt("tableCount", tables.size());
+
+            for (int i = 0; i < tables.size(); i++) {
+                Table table = tables.get(i);
+                FoodItem itemOnTable = table.getItemOnTable();
+
+                if (itemOnTable != null) {
+                    int itemType = (itemOnTable instanceof Ingredient) ?
+                            PlayerInventory.INGREDIENT : PlayerInventory.COOKED;
+                    editor.putInt("table_" + i + "_itemType", itemType);
+                    editor.putInt("table_" + i + "_itemId", itemOnTable.getId());
+                    editor.putString("table_" + i + "_itemName", itemOnTable.getName());
+
+                    // For cooked food, save ingredients
+                    if (itemType == PlayerInventory.COOKED && itemOnTable instanceof CookedFood) {
+                        CookedFood cookedFood = (CookedFood) itemOnTable;
+                        List<Ingredient> ingredients = cookedFood.getMadeWith();
+
+                        if (ingredients != null && !ingredients.isEmpty()) {
+                            editor.putInt("table_" + i + "_ingredientsCount", ingredients.size());
+
+                            for (int j = 0; j < ingredients.size(); j++) {
+                                Ingredient ingredient = ingredients.get(j);
+                                editor.putInt("table_" + i + "_ingredient_" + j + "_id", ingredient.getId());
+                                editor.putString("table_" + i + "_ingredient_" + j + "_name", ingredient.getName());
+                            }
+                        }
+                    }
+                } else {
+                    editor.putInt("table_" + i + "_itemType", -1);  // -1 indicates empty table
+                }
+            }
+
+            // Save Process information
+            List<Process> activeProcesses = gameManager.getActiveProcesses();
+            List<Process> relevantProcesses = new ArrayList<>();
+
+            // Only save processes that aren't complete or dead
+            for (Process process : activeProcesses) {
+                if (!process.isComplete() && !process.isDead()) {
+                    relevantProcesses.add(process);
+                }
+            }
+
+            editor.putInt("processCount", relevantProcesses.size());
 
             // Save each process
-            for (int i = 0; i < processInfos.size(); i++) {
-                GameState.ProcessInfo info = processInfos.get(i);
-                editor.putString("process_" + i + "_recipe", info.getRecipeName());
-                editor.putInt("process_" + i + "_remaining", info.getTimeRemaining());
-                editor.putInt("process_" + i + "_limit", info.getTimeLimit());
+            for (int i = 0; i < relevantProcesses.size(); i++) {
+                Process process = relevantProcesses.get(i);
+                editor.putString("process_" + i + "_recipe", process.getRecipe().getName());
+                editor.putInt("process_" + i + "_remaining", process.getTimeRemaining());
+                editor.putInt("process_" + i + "_limit", process.getTimeLimit());
             }
+
+            // Apply all changes
             editor.apply();
+
+            Toast.makeText(this, "Game saved!", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e("GameActivity", "Error saving game: " + e.getMessage());
+            Toast.makeText(this, "Error saving game", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadGameState() {
         try {
             SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
-
             // Load player position
             float playerX = prefs.getFloat("playerX", 0);
             float playerY = prefs.getFloat("playerY", 0);
             game.getPlayer().setPosition(playerX, playerY);
 
-            // Load score and progress
-            int score = prefs.getInt("score", 0);
-            int deadCount = prefs.getInt("deadProcessCount", 0);
+            int deadProcessCount = prefs.getInt("deadProcessCount", 0);
+            gameManager.setDeadProcessCount(deadProcessCount);
 
-            // Update game manager (safely)
+            int score = prefs.getInt("score", 0);
             gameManager.setScore(score);
+
+            updateScoreDisplay(score);
+            updateDeadProcessCountDisplay(deadProcessCount);
 
             int heldItemType = prefs.getInt("heldItemType", PlayerInventory.EMPTY);
             playerInventory.getAndRemoveItem();
 
+            // Load Player Inventory
             if (heldItemType != PlayerInventory.EMPTY) {
                 int itemId = prefs.getInt("heldItemId", 0);
                 String itemName = prefs.getString("heldItemName", "");
@@ -318,12 +347,50 @@ public class GameActivity extends AppCompatActivity implements
                 }
             }
 
+            // Restore items on tables
+            int tableCount = prefs.getInt("tableCount", 0);
+            List<Table> tables = game.getTables();
+
+            for (int i = 0; i < Math.min(tableCount, tables.size()); i++) {
+                Table table = tables.get(i);
+                int itemType = prefs.getInt("table_" + i + "_itemType", -1);
+
+                table.clearItem();
+
+                if (itemType != -1) {  // -1 means table was empty
+                    int itemId = prefs.getInt("table_" + i + "_itemId", 0);
+                    String itemName = prefs.getString("table_" + i + "_itemName", "");
+
+                    FoodItem itemToPlace = null;
+
+                    if (itemType == PlayerInventory.INGREDIENT) {
+                        // Create a simple ingredient
+                        itemToPlace = new Ingredient(itemId);
+                    }
+                    else if (itemType == PlayerInventory.COOKED) {
+                        // Get ingredients for cooked food
+                        int ingredientsCount = prefs.getInt("table_" + i + "_ingredientsCount", 0);
+                        List<Ingredient> ingredients = new ArrayList<>();
+
+                        for (int j = 0; j < ingredientsCount; j++) {
+                            int ingId = prefs.getInt("table_" + i + "_ingredient_" + j + "_id", 0);
+                            Ingredient ingredient = new Ingredient(ingId);
+                            ingredients.add(ingredient);
+                        }
+
+                        // Create cooked food
+                        itemToPlace = new CookedFood(itemId, itemName, ingredients);
+                    }
+
+                    // Place item on table
+                    if (itemToPlace != null) {
+                        table.placeItem(itemToPlace);  // Add this method to Table.java
+                    }
+                }
+            }
+
             // Make sure the player inventory view is updated
             updatePlayerInventoryView();
-
-            // Update UI
-            updateScoreDisplay(score);
-            updateDeadProcessCountDisplay(deadCount);
 
             // Load processes
             int processCount = prefs.getInt("processCount", 0);
@@ -349,6 +416,8 @@ public class GameActivity extends AppCompatActivity implements
             if (processAdapter != null) {
                 processAdapter.updateProcesses(gameManager.getActiveProcesses());
             }
+
+            updateMediaPlaybackSpeed(deadProcessCount);
 
             Toast.makeText(this, "Game loaded", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {

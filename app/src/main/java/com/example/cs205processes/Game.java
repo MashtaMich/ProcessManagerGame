@@ -272,4 +272,17 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
         }
         return true; // no collision
     }
+
+    public List<Table> getTables() {
+        List<Table> tableList = new ArrayList<>();
+
+        // Find all tables among interactables
+        for (Interactable obj : interactables) {
+            if (obj instanceof Table) {
+                tableList.add((Table) obj);
+            }
+        }
+
+        return tableList;
+    }
 }

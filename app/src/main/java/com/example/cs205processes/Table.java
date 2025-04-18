@@ -98,5 +98,17 @@ public class Table extends Interactable {
         }
     }
 
+    public FoodItem getItemOnTable() {
+        return itemOnTable;
+    }
 
+    public void clearItem() {
+        itemOnTable = null;
+        updateSprite();
+    }
+
+    public void placeItem(FoodItem item) {
+        itemOnTable = item;
+        updateSprite();
+    }
 }
