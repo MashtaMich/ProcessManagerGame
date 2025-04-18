@@ -64,11 +64,11 @@
         android:id="@+id/step3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginStart="560dp"
+        android:layout_marginStart="522dp"
         android:layout_marginTop="28dp"
         android:orientation="vertical"
         android:padding="8dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -125,8 +125,8 @@
         android:id="@+id/step6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="616dp"
-        android:layout_marginTop="148dp"
+        android:layout_marginStart="576dp"
+        android:layout_marginTop="144dp"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
@@ -140,28 +140,30 @@
             android:layout_marginStart="100dp"
             android:rotation="40"
             android:src="@drawable/arrow" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/arrow6b"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
-            android:rotation="145"
-            android:src="@drawable/arrow" />
 
-        <Button
-            android:id="@+id/nextButton6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginStart="10dp"
-            android:backgroundTint="#6200EE"
-            android:padding="8dp"
-            android:text="Next"
-            android:textColor="#FFFFFF" />
+            <ImageView
+                android:id="@+id/arrow6b"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:rotation="145"
+                android:src="@drawable/arrow" />
+
+            <Button
+                android:id="@+id/nextButton6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#6200EE"
+                android:padding="8dp"
+                android:text="Next"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
 
 
@@ -180,8 +182,8 @@
         android:id="@+id/step5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="452dp"
-        android:layout_marginTop="124dp"
+        android:layout_marginStart="420dp"
+        android:layout_marginTop="128dp"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
@@ -315,13 +317,14 @@
         android:id="@+id/step7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="652dp"
-        android:layout_marginTop="192dp"
+        android:layout_marginStart="620dp"
+        android:layout_marginTop="184dp"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <Button
             android:id="@+id/nextButton7"
             android:layout_width="wrap_content"
@@ -331,6 +334,7 @@
             android:padding="8dp"
             android:text="Next"
             android:textColor="#FFFFFF" />
+
         <TextView
             android:id="@+id/instructionBox7"
             android:layout_width="wrap_content"
@@ -353,8 +357,8 @@
         android:id="@+id/step8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="792dp"
-        android:layout_marginTop="168dp"
+        android:layout_marginStart="744dp"
+        android:layout_marginTop="160dp"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
