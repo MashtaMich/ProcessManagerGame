@@ -46,6 +46,12 @@ public class Process {
         Recipe randomRecipe = availableRecipes.get((int)(Math.random() * availableRecipes.size()));
         return new Process(randomRecipe, randomTime);
     }
+    public static Process generateRandomProcess(Recipe recipe, int timeLimit, int timeRemaining) {
+        Process process = new Process(recipe, timeLimit);
+        // Access the private field via reflection or add a package-private setter
+        process.timeRemaining = timeRemaining;
+        return process;
+    }
 
     // This is called by the DeltaStepper
     private boolean timeStep(long deltaTime) {

@@ -354,4 +354,18 @@ public class GameManager {
     public List<Recipe> getAvailableRecipes(){
         return availableRecipes;
     }
+
+    // In GameManager.java
+    public void addProcessDirectly(Process process) {
+        synchronized (mutex) {
+            activeProcesses.add(process);
+        }
+    }
+
+    public void setScore(int newScore) {
+        this.score = newScore;
+        if (gameListener != null) {
+            gameListener.onScoreChanged(newScore);
+        }
+    }
 }

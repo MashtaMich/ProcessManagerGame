@@ -31,6 +31,14 @@ public class Player {
         this.inventory = playerInventory;
     }
 
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
+        this.targetX = x;
+        this.targetY = y;
+        this.isMoving = false;
+    }
+
     public void setInventory(PlayerInventory inventory) {
         this.inventory = inventory;
     }
