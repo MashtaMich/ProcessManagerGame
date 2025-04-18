@@ -3,23 +3,21 @@ package com.example.cs205processes;
 import android.content.Context;
 import android.graphics.*;
 import android.util.Log;
-import android.widget.ImageView;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 public class Pot extends Interactable {
     private String TAG="pot";
-    private enum State { EMPTY, COOKING, DONE }
+    public enum State { EMPTY, COOKING, DONE }
     private PotFunctions potFunctions;
     private State state;
     private Bitmap emptySprite, cookingSprite, doneSprite;
     private HashMap<String,Bitmap> ingredientSprites=new HashMap<>();
-    private int cookingDuration = 6000; // ms
+    private int cookingDuration=6000; // ms
     //Shared pot thread pool
     private final PotThreadPool potThreadPool;
     private final Context context;
@@ -34,7 +32,7 @@ public class Pot extends Interactable {
 
         try {
             this.state = State.valueOf(props.optString("state", "empty").toUpperCase());
-            this.cookingDuration = props.optInt("cooking_time", 3000);
+            this.cookingDuration = props.optInt("cooking_time", 6000);
 
             loadSprites(context,props);
 
@@ -133,22 +131,22 @@ public class Pot extends Interactable {
 
     private void drawIngredientsAbovePot(Canvas canvas, Paint paint, int TILE_SIZE, List<Ingredient> ingredients) {
         //3 icons above pot max since capacity is 3, so tile size/3
-        int iconSize = TILE_SIZE / 3;
+        int spriteSize = TILE_SIZE / 3;
         int padding = 5;//To prevent the ingredients from being too close
         int startX = (int) x;//Same starting x
-        int startY = (int) (y - iconSize - padding);
+        int startY = (int) (y - spriteSize - padding);//Start above the pot
 
         for (int i = 0; i < ingredients.size(); i++) {
             String ingredientName = ingredients.get(i).getName();
-            Bitmap icon = ingredientSprites.get(ingredientName);
+            Bitmap ingredientSprite = ingredientSprites.get(ingredientName);
 
-            if (icon != null) {
-                Bitmap scaledIcon = Bitmap.createScaledBitmap(icon, iconSize, iconSize, true);
-                canvas.drawBitmap(scaledIcon, startX + i * (iconSize + padding), startY, paint);
+            if (ingredientSprite != null) {
+                Bitmap scaledIcon = Bitmap.createScaledBitmap(ingredientSprite, spriteSize, spriteSize, true);
+                canvas.drawBitmap(scaledIcon, startX + i * (spriteSize + padding), startY, paint);
             } else {
-                // draw placeholder if missing icon
+                // draw placeholder if missing ingredient sprite
                 paint.setColor(Color.RED);
-                canvas.drawRect(startX + i * (iconSize + padding), startY, startX + i * (iconSize + padding) + iconSize, startY + iconSize, paint);
+                canvas.drawRect(startX + i * (spriteSize + padding), startY, startX + i * (spriteSize + padding) + spriteSize, startY + spriteSize, paint);
             }
         }
     }
@@ -174,7 +172,23 @@ public class Pot extends Interactable {
         return potFunctions.getIngredientsInside();
     }
 
-    public State getState(){
-        return this.state;
+    public String getState(){
+        return this.state.name();
+    }
+
+    public PotFunctions getPotFunctions(){
+        return this.potFunctions;
+    }
+
+    public CookedFood getFood(){
+        return potFunctions.getFood();
+    }
+
+    public void setState(String newState) {
+        //For loading not meant for use elsewhere
+        synchronized (stateLock) {
+            this.state = State.valueOf(newState);
+            updateSprite();
+        }
     }
 }

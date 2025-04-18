@@ -285,6 +285,58 @@ public class GameActivity extends AppCompatActivity implements
                 editor.putInt("process_" + i + "_limit", process.getTimeLimit());
             }
 
+            // Save pots state
+            List<Pot> pots = game.getPots();
+            editor.putInt("potCount", pots.size());
+
+            for (int i = 0; i < pots.size(); i++) {
+                Pot pot = pots.get(i);
+
+                // Save common pot info for all states
+                editor.putString("pot_" + i + "_state", pot.getState());
+
+                List<Ingredient> ingredients = pot.getInPot();
+                editor.putInt("pot_" + i + "_ingredientCount", ingredients.size());
+
+                for (int j = 0; j < ingredients.size(); j++) {
+                    Ingredient ingredient = ingredients.get(j);
+                    editor.putInt("pot_" + i + "_ingredient_" + j + "_id", ingredient.getId());
+                }
+
+                // If pot is DONE state, save cooked food
+                if (pot.getState().equals(Pot.State.DONE.name())) {
+                    CookedFood food = pot.getFood();
+                    editor.putInt("pot_" + i + "_food_id", food.getId());
+                    editor.putString("pot_" + i + "_food_name", food.getName());
+
+                    List<Ingredient> madeWith = food.getMadeWith();
+                    editor.putInt("pot_" + i + "_food_ingredientCount", madeWith.size());
+
+                    for (int j = 0; j < madeWith.size(); j++) {
+                        Ingredient ingredient = madeWith.get(j);
+                        editor.putInt("pot_" + i + "_food_ingredient_" + j + "_id", ingredient.getId());
+                        editor.putString("pot_" + i + "_food_ingredient_" + j + "_name", ingredient.getName());
+                    }
+                }
+
+                // If pot is in COOKING state, save cooking progress and recipe being cooked as well
+                if (pot.getState().equals(Pot.State.COOKING.name())) {
+                    editor.putInt("pot_" + i + "_cooking_progress", pot.getPotFunctions().getCookProgress());
+                    Recipe beingCooked=pot.getPotFunctions().getRecipeCooking();
+                    editor.putString("pot_" + i + "_recipe_name", beingCooked.getName());
+
+                    List<Ingredient> ingredientList=beingCooked.getIngredients();
+
+                    editor.putInt("pot_" + i + "_recipe_ingredientCount", ingredientList.size());
+
+                    for (int j = 0; j < ingredientList.size(); j++) {
+                        Ingredient ingredient = ingredientList.get(j);
+                        editor.putInt("pot_" + i + "_recipe_ingredient_" + j + "_id", ingredient.getId());
+                        editor.putString("pot_" + i + "_food_ingredient_" + j + "_name", ingredient.getName());
+                    }
+                }
+            }
+
             // Apply all changes
             editor.apply();
 
@@ -408,6 +460,88 @@ public class GameActivity extends AppCompatActivity implements
                         Process process = Process.generateRandomProcess(recipe, timeLimit, timeRemaining);
                         gameManager.addProcessDirectly(process);
                         break;
+                    }
+                }
+            }
+
+            //Load pots
+            int potCount = prefs.getInt("potCount", 0);
+            List<Pot> pots = game.getPots();
+
+            for (int i = 0; i < Math.min(potCount, pots.size()); i++) {
+                Pot pot = pots.get(i);
+
+                // Load pot state, or get default of EMPTY
+                String potState = prefs.getString("pot_" + i + "_state", Pot.State.EMPTY.name());
+                Log.d(TAG,"potState:"+potState);
+                pot.setState(potState);
+
+                // Load ingredients in the pot
+                int ingredientCount = prefs.getInt("pot_" + i + "_ingredientCount", 0);
+                List<Ingredient> ingredients = new ArrayList<>();
+
+                for (int j = 0; j < ingredientCount; j++) {
+                    int ingId = prefs.getInt("pot_" + i + "_ingredient_" + j + "_id", 0);
+                    Ingredient ingredient = new Ingredient(ingId);
+                    ingredients.add(ingredient);
+                }
+
+                // Add ingredients to pot
+                PotFunctions potFunctions = pot.getPotFunctions();
+                for (Ingredient ingredient : ingredients) {
+                    potFunctions.addIngredient(ingredient);
+                }
+
+                // If pot is in DONE state, load the cooked food
+                if (Pot.State.valueOf(potState)==Pot.State.DONE) {
+                    Log.d(TAG,"Loading DONE pot");
+                    //Cooked food is always id of 5
+                    int foodId = prefs.getInt("pot_" + i + "_food_id", 5);
+                    String foodName = prefs.getString("pot_" + i + "_food_name", "");
+
+                    int foodIngCount = prefs.getInt("pot_" + i + "_food_ingredientCount", 0);
+                    List<Ingredient> foodIngredients = new ArrayList<>();
+
+                    for (int j = 0; j < foodIngCount; j++) {
+                        int ingId = prefs.getInt("pot_" + i + "_food_ingredient_" + j + "_id", 0);
+                        Ingredient ingredient = new Ingredient(ingId);
+                        foodIngredients.add(ingredient);
+                    }
+
+                    // Create the cooked food and set it in the pot
+                    CookedFood cookedFood = new CookedFood(foodId, foodName, foodIngredients);
+                    potFunctions.setCookedFood(cookedFood);
+                }
+                // If pot is in COOKING state, restore cooking progress
+                else if (Pot.State.valueOf(potState)==Pot.State.COOKING) {
+                    int cookProgress = prefs.getInt("pot_" + i + "_cooking_progress", 0);
+                    String recipeName = prefs.getString("pot_" + i + "_recipe_name", "");
+
+                    // Find the recipe that's being cooked from default recipes
+                    Recipe cookingRecipe = null;
+                    for (Recipe recipe : Recipe.getDefaultRecipes()) {
+                        if (recipe.getName().equals(recipeName)) {
+                            cookingRecipe = recipe;
+                            break;
+                        }
+                    }
+                    if (cookingRecipe==null){
+                        cookingRecipe=new Recipe("Waste",new ArrayList<>());
+                    }
+
+                    // If we found the recipe, restart cooking with the saved progress
+                    if (cookingRecipe != null) {
+                        Log.d(TAG,"Restart cooking recipe");
+                        // put pot in cooking state
+                        pot.setState(Pot.State.COOKING.name());
+                        potFunctions.setCookProgress(cookProgress);
+                        final Recipe resumeRecipe=cookingRecipe;
+                        // Restart cooking using cookRecipe and progress
+                        potThreadPool.submit(() -> {
+                            potFunctions.restartCooking(resumeRecipe, this);
+                            pot.setState(Pot.State.DONE.name());
+                            Log.d(TAG,"Finished cooking recipe");
+                        });
                     }
                 }
             }

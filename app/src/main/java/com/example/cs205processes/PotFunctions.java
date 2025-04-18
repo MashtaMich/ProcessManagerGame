@@ -14,6 +14,7 @@ public class PotFunctions {
     private final Object foodDoneLock = new Object();// to sync available list
     private final Object ingredientLock=new Object();//ingredient lock
     private Recipe recipeCooking;
+    private Integer cookProgress;
 
     public interface PotListener{//To send to UI thread in GameActivity
         void potProgressUpdate(int progress);
@@ -78,20 +79,20 @@ public class PotFunctions {
             this.recipeCooking=recipe;
 
             // Start cooking the ingredients
-            int progress = 0; // Progress will be every 1 second
+            this.cookProgress = 0; // Progress will be every 1 second
 
             try {
-                while (progress<cookTime/1000){
+                while (cookProgress<cookTime/1000){
                     Thread.sleep(1000);
-                    progress++;
-                    listener.potProgressUpdate(progress);
+                    cookProgress++;
+                    listener.potProgressUpdate(cookProgress);
                 }
             } catch (InterruptedException e) {
                 Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
             }
 
+            newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
             synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
                 this.ingredientsInside.clear();
             }
             synchronized (foodDoneLock) {
@@ -99,42 +100,53 @@ public class PotFunctions {
             }
             this.recipeCooking=null;
 
-            listener.potProgressUpdate(progress+1);
+            listener.potProgressUpdate(cookProgress+1);
+            this.cookProgress=0;
         }
     }
 
-    public void restartCooking(Recipe recipe,PotListener listener,Integer progress){
-        boolean canCook;
-        synchronized (ingredientLock) {
-            canCook=isReadyToCook();
-        }
-
-        if (canCook){
-            CookedFood newFood;
-            this.recipeCooking=recipe;
-
-            // restart cooking the ingredients
-
-            try {
-                while (progress<cookTime/1000){
-                    Thread.sleep(1000);
-                    progress++;
-                    listener.potProgressUpdate(progress);
-                }
-            } catch (InterruptedException e) {
+    public void restartCooking(Recipe recipe,PotListener listener){
+        // restart cooking the ingredients
+        try {
+            while (cookProgress<cookTime/1000){
+                Thread.sleep(1000);
+                this.cookProgress++;
+                listener.potProgressUpdate(cookProgress);
+            }
+        } catch (InterruptedException e) {
                 Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
-            }
-
-            synchronized (ingredientLock) {
-                newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
-                this.ingredientsInside.clear();
-            }
-            synchronized (foodDoneLock) {
-                this.foodDone = newFood;
-            }
-            this.recipeCooking=null;
-
-            listener.potProgressUpdate(progress+1);
         }
+
+        CookedFood newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
+        synchronized (ingredientLock) {
+            this.ingredientsInside.clear();
+        }
+        synchronized (foodDoneLock) {
+            this.foodDone = newFood;
+        }
+        this.recipeCooking=null;
+
+        listener.potProgressUpdate(cookProgress+1);
+        this.cookProgress=0;
+        Log.d(TAG,"Restart complete");
+    }
+
+    public Recipe getRecipeCooking(){
+        return this.recipeCooking;
+    }
+
+    public int getCookProgress(){
+        return this.cookProgress;
+    }
+
+    public void setCookedFood(CookedFood food) {
+        //For loading
+        synchronized (foodDoneLock) {
+            this.foodDone = food;
+        }
+    }
+
+    public void setCookProgress(int progress){
+        this.cookProgress=progress;
     }
 }

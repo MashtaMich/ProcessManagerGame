@@ -109,7 +109,6 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
 
 
                             this.player = new Player(col * TILE_SIZE, row * TILE_SIZE, playerBitmap, TILE_SIZE, this,playerInventory);
-                            //player.setInventory(playerInventory); // Use the shared inventory
 
                         }
                     }
