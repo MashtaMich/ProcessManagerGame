@@ -46,7 +46,6 @@ public class Basket extends Interactable {
     @Override
     public void onInteract(Player player) {
         System.out.println("Player took a " + ingredient);
-        // TODO: Add to player's inventory or similar logic
         PlayerInventory inventory=player.getInventory();
         try {
             if (inventory.checkHeldType()==PlayerInventory.EMPTY){

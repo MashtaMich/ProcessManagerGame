@@ -41,9 +41,7 @@ public class GameManager {
     private Runnable gameTickRunnable;
     private final Context context;
     private final GameListener gameListener;
-
     private boolean isPaused = false;
-
     public interface GameListener {
         void onProcessAdded(Process process);
         void onProcessCompleted(Process process);
@@ -51,7 +49,6 @@ public class GameManager {
         void onScoreChanged(int newScore);
         void onGameOver(int finalScore);
         void onTimerTick(); // Notify UI of every timer tick
-
     }
 
     public GameManager(Context context, GameListener listener,List<Recipe> recipeList) {
@@ -65,15 +62,12 @@ public class GameManager {
         this.isGameOver = false;
         this.random = new Random();
 
-        // Initialize timer stepper
         this.timerStepper = new DeltaStepper(1000, this::tickUpdate);
 
-        // Create handlers on the main thread
         this.mainHandler = new Handler(Looper.getMainLooper());
         this.gameTickHandler = new Handler(Looper.getMainLooper());
     }
 
-    // This method updates the UI every second
     private boolean tickUpdate(long deltaTime) {
         if (gameListener != null) {
             gameListener.onTimerTick();
@@ -101,7 +95,6 @@ public class GameManager {
     }
 
     private void scheduleNextProcess() {
-        // Randomize spawn delay for variety but keep it game-appropriate
         int spawnDelay = 5000 + random.nextInt(8000); // 5-13 seconds between processes
 
         Log.d(TAG, "Scheduling next process in " + spawnDelay + "ms");
@@ -334,7 +327,6 @@ public class GameManager {
         gameTickHandler.removeCallbacks(gameTickRunnable);
     }
 
-    // Getters with thread-safe access
     public List<Process> getActiveProcesses() {
         List<Process> processesCopy = new ArrayList<>();
         synchronized (mutex) {

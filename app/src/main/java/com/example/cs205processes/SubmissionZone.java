@@ -82,7 +82,7 @@ public class SubmissionZone extends Interactable {
                     if (submitted) {
                         player.getInventory().getAndRemoveItem();
                     } else {
-                        playNotificationSound();  // ❗Correct recipe, but not matching any active process
+                        playNotificationSound();
                     }
 
 

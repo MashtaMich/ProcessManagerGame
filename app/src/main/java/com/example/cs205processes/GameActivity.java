@@ -73,8 +73,6 @@ public class GameActivity extends AppCompatActivity implements
     private IngredientBasketFiller basketFiller;
     private BasketManager basketManager;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,11 +82,11 @@ public class GameActivity extends AppCompatActivity implements
             volumeSeekBar = findViewById(R.id.volumeSeekBar);
             sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
             int savedVolume = sharedPreferences.getInt("volume", 100);
-            volumeSeekBar.setProgress(savedVolume);  // Convert 0.0-1.0 to 0-100
+            volumeSeekBar.setProgress(savedVolume);
             float volume = savedVolume / 100f;
             mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
             mediaPlayer.setLooping(true);
-            mediaPlayer.setVolume(volume,volume); // Set initial volume
+            mediaPlayer.setVolume(volume,volume);
             mediaPlayer.start();
 
             hideSystemUI();
@@ -99,13 +97,10 @@ public class GameActivity extends AppCompatActivity implements
                 new Handler().postDelayed(this::loadGameState, 500);
             }
 
-
-            // Add a listener to update the volume when the SeekBar is moved
             volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {                float newVolume = progress / 100f;
                     mediaPlayer.setVolume(newVolume, newVolume);
-
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putInt("volume", progress);
                     editor.apply();
@@ -113,12 +108,10 @@ public class GameActivity extends AppCompatActivity implements
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
-
                 }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-
                 }
             });
 
@@ -127,7 +120,6 @@ public class GameActivity extends AppCompatActivity implements
             Log.d("Interact", "setting a listener");
             interactButton.setOnClickListener(v -> game.interact());
             Log.d("Interact", "done with listening and passing logic to game.interact()");
-
 
             // Link buttons
             Button togglePauseButton = findViewById(R.id.togglePauseButton);
@@ -150,22 +142,17 @@ public class GameActivity extends AppCompatActivity implements
                 }
             });
             resume.setOnClickListener(v -> {
-                // Resume the game and hide the pause menu
                 gameManager.resumeGame();
                 pauseMenu.setVisibility(View.GONE);  // Hide the pause menu
             });
-            // Set up the save game button functionality in the pause menu
             save.setOnClickListener(v -> {
                 saveGameState();
                 Toast.makeText(this, "Game saved", Toast.LENGTH_SHORT).show();
             });
-            // Set up the settings button functionality in the pause menu
             settings.setOnClickListener(v -> {
-                // Open the settings activity or show settings dialog
                 settingsMenu.setVisibility(View.VISIBLE);
                 pauseMenu.setVisibility(GONE);
                 back.setVisibility(VISIBLE);
-
             });
             mainMenuButton.setOnClickListener(v -> {
                 Intent intent = new Intent(GameActivity.this, MainActivity.class);
@@ -180,11 +167,10 @@ public class GameActivity extends AppCompatActivity implements
             });
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: " + e.getMessage(), e);
-            finish(); // Safely exit the activity if initialization fails
+            finish();
         }
     }
 
-    // Simple save method
     private void saveGameState() {
         try {
             // Get SharedPreferences and create an editor
@@ -202,7 +188,7 @@ public class GameActivity extends AppCompatActivity implements
             editor.putInt("score", score);
             editor.putInt("deadProcessCount", deadProcessCount);
 
-            // Save Player inventory
+            // Save player inventory
             FoodItem heldItem = playerInventory.getHeld();
             if (heldItem != null) {
                 int itemType = playerInventory.checkHeldType();
@@ -596,18 +582,6 @@ public class GameActivity extends AppCompatActivity implements
             updateDeadProcessCountDisplay(0);
     }
 
-//    private void setupMovementControls() {
-//
-//            View btnUp = findViewById(R.id.btnUp);
-//            View btnDown = findViewById(R.id.btnDown);
-//            View btnLeft = findViewById(R.id.btnLeft);
-//            View btnRight = findViewById(R.id.btnRight);
-//
-//            if (btnUp != null) btnUp.setOnClickListener(v -> game.moveUp());
-//            if (btnDown != null) btnDown.setOnClickListener(v -> game.moveDown());
-//            if (btnLeft != null) btnLeft.setOnClickListener(v -> game.moveLeft());
-//            if (btnRight != null) btnRight.setOnClickListener(v -> game.moveRight());
-//    }
     private void setupMovementControls() {
         View btnUp = findViewById(R.id.btnUp);
         View btnDown = findViewById(R.id.btnDown);
@@ -645,7 +619,6 @@ public class GameActivity extends AppCompatActivity implements
         });
     }
 
-
     private void initializeUIComponents() {
         try {
             // Initialize statistics text views
@@ -674,7 +647,6 @@ public class GameActivity extends AppCompatActivity implements
             Log.d(TAG,""+basketManager);
             basketFiller=new IngredientBasketFiller(ingredientQueue,basketManager);
             ingredientFetcher = new IngredientFetchWorker(ingredientQueue,basketFiller);
-            // playerInventory is initialized in initializeGameComponents
 
             // Initialize view lists
             initializeViewLists();

@@ -94,8 +94,6 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
             // Display recipe name
             recipeName.setText(process.getRecipe().getName());
-
-
         }
 
         private void updateCardBackgroundColor(Process process) {
