@@ -19,7 +19,7 @@ public class Pot extends Interactable {
     private State state;
     private Bitmap emptySprite, cookingSprite, doneSprite;
     private HashMap<String,Bitmap> ingredientSprites=new HashMap<>();
-    private int cookingDuration = 3000; // ms
+    private int cookingDuration = 6000; // ms
     //Shared pot thread pool
     private final PotThreadPool potThreadPool;
     private final Context context;
@@ -30,7 +30,7 @@ public class Pot extends Interactable {
         this.y = y;
         this.potFunctions=new PotFunctions(cookingDuration);
         this.potThreadPool=potThreadPool;
-        this.context=context;
+        this.context=context;//Game Activity context
 
         try {
             this.state = State.valueOf(props.optString("state", "empty").toUpperCase());
@@ -50,6 +50,7 @@ public class Pot extends Interactable {
             this.emptySprite = loadSprite(context, props.getString("empty_sprite"));
             this.cookingSprite = loadSprite(context, props.getString("cooking_sprite"));
             this.doneSprite = loadSprite(context, props.getString("done_sprite"));
+
             ingredientSprites.put("carrot",loadSprite(context,props.getString("carrot")));
             ingredientSprites.put("potato",loadSprite(context,props.getString("potato")));
             ingredientSprites.put("onion",loadSprite(context,props.getString("onion")));
@@ -123,6 +124,7 @@ public class Pot extends Interactable {
             return;
         }
         canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
+        //Draw all ingredients inside above the pot
         List<Ingredient> ingredients = potFunctions.getIngredientsInside();
         if (!ingredients.isEmpty()) {
             drawIngredientsAbovePot(canvas, paint, TILE_SIZE, ingredients);
@@ -132,9 +134,9 @@ public class Pot extends Interactable {
     private void drawIngredientsAbovePot(Canvas canvas, Paint paint, int TILE_SIZE, List<Ingredient> ingredients) {
         //3 icons above pot max since capacity is 3, so tile size/3
         int iconSize = TILE_SIZE / 3;
-        int padding = 5;//To prevent the objects from being overlapping
-        int startX = (int) x;
-        int startY = (int) (y - iconSize - padding); // move above pot
+        int padding = 5;//To prevent the ingredients from being too close
+        int startX = (int) x;//Same starting x
+        int startY = (int) (y - iconSize - padding);
 
         for (int i = 0; i < ingredients.size(); i++) {
             String ingredientName = ingredients.get(i).getName();
@@ -166,6 +168,10 @@ public class Pot extends Interactable {
                     break;
             }
         }
+    }
+
+    public List<Ingredient> getInPot(){
+        return potFunctions.getIngredientsInside();
     }
 
 }

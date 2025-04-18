@@ -414,7 +414,8 @@ public class GameActivity extends AppCompatActivity implements
                 List<Ingredient> swapOptions = ingredientFetcher.getAvailableList();
 
                 if (swapOptions != null && index < swapOptions.size() && selectedIngredientIndex < basketManager.getBasketCount()) {
-                    Ingredient dropIngredient = basketManager.getIngredientFromBasket(maxIngredients-1-selectedIngredientIndex);
+                    int basketIndex=maxIngredients-1-selectedIngredientIndex;//Baskets are from bottom up, top most is last index
+                    Ingredient dropIngredient = basketManager.getIngredientFromBasket(basketIndex);
 
                     if (index < availableIngredientsViews.size()) {
                         availableIngredientsViews.get(index).setBackgroundResource(R.drawable.swap_options_selected);

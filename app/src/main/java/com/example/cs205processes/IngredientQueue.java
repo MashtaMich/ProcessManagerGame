@@ -8,23 +8,24 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class IngredientQueue {
-    //Honestly wrote the whole Ingredient logic before remembering that its supposed to be Producer/Consumer queue is supposed to replace inventory
+    //Queue replaces Ingredient Inventory, will fetch from Ingredient Fetch Worker to be consumed to fill the baskets at Basket Filler
     private static final String TAG = "Ingredient Queue";
     private final Queue<Ingredient> queue = new LinkedList<>();
     private final int capacity;
-    private final Lock lock = new ReentrantLock();
-    private final Condition notEmpty = lock.newCondition();
-    private final Condition notFull = lock.newCondition();
+    private final Lock queueLock = new ReentrantLock();
+    private final Condition notEmpty = queueLock.newCondition();
+    private final Condition notFull = queueLock.newCondition();
 
     public IngredientQueue(int capacity) {
         this.capacity = capacity;
     }
 
     public void put(Ingredient ingredient) throws InterruptedException {
-        lock.lock();
+        //Standard producer put method
+        queueLock.lock();
         try {
             while (queue.size() == capacity) {
-                //Should never be full if full there is an error
+                //Should never be full if full there is an error,
                 Log.d(TAG, "Queue is full. Waiting to put: " + ingredient.getName());
                 notFull.await();
             }
@@ -32,13 +33,14 @@ public class IngredientQueue {
             Log.d(TAG, "Added to queue: " + ingredient.getName());
             notEmpty.signal();
         } finally {
-            lock.unlock();
+            queueLock.unlock();
         }
     }
 
     public Ingredient take() throws InterruptedException {
+        //Standard consumer put function
         Log.d(TAG,"taking");
-        lock.lock();
+        queueLock.lock();
         try {
             while (queue.isEmpty()) {
                 //Queue shouldn't be empty
@@ -50,26 +52,26 @@ public class IngredientQueue {
             notFull.signal();
             return ingredient;
         } finally {
-            lock.unlock();
-            Log.d(TAG,"Took an ingredient");
+            queueLock.unlock();
+            Log.d(TAG,"Take finished");
         }
     }
 
     public boolean isEmpty() {
-        lock.lock();
+        queueLock.lock();
         try {
             return queue.isEmpty();
         } finally {
-            lock.unlock();
+            queueLock.unlock();
         }
     }
 
     public int size() {
-        lock.lock();
+        queueLock.lock();
         try {
             return queue.size();
         } finally {
-            lock.unlock();
+            queueLock.unlock();
         }
     }
 }

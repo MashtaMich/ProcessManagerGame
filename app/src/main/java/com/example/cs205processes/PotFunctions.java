@@ -14,7 +14,7 @@ public class PotFunctions {
     private final Object foodDoneLock = new Object();// to sync available list
     private final Object ingredientLock=new Object();//ingredient lock
 
-    public interface PotListener{
+    public interface PotListener{//To send to UI thread in GameActivity
         void potProgressUpdate(int progress);
     }
 
@@ -85,7 +85,6 @@ public class PotFunctions {
                     listener.potProgressUpdate(progress);
                 }
             } catch (InterruptedException e) {
-                // handle later
                 Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
             }
 
