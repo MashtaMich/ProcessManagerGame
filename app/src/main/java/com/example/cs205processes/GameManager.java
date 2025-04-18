@@ -31,7 +31,11 @@ public class GameManager {
     private final List<Process> pendingRemovals;
 
     private final List<Recipe> availableRecipes;
-    private int score;
+    private int score = 0;
+    private int streakCount;
+    private long lastCompletionTime = 0L; // in milliseconds
+    private static final long STREAK_TIME_LIMIT = 10_000L; // 10 seconds in milliseconds
+    private static final int BASE_POINTS = 100;
     private int deadProcessCount;
     private boolean isGameOver;
     private final Random random;
@@ -102,7 +106,7 @@ public class GameManager {
 
     private void scheduleNextProcess() {
         // Randomize spawn delay for variety but keep it game-appropriate
-        int spawnDelay = 5000 + random.nextInt(8000); // 5-13 seconds between processes
+        int spawnDelay = 10000 + random.nextInt(8000); // 5-13 seconds between processes
 
         Log.d(TAG, "Scheduling next process in " + spawnDelay + "ms");
 
@@ -189,8 +193,8 @@ public class GameManager {
         Log.d(TAG, "Process died: " + process.getName());
 
         deadProcessCount++;
-        score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
-        if (score < 0) score = 0;
+//        score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
+//        if (score < 0) score = 0;
 
         // Add to pending removals
         synchronized (mutex) {
@@ -240,9 +244,26 @@ public class GameManager {
         // Complete the process if found
         if (processToComplete != null) {
             processToComplete.completeProcess();
-            score += POINTS_PER_COMPLETED_PROCESS;
+//            score += POINTS_PER_COMPLETED_PROCESS;
+            // Check if the process was successfully completed
+            if (!processToComplete.isDead()) {
+                long currentTime = System.currentTimeMillis();
 
-            // Add to pending removals to be cleared next tick
+                if (lastCompletionTime > 0 && (currentTime - lastCompletionTime <= STREAK_TIME_LIMIT)) {
+                    streakCount++;
+                } else {
+                    streakCount = 1; // reset streak to 1 (not 0) because we still scored
+                }
+
+                int pointsEarned = BASE_POINTS * streakCount;
+                score += pointsEarned;
+                lastCompletionTime = currentTime;
+            } else {
+                streakCount = 0;
+                lastCompletionTime = 0;
+            }
+
+                // Add to pending removals to be cleared next tick
             synchronized (mutex) {
                 pendingRemovals.add(processToComplete);
             }
@@ -253,6 +274,9 @@ public class GameManager {
                 gameListener.onProcessCompleted(processToComplete);
                 gameListener.onScoreChanged(score);
             }
+        } else{
+            streakCount = 0;
+            lastCompletionTime= 0;
         }
     }
 

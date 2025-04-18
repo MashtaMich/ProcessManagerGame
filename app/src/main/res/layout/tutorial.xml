@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tutorialLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/tutorial" />
+
+    <LinearLayout
+        android:id="@+id/step4"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="356dp"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow4"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="215"
+            android:src="@drawable/arrow" />
+
+        <TextView
+            android:id="@+id/instructionBox4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="Here are the ingredients you need\nto make the recipe, there is a timer\nin order to score points. There is a \nsubmission streak where you get \nmore points for consecutive\nsubmissions within 10 seconds\nelse the streak is broken."
+            android:textSize="16sp" />
+        <Button
+            android:id="@+id/nextButton4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:layout_marginTop="12dp"
+            android:padding="8dp"
+            android:backgroundTint="#6200EE"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginStart="560dp"
+        android:layout_marginTop="28dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- LinearLayout for the two arrows (horizontal orientation) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- First Arrow -->
+            <ImageView
+                android:id="@+id/arrow3a"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="180dp"
+                android:rotation="225"
+                android:src="@drawable/arrow" />
+
+
+            <!-- Second Arrow -->
+            <ImageView
+                android:id="@+id/arrow3b"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:rotation="300"
+                android:src="@drawable/arrow" />
+        </LinearLayout>
+
+        <!-- Instruction Box -->
+        <TextView
+            android:id="@+id/instructionBox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="The pause button is to show the main menu\nwhich allows resume, save game, settings \nand returning to main menu.\nThe top right hand corner shows the current\nscore and number of failed orders, once you\nhit 3 failed orders the game ends."
+            android:textSize="16sp" />
+
+        <!-- Next Button -->
+        <Button
+            android:id="@+id/nextButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="616dp"
+        android:layout_marginTop="148dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow6a"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="100dp"
+            android:rotation="40"
+            android:src="@drawable/arrow" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/arrow6b"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:rotation="145"
+            android:src="@drawable/arrow" />
+
+        <Button
+            android:id="@+id/nextButton6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/instructionBox6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="The display at the right shows the \navailable ingredient currently in the\ngame you can swap one ingredient\nout at a time.It takes awhile before\nit is updated so swap wisely!"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="452dp"
+        android:layout_marginTop="124dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow5"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="0"
+            android:src="@drawable/arrow" />
+
+        <TextView
+            android:id="@+id/instructionBox5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="This is the dustbin, if you make a\nmistake you can throw it away here."
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/nextButton5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="468dp"
+        android:layout_marginTop="228dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="215"
+            android:src="@drawable/arrow" />
+
+        <TextView
+            android:id="@+id/instructionBox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="Here is your spawn point"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/nextButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="340dp"
+        android:layout_marginTop="192dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow9a"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="215"
+            android:src="@drawable/arrow" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/instructionBox9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:text="Here are your cooking pots, you need to place 3\ningredients before it start cooking, no mistakes \nare allowed. If you put the wrong ingredient you\nhave to restart and risk throwing the trash away"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/nextButton9"
+                android:layout_marginStart="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#6200EE"
+                android:padding="8dp"
+                android:text="Next"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/arrow9b"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="220"
+            android:src="@drawable/arrow" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="652dp"
+        android:layout_marginTop="192dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <Button
+            android:id="@+id/nextButton7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+        <TextView
+            android:id="@+id/instructionBox7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="To pick up/down and submit"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/arrow7"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="25"
+            android:src="@drawable/arrow" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="792dp"
+        android:layout_marginTop="168dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/nextButton8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/instructionBox8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="Currently\nholding\nobject"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/arrow8"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="25"
+            android:src="@drawable/arrow" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="224dp"
+        android:layout_marginTop="152dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/nextButton10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/instructionBox10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="To store at table, 1 item \non each table maximum"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/arrow10"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="180"
+            android:src="@drawable/arrow" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="200dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/nextButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/instructionBox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="Joystick to move player"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/arrow2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="180"
+            android:src="@drawable/arrow" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/step11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="120dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/arrow11"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:rotation="180"
+            android:src="@drawable/arrow" />
+
+        <TextView
+            android:id="@+id/instructionBox11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:padding="10dp"
+            android:text="To submit the order and gain \npoints. If wrong order there will\nbe an notification sound."
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/nextButton11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Finish"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,6 +24,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -74,7 +75,6 @@ public class GameActivity extends AppCompatActivity implements
     private BasketManager basketManager;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +98,6 @@ public class GameActivity extends AppCompatActivity implements
                 // Load after a short delay to ensure all components are initialized
                 new Handler().postDelayed(this::loadGameState, 500);
             }
-
 
             // Add a listener to update the volume when the SeekBar is moved
             volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

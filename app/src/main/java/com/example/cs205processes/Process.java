@@ -41,8 +41,8 @@ public class Process {
     }
 
     public static Process generateRandomProcess(List<Recipe> availableRecipes) {
-        // Random time between 30-60 seconds
-        int randomTime = 30 + (int)(Math.random() * 31);
+        // Random time between 60-120 seconds
+        int randomTime = 60 + (int)(Math.random() * 61);
         Recipe randomRecipe = availableRecipes.get((int)(Math.random() * availableRecipes.size()));
         return new Process(randomRecipe, randomTime);
     }
