@@ -16,7 +16,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class SubmissionZone extends Interactable {
-
+    private String TAG="SubmissionZone";
     private Context context;
     public SubmissionZone(Context context, float x, float y, JSONObject props) {
         this.context = context;
@@ -25,6 +25,7 @@ public class SubmissionZone extends Interactable {
         try {
             sprite = loadSprite(context, props.getString("sprite"));
         } catch (Exception e) {
+            Log.e(TAG,"Error at loading submission zone sprite:"+e.getLocalizedMessage());
             e.printStackTrace();
         }
     }
@@ -89,12 +90,12 @@ public class SubmissionZone extends Interactable {
                     playNotificationSound();
                 }
             } catch (ClassCastException e) {
-                Log.e("SubmissionZone", "ClassCastException: " + e.getMessage());
+                Log.e(TAG, "ClassCastException: " + e.getMessage());
                 e.printStackTrace();
             }
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
-            Log.d("SubmissionZone", "Nothing to submit or invalid item. HeldType: " + heldType);
+            Log.d(TAG, "Nothing to submit or invalid item. HeldType: " + heldType);
             playNotificationSound();
         }
     }
@@ -108,6 +109,7 @@ public class SubmissionZone extends Interactable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG,"Exception when playing notification sound:"+e.getLocalizedMessage());
         }
     }
 

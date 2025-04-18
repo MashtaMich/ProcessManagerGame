@@ -22,6 +22,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -130,6 +131,23 @@ public class MainActivity extends AppCompatActivity {
                 showSettingsDialog();
             }
         });
+
+        loadGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Check if a save exists
+                SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
+                if (prefs.contains("score")) {
+                    // Pass a load flag to GameActivity
+                    Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+                    gameIntent.putExtra("loadSavedGame", true);
+                    startActivity(gameIntent);
+                } else {
+                    Toast.makeText(MainActivity.this, "No saved game found", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         // Back button - goes back to main menu
         back.setOnClickListener(new View.OnClickListener() {
             @Override

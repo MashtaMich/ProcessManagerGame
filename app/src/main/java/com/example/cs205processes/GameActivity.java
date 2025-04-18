@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -92,6 +94,12 @@ public class GameActivity extends AppCompatActivity implements
             hideSystemUI();
             initializeGameComponents();
 
+            if (getIntent().getBooleanExtra("loadSavedGame", false)) {
+                // Load after a short delay to ensure all components are initialized
+                new Handler().postDelayed(this::loadGameState, 500);
+            }
+
+
             // Add a listener to update the volume when the SeekBar is moved
             volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -129,6 +137,7 @@ public class GameActivity extends AppCompatActivity implements
             Button resume = findViewById(R.id.btnResume);
             Button save = findViewById(R.id.btnSave);
             Button settings = findViewById(R.id.btnSettings);
+            Button mainMenuButton = findViewById(R.id.btnMainMenu);
             ImageButton back = findViewById(R.id.backButton);
 
            // Set listeners
@@ -147,7 +156,8 @@ public class GameActivity extends AppCompatActivity implements
             });
             // Set up the save game button functionality in the pause menu
             save.setOnClickListener(v -> {
-                // Add save game functionality here
+                saveGameState();
+                Toast.makeText(this, "Game saved", Toast.LENGTH_SHORT).show();
             });
             // Set up the settings button functionality in the pause menu
             settings.setOnClickListener(v -> {
@@ -156,6 +166,12 @@ public class GameActivity extends AppCompatActivity implements
                 pauseMenu.setVisibility(GONE);
                 back.setVisibility(VISIBLE);
 
+            });
+            mainMenuButton.setOnClickListener(v -> {
+                Intent intent = new Intent(GameActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish(); // Close the current activity
             });
             back.setOnClickListener(v -> {
                 settingsMenu.setVisibility(View.GONE);
@@ -168,6 +184,177 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
 
+    // Simple save method
+    private void saveGameState() {
+        try {
+            // Create a basic GameState
+            GameState state = new GameState();
+            // Save player position
+            Player player = game.getPlayer();
+            state.setPlayerX(player.getX());
+            state.setPlayerY(player.getY());
+
+            // Save score and progress
+            state.setScore(gameManager.getScore());
+            state.setDeadProcessCount(gameManager.getDeadProcessCount());
+
+            FoodItem heldItem = playerInventory.getHeld();
+
+            // Save minimal process information
+            List<GameState.ProcessInfo> processInfos = new ArrayList<>();
+            for (Process process : gameManager.getActiveProcesses()) {
+                if (!process.isComplete() && !process.isDead()) {
+                    processInfos.add(new GameState.ProcessInfo(
+                            process.getRecipe().getName(),
+                            process.getTimeRemaining(),
+                            process.getTimeLimit()
+                    ));
+                }
+            }
+            state.setActiveProcesses(processInfos);
+
+            // Save to SharedPreferences as a simple solution
+            SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            if (heldItem != null) {
+                int itemType = playerInventory.checkHeldType();
+
+                // Save item type
+                editor.putInt("heldItemType", itemType);
+
+                // Save item ID and name
+                editor.putInt("heldItemId", heldItem.getId());
+                editor.putString("heldItemName", heldItem.getName());
+
+                // For cooked food, save ingredients
+                if (itemType == PlayerInventory.COOKED && heldItem instanceof CookedFood) {
+                    CookedFood cookedFood = (CookedFood) heldItem;
+                    List<Ingredient> ingredients = cookedFood.getMadeWith();
+
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        editor.putInt("heldItemIngredientsCount", ingredients.size());
+
+                        for (int i = 0; i < ingredients.size(); i++) {
+                            Ingredient ingredient = ingredients.get(i);
+                            editor.putInt("heldItemIngredient_" + i + "_id", ingredient.getId());
+                            editor.putString("heldItemIngredient_" + i + "_name", ingredient.getName());
+                        }
+                    }
+                }
+            } else {
+                // Nothing held
+                editor.putInt("heldItemType", PlayerInventory.EMPTY);
+            }
+
+            // Convert to JSON or serialized string
+            // For simplicity, just save the core data individually
+            editor.putFloat("playerX", state.getPlayerX());
+            editor.putFloat("playerY", state.getPlayerY());
+            editor.putInt("score", state.getScore());
+            editor.putInt("deadProcessCount", state.getDeadProcessCount());
+            editor.putInt("processCount", processInfos.size());
+
+            // Save each process
+            for (int i = 0; i < processInfos.size(); i++) {
+                GameState.ProcessInfo info = processInfos.get(i);
+                editor.putString("process_" + i + "_recipe", info.getRecipeName());
+                editor.putInt("process_" + i + "_remaining", info.getTimeRemaining());
+                editor.putInt("process_" + i + "_limit", info.getTimeLimit());
+            }
+            editor.apply();
+        } catch (Exception e) {
+            Log.e("GameActivity", "Error saving game: " + e.getMessage());
+        }
+    }
+
+    private void loadGameState() {
+        try {
+            SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
+
+            // Load player position
+            float playerX = prefs.getFloat("playerX", 0);
+            float playerY = prefs.getFloat("playerY", 0);
+            game.getPlayer().setPosition(playerX, playerY);
+
+            // Load score and progress
+            int score = prefs.getInt("score", 0);
+            int deadCount = prefs.getInt("deadProcessCount", 0);
+
+            // Update game manager (safely)
+            gameManager.setScore(score);
+
+            int heldItemType = prefs.getInt("heldItemType", PlayerInventory.EMPTY);
+            playerInventory.getAndRemoveItem();
+
+            if (heldItemType != PlayerInventory.EMPTY) {
+                int itemId = prefs.getInt("heldItemId", 0);
+                String itemName = prefs.getString("heldItemName", "");
+
+                FoodItem itemToHold = null;
+
+                if (heldItemType == PlayerInventory.INGREDIENT) {
+                    // Create a simple ingredient
+                    itemToHold = new Ingredient(itemId);
+                }
+                else if (heldItemType == PlayerInventory.COOKED) {
+                    // Get ingredients for cooked food
+                    int ingredientsCount = prefs.getInt("heldItemIngredientsCount", 0);
+                    List<Ingredient> ingredients = new ArrayList<>();
+
+                    for (int i = 0; i < ingredientsCount; i++) {
+                        int ingId = prefs.getInt("heldItemIngredient_" + i + "_id", 0);
+                        Ingredient ingredient = new Ingredient(ingId);
+                        ingredients.add(ingredient);
+                    }
+
+                    // Create cooked food
+                    itemToHold = new CookedFood(itemId, itemName, ingredients);
+                }
+
+                // If valid item was created, add to inventory
+                if (itemToHold != null) {
+                    playerInventory.grabItem(itemToHold);
+                }
+            }
+
+            // Make sure the player inventory view is updated
+            updatePlayerInventoryView();
+
+            // Update UI
+            updateScoreDisplay(score);
+            updateDeadProcessCountDisplay(deadCount);
+
+            // Load processes
+            int processCount = prefs.getInt("processCount", 0);
+            List<Recipe> recipes = Recipe.getDefaultRecipes();
+
+            for (int i = 0; i < processCount; i++) {
+                String recipeName = prefs.getString("process_" + i + "_recipe", "");
+                int timeRemaining = prefs.getInt("process_" + i + "_remaining", 30);
+                int timeLimit = prefs.getInt("process_" + i + "_limit", 60);
+
+                // Find matching recipe
+                for (Recipe recipe : recipes) {
+                    if (recipe.getName().equals(recipeName)) {
+                        // Create a new process with this data
+                        Process process = Process.generateRandomProcess(recipe, timeLimit, timeRemaining);
+                        gameManager.addProcessDirectly(process);
+                        break;
+                    }
+                }
+            }
+
+            // Update the process display
+            if (processAdapter != null) {
+                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            }
+
+            Toast.makeText(this, "Game loaded", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e("GameActivity", "Error loading game: " + e.getMessage());
+        }
+    }
     private void initializeGameComponents() {
             // Initialize game view and logic
             gameView = findViewById(R.id.gameView);
