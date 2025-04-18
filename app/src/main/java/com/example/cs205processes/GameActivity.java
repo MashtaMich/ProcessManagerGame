@@ -217,6 +217,7 @@ public class GameActivity extends AppCompatActivity implements
             SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
 
+            // Save Player inventory
             if (heldItem != null) {
                 int itemType = playerInventory.checkHeldType();
 
@@ -245,6 +246,45 @@ public class GameActivity extends AppCompatActivity implements
             } else {
                 // Nothing held
                 editor.putInt("heldItemType", PlayerInventory.EMPTY);
+            }
+
+            // Save Table
+            List<Table> tables = game.getTables();
+            editor.putInt("tableCount", tables.size());
+
+            for (int i = 0; i < tables.size(); i++) {
+                Table table = tables.get(i);
+                FoodItem itemOnTable = table.getItemOnTable();
+
+                if (itemOnTable != null) {
+                    // Save item type (ingredient or cooked food)
+                    int itemType = (itemOnTable instanceof Ingredient) ?
+                            PlayerInventory.INGREDIENT : PlayerInventory.COOKED;
+                    editor.putInt("table_" + i + "_itemType", itemType);
+
+                    // Save item ID and name
+                    editor.putInt("table_" + i + "_itemId", itemOnTable.getId());
+                    editor.putString("table_" + i + "_itemName", itemOnTable.getName());
+
+                    // For cooked food, save ingredients
+                    if (itemType == PlayerInventory.COOKED && itemOnTable instanceof CookedFood) {
+                        CookedFood cookedFood = (CookedFood) itemOnTable;
+                        List<Ingredient> ingredients = cookedFood.getMadeWith();
+
+                        if (ingredients != null && !ingredients.isEmpty()) {
+                            editor.putInt("table_" + i + "_ingredientsCount", ingredients.size());
+
+                            for (int j = 0; j < ingredients.size(); j++) {
+                                Ingredient ingredient = ingredients.get(j);
+                                editor.putInt("table_" + i + "_ingredient_" + j + "_id", ingredient.getId());
+                                editor.putString("table_" + i + "_ingredient_" + j + "_name", ingredient.getName());
+                            }
+                        }
+                    }
+                } else {
+                    // Table is empty
+                    editor.putInt("table_" + i + "_itemType", -1);  // -1 indicates empty table
+                }
             }
 
             // Convert to JSON or serialized string
@@ -287,6 +327,7 @@ public class GameActivity extends AppCompatActivity implements
             int heldItemType = prefs.getInt("heldItemType", PlayerInventory.EMPTY);
             playerInventory.getAndRemoveItem();
 
+            // Load Player Inventory
             if (heldItemType != PlayerInventory.EMPTY) {
                 int itemId = prefs.getInt("heldItemId", 0);
                 String itemName = prefs.getString("heldItemName", "");
@@ -315,6 +356,49 @@ public class GameActivity extends AppCompatActivity implements
                 // If valid item was created, add to inventory
                 if (itemToHold != null) {
                     playerInventory.grabItem(itemToHold);
+                }
+            }
+
+            // Restore items on tables
+            int tableCount = prefs.getInt("tableCount", 0);
+            List<Table> tables = game.getTables();
+
+            for (int i = 0; i < Math.min(tableCount, tables.size()); i++) {
+                Table table = tables.get(i);
+                int itemType = prefs.getInt("table_" + i + "_itemType", -1);
+
+                // Clear the table first
+                table.clearItem();  // Add this method to Table.java
+
+                if (itemType != -1) {  // -1 means table was empty
+                    int itemId = prefs.getInt("table_" + i + "_itemId", 0);
+                    String itemName = prefs.getString("table_" + i + "_itemName", "");
+
+                    FoodItem itemToPlace = null;
+
+                    if (itemType == PlayerInventory.INGREDIENT) {
+                        // Create a simple ingredient
+                        itemToPlace = new Ingredient(itemId);
+                    }
+                    else if (itemType == PlayerInventory.COOKED) {
+                        // Get ingredients for cooked food
+                        int ingredientsCount = prefs.getInt("table_" + i + "_ingredientsCount", 0);
+                        List<Ingredient> ingredients = new ArrayList<>();
+
+                        for (int j = 0; j < ingredientsCount; j++) {
+                            int ingId = prefs.getInt("table_" + i + "_ingredient_" + j + "_id", 0);
+                            Ingredient ingredient = new Ingredient(ingId);
+                            ingredients.add(ingredient);
+                        }
+
+                        // Create cooked food
+                        itemToPlace = new CookedFood(itemId, itemName, ingredients);
+                    }
+
+                    // Place item on table
+                    if (itemToPlace != null) {
+                        table.placeItem(itemToPlace);  // Add this method to Table.java
+                    }
                 }
             }
 
