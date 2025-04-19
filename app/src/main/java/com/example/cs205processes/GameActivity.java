@@ -69,8 +69,6 @@ public class GameActivity extends AppCompatActivity implements
     private ImageView playerInventoryView;
     private SeekBar volumeSeekBar;
     private SharedPreferences sharedPreferences;
-    private IngredientQueue ingredientQueue;
-    private IngredientBasketFiller basketFiller;
     private BasketManager basketManager;
 
     @Override
@@ -557,7 +555,6 @@ public class GameActivity extends AppCompatActivity implements
 
             // Set up pool for PotFunctions calls
             potThreadPool=new PotThreadPool(maxPots);
-            ingredientQueue=new IngredientQueue(maxIngredients);
             
             // Create game with the playerInventory
             game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
@@ -644,9 +641,7 @@ public class GameActivity extends AppCompatActivity implements
     private void initializeInventory() {
         try {
             // Initialize ingredient fetcher and ingredientInventory
-            Log.d(TAG,""+basketManager);
-            basketFiller=new IngredientBasketFiller(ingredientQueue,basketManager);
-            ingredientFetcher = new IngredientFetchWorker(ingredientQueue,basketFiller);
+            ingredientFetcher = new IngredientFetchWorker(maxIngredients,basketManager);
 
             // Initialize view lists
             initializeViewLists();
@@ -789,8 +784,8 @@ public class GameActivity extends AppCompatActivity implements
                     if (ingredientBlocker != null) {
                         ingredientBlocker.setVisibility(VISIBLE);
                     }
-                    Log.d(TAG,"Made it to exchange, exchanging "+dropIngredient.getName());
                     try{
+                        Log.d(TAG,"exchanging "+dropIngredient.getName()+" for "+swapOptions.get(index).getName());
                         ingredientFetcher.exchangeIngredient(dropIngredient, swapOptions.get(index), this);
                     }catch(Exception e){
                         Log.e(TAG,"Failed to fetch ingredient:"+e.getLocalizedMessage());

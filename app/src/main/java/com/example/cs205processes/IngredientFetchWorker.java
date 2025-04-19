@@ -20,20 +20,21 @@ public class IngredientFetchWorker {
     private final Random random;
     private final IngredientQueue queue;
     private final Object availableLock = new Object();// to sync available list
-    private final int maxCap=3;
+    private final int maxCap;
 
 
     public interface ingredientFetchListener{
         void fetchIngredientProgressUpdate(int progress);
     }
 
-    public IngredientFetchWorker(IngredientQueue queue,IngredientBasketFiller basketFiller){
+    public IngredientFetchWorker(Integer maxCap,BasketManager basketManager){
         // fill the available list
         Log.d(TAG, "Initializing ingredient list");
         generateIngredientList();
-        this.queue=queue;
+        this.maxCap=maxCap;
+        this.queue=new IngredientQueue(maxCap);
         this.random=new Random();
-        this.basketFiller=basketFiller;
+        this.basketFiller=new IngredientBasketFiller(queue,basketManager,maxCap);
     }
 
     private void generateIngredientList(){
@@ -68,8 +69,10 @@ public class IngredientFetchWorker {
     public void updateBaskets(ingredientFetchListener listener){
             executor.submit(()->{
                 try{
-                    updatingBaskets();
+                    //Start consumer
                     basketFiller.startFilling((IngredientBasketFiller.BasketFillListener) listener);
+                    //Start producer
+                    updatingBaskets();
                 }catch(Exception e){
                     Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
                 }
@@ -83,9 +86,12 @@ public class IngredientFetchWorker {
                 Log.e(TAG,"Used list is not correct size");
                 return;
             }
-            for (Ingredient ingredient:usedList){
-                queue.put(ingredient);
+            synchronized (availableLock){
+                for (Ingredient ingredient:usedList){
+                    queue.put(ingredient);
+                }
             }
+
         }catch(InterruptedException e){
             Log.e(TAG, "filler interrupted: " + e.getMessage());
             Thread.currentThread().interrupt();
@@ -127,11 +133,13 @@ public class IngredientFetchWorker {
             //replace ingredient to fetch from inventory
             if (usedList.contains(returnIngredient) && availableList.contains(ingredient)) {
                 int swapItemIndex=availableList.indexOf(ingredient);
+                Log.d(TAG,"Swap item is at index:"+swapItemIndex+" is ingredient"+ingredient.getName());
                 availableList.set(swapItemIndex,returnIngredient);
 
                 result = ingredient;
-                swapItemIndex=usedList.indexOf(returnIngredient);
-                usedList.set(swapItemIndex,result);
+                int returnItemIndex=usedList.indexOf(returnIngredient);
+                Log.d(TAG,"return item is at index:"+swapItemIndex+" is ingredient"+returnIngredient.getName());
+                usedList.set(returnItemIndex,result);
             }
         }
         if (result != null) {

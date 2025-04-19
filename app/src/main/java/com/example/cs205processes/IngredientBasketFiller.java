@@ -12,24 +12,24 @@ public class IngredientBasketFiller {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final IngredientQueue queue;
     private final BasketManager basketManager;
+    private final int fillSize;
 
     public interface BasketFillListener{
         void finishedBasketFilling(List<Ingredient> fillOrder);
     }
 
-    public IngredientBasketFiller(IngredientQueue queue, BasketManager basketManager) {
+    public IngredientBasketFiller(IngredientQueue queue, BasketManager basketManager,Integer fillSize) {
         this.queue = queue;
         this.basketManager = basketManager;
+        this.fillSize=fillSize;
     }
 
     public void startFilling(BasketFillListener listener) {
-        Log.d(TAG,"Start filling from queue size:"+queue.size());
             executor.submit(() -> {
                 List<Ingredient> fillOrder=new ArrayList<>();
-                int fillSize= queue.size();
 
-                     for (int i=fillSize-1;i> -1;i--){
-                        // Take ingredient from queue (will block, should never be blocking if it is there is an error)
+                for (int i=fillSize-1;i> -1;i--){
+                        // Take ingredient from queue (will block if no ingredient inside)
                          Ingredient ingredient=null;
                          try {
                              ingredient = queue.take();
@@ -42,7 +42,7 @@ public class IngredientBasketFiller {
                         Log.d(TAG, "filled basket with: " + ingredient.getName() + " at basket " + i);
                         fillOrder.add(ingredient);
 
-                    }
+                }
                 listener.finishedBasketFilling(fillOrder);
             });
     }

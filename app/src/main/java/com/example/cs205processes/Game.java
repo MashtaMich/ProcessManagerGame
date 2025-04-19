@@ -170,6 +170,23 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
 
     public void draw() {
         gameView.useCanvas(canvas -> {
+            //Code to scale to fit my VM device screen
+//            int screenWidth=gameView.getScreenWidth();
+//            int screenHeight=gameView.getScreenHeight();
+//
+//            // Scale to fit device screen with the map SCREEN_WIDTH and SCREEN_HEIGHT
+//            float scaleX = (float) screenWidth / SCREEN_WIDTH;
+//            float scaleY = (float) screenHeight / SCREEN_HEIGHT;
+//            float scale = Math.min(scaleX, scaleY);
+//
+//            //Offset used to center the canvas in case device screen does not fit all tiles perfectly
+//            float offsetX = (screenWidth - SCREEN_WIDTH * scale) / 2;
+//            float offsetY = (screenHeight - SCREEN_HEIGHT * scale) / 2;
+//
+//            // Apply translation and scaling
+//            canvas.translate(offsetX, offsetY);
+//            canvas.scale(scale, scale);
+
             canvas.drawColor(0xFFFFFFFF);
             //draw floor
             if (tileLayer != null) {

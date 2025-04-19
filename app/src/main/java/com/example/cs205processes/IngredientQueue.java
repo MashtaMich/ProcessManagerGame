@@ -47,7 +47,7 @@ public class IngredientQueue {
                 Log.d(TAG, "Queue is empty. Waiting to take an ingredient.");
                 notEmpty.await();
             }
-            Ingredient ingredient = queue.remove();
+            Ingredient ingredient = queue.poll();
             Log.d(TAG, "Removed from queue: " + ingredient.getName());
             notFull.signal();
             return ingredient;
