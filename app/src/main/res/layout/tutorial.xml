@@ -23,15 +23,19 @@
 
     <LinearLayout
         android:id="@+id/step4"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="356dp"
         android:layout_marginTop="60dp"
         android:orientation="vertical"
         android:padding="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.025"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ImageView
             android:id="@+id/arrow4"
@@ -48,15 +52,17 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="Here are the ingredients you need\nto make the recipe, there is a timer\nin order to score points. There is a \nsubmission streak where you get \nmore points for consecutive\nsubmissions within 10 seconds\nelse the streak is broken."
+            android:textColor="@color/black"
             android:textSize="16sp" />
+
         <Button
             android:id="@+id/nextButton4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Next"
             android:layout_marginTop="12dp"
-            android:padding="8dp"
             android:backgroundTint="#6200EE"
+            android:padding="8dp"
+            android:text="Next"
             android:textColor="#FFFFFF" />
     </LinearLayout>
 
@@ -69,8 +75,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.847"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <!-- LinearLayout for the two arrows (horizontal orientation) -->
         <LinearLayout
@@ -107,6 +117,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="The pause button is to show the main menu\nwhich allows resume, save game, settings \nand returning to main menu.\nThe top right hand corner shows the current\nscore and number of failed orders, once you\nhit 3 failed orders the game ends."
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <!-- Next Button -->
@@ -130,8 +141,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.714"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.407">
 
         <ImageView
             android:id="@+id/arrow6a"
@@ -175,6 +190,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="The display at the right shows the \navailable ingredient currently in the\ngame you can swap one ingredient\nout at a time.It takes awhile before\nit is updated so swap wisely!"
+            android:textColor="@color/black"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -187,8 +203,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ImageView
             android:id="@+id/arrow5"
@@ -205,6 +225,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="This is the dustbin, if you make a\nmistake you can throw it away here."
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <Button
@@ -227,8 +248,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.012"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.058">
 
         <ImageView
             android:id="@+id/arrow1"
@@ -245,6 +270,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="Here is your spawn point"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <Button
@@ -267,8 +293,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.037"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <ImageView
             android:id="@+id/arrow9a"
@@ -290,13 +320,14 @@
                 android:background="#FFFFFF"
                 android:padding="10dp"
                 android:text="Here are your cooking pots, you need to place 3\ningredients before it start cooking, no mistakes \nare allowed. If you put the wrong ingredient you\nhave to restart and risk throwing the trash away"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <Button
                 android:id="@+id/nextButton9"
-                android:layout_marginStart="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="#6200EE"
                 android:padding="8dp"
@@ -322,8 +353,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.393">
 
         <Button
             android:id="@+id/nextButton7"
@@ -343,6 +378,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="To pick up/down and submit"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <ImageView
@@ -362,8 +398,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.621"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.229">
 
         <Button
             android:id="@+id/nextButton8"
@@ -383,6 +423,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="Currently\nholding\nobject"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <ImageView
@@ -398,12 +439,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="224dp"
-        android:layout_marginTop="152dp"
+        android:layout_marginTop="12dp"
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.53">
 
         <Button
             android:id="@+id/nextButton10"
@@ -423,6 +468,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="To store at table, 1 item \non each table maximum"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <ImageView
@@ -442,8 +488,12 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
 
         <Button
             android:id="@+id/nextButton2"
@@ -463,6 +513,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="Joystick to move player"
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <ImageView
@@ -481,9 +532,13 @@
         android:layout_marginTop="120dp"
         android:orientation="vertical"
         android:padding="8dp"
-        android:visibility="invisible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.024"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.102">
 
         <ImageView
             android:id="@+id/arrow11"
@@ -500,6 +555,7 @@
             android:background="#FFFFFF"
             android:padding="10dp"
             android:text="To submit the order and gain \npoints. If wrong order there will\nbe an notification sound."
+            android:textColor="@color/black"
             android:textSize="16sp" />
 
         <Button
