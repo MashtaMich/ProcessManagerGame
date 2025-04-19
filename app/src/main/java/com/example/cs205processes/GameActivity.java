@@ -41,7 +41,7 @@ public class GameActivity extends AppCompatActivity implements
 
     private static final String TAG = "GameActivity";
 
-    private Handler moveHandler = new Handler();
+    private final Handler moveHandler = new Handler();
     private Runnable moveRunnable;
     private MediaPlayer mediaPlayer;
     private GameManager gameManager;
@@ -52,7 +52,6 @@ public class GameActivity extends AppCompatActivity implements
 
     private GameView gameView;
     private Game game;
-    private int highScore = 0;
 
     private List<ImageView> inventoryViews;
     private List<ImageView> availableIngredientsViews;

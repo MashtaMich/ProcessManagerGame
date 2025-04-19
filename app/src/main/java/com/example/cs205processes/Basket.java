@@ -6,8 +6,6 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import java.util.List;
-
 public class Basket extends Interactable {
     private String ingredient;//Store ingredient by name
     private Bitmap emptySprite, cabbageSprite, carrotSprite,onionSprite,tomatoSprite,potatoSprite;

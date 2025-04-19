@@ -16,7 +16,6 @@ public class IngredientFetchWorker {
     private final int totalIngredients =5;
     private List<Ingredient> availableList=new ArrayList<>(totalIngredients);
     private final List<Ingredient> usedList=new ArrayList<>();
-    private final int fetchTime =3000;//In ms, currently 3 seconds
     private final Random random;
     private final IngredientQueue queue;
     private final Object availableLock = new Object();// to sync available list and usedList
@@ -123,8 +122,10 @@ public class IngredientFetchWorker {
     private void fetchIngredient(Ingredient returnIngredient,Ingredient ingredient, ingredientFetchListener listener) {
         //swaps the ingredient using a timer
         Log.d(TAG,"Starting fetch");
+        //In ms, currently 3 seconds
+        int fetchTime = 3000;
         try {
-            for (int i=1;i<=fetchTime/1000;i++){
+            for (int i = 1; i<= fetchTime /1000; i++){
                     Thread.sleep(1000);
                     listener.fetchIngredientProgressUpdate(i);
             }
@@ -153,13 +154,8 @@ public class IngredientFetchWorker {
             Log.d(TAG,"Failed to swap  "+returnIngredient.getName());
         }
 
-        listener.fetchIngredientProgressUpdate(fetchTime/1000+1);
+        listener.fetchIngredientProgressUpdate(fetchTime /1000+1);
         Log.d(TAG,"Starting update Baskets");
         updateBaskets(listener);
-    }
-
-    private void Shutdown(){
-        //To help with game end termination
-        executor.shutdownNow();
     }
 }

@@ -15,10 +15,10 @@ public class Recipe {
     final static int CABBAGE = 3;
     final static int TOMATO = 4;
 
-    private String id;
-    private String name;
-    private List<Ingredient> ingredients;
-    protected int iconResourceId;
+    private final String id;
+    private final String name;
+    private final List<Ingredient> ingredients;
+    //protected int iconResourceId;
 
     public Recipe(String name, List<Ingredient> ingredients) {
         this.id = java.util.UUID.randomUUID().toString();
@@ -88,8 +88,9 @@ public class Recipe {
         Map<Integer,Integer> countMap=new HashMap<>();
         for (Ingredient ing:list){
             int id=ing.getId();
-            countMap.put(id,
-                    countMap.getOrDefault(id,0)+1);
+            Integer currentCount = countMap.get(id);
+            if (currentCount == null) currentCount = 0;
+            countMap.put(id,currentCount+1);
         }
         return countMap;
     }

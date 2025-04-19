@@ -23,7 +23,7 @@ public abstract class Interactable {
             return BitmapFactory.decodeStream(context.getAssets().open("tiles/" + filename));
         } catch (Exception e) {
             Log.e("LoadSprite", "FAILED to load sprite: " + filename);
-            e.printStackTrace();
+            //e.printStackTrace();
             return fallbackRedSquareBitmap();
         }
     }

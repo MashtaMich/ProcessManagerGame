@@ -26,7 +26,7 @@ public class IngredientQueue {
         queueLock.lock();
         try {
             while (queue.size() == capacity) {
-                //Should never be full if full there is an error,
+                //Should never be full if full there is an error
                 Log.d(TAG, "Queue is full. Waiting to put: " + ingredient.getName());
                 notFull.await();
             }
@@ -49,22 +49,20 @@ public class IngredientQueue {
                 Log.d(TAG, "Queue is empty. Waiting to take an ingredient.");
                 notEmpty.await();
             }
+
             Ingredient ingredient = queue.poll();//Take from front for FIFO
-            Log.d(TAG, "Removed from queue: " + ingredient.getName());
+
+            if (ingredient!=null){
+                Log.d(TAG, "Removed from queue: " + ingredient.getName());
+            }else{
+                Log.e(TAG,"Failed to take an ingredient from the queue");
+            }
+
             notFull.signal();
             return ingredient;
         } finally {
             queueLock.unlock();
             Log.d(TAG,"Take finished");
-        }
-    }
-
-    public boolean isEmpty() {
-        queueLock.lock();
-        try {
-            return queue.isEmpty();
-        } finally {
-            queueLock.unlock();
         }
     }
 

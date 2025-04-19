@@ -39,10 +39,15 @@ public class IngredientBasketFiller {
                              Log.e(TAG, "Exception during take()", e);
                          }
 
-                         basketManager.updateBasketContents(i, ingredient);
+                         if (ingredient!=null){
+                             basketManager.updateBasketContents(i, ingredient);
 
-                        Log.d(TAG, "filled basket with: " + ingredient.getName() + " at basket " + i);
-                        fillOrder.add(ingredient);
+                             Log.d(TAG, "filled basket with: " + ingredient.getName() + " at basket " + i);
+                             fillOrder.add(ingredient);
+                         }else{
+                             Log.e(TAG,"Failed to add an ingredient at basket"+i);
+                         }
+
 
                 }
                 listener.finishedBasketFilling(fillOrder);

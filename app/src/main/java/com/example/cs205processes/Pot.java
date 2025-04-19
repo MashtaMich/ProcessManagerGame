@@ -11,15 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Pot extends Interactable {
-    //Handles pot UI interactions, pot functions handled in class potfunctions
+    //Handles pot UI interactions, pot functions handled in class pot functions
     //All pots should share same potThreadPool
-    private String TAG="pot";
+    private final String TAG="pot";
     public enum State { EMPTY, COOKING, DONE }
     private final PotFunctions potFunctions;
     private State state;
     private Bitmap emptySprite, cookingSprite, doneSprite;
     private final HashMap<String,Bitmap> ingredientSprites=new HashMap<>();
-    private int cookingDuration=6000; // ms so 6 seconds
     //Shared pot thread pool
     private final PotThreadPool potThreadPool;//Should be initialized in GameActivity then passed from Game
     private final Context context;//Should be GameActivity context from Game
@@ -28,15 +27,17 @@ public class Pot extends Interactable {
     public Pot(Context context, float x, float y, JSONObject props,PotThreadPool potThreadPool) {
         this.x = x;
         this.y = y;
-        this.potFunctions=new PotFunctions(cookingDuration);
+        // preset cookingDuration, ms so 6 seconds
+        int cookingDuration = 6000;
         this.potThreadPool=potThreadPool;
         this.context=context;//Game Activity context
+        //Use preset cooking duration if props has no cooking_time set
+        cookingDuration = props.optInt("cooking_time", cookingDuration);
+        this.potFunctions=new PotFunctions(cookingDuration);
 
         try {
             //Default if not props state is State.EMPTY
             this.state = State.valueOf(props.optString("state", "empty").toUpperCase());
-            //Use preset cooking duration if props has no cooking_time set
-            this.cookingDuration = props.optInt("cooking_time", cookingDuration);
 
             loadSprites(context,props);//Load all the sprites
 

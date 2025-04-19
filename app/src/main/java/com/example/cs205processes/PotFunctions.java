@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+/** @noinspection BusyWait*/
 public class PotFunctions {
     //To handle the pot internal functions
     private final String TAG="PotFunctions";
@@ -65,12 +66,6 @@ public class PotFunctions {
         //If there is finished food in the pot
         synchronized (foodDoneLock) {
             return foodDone != null;
-        }
-    }
-
-    public int potContainingNumIngredients(){
-        synchronized (ingredientLock) {
-            return ingredientsInside.size();
         }
     }
 

@@ -3,9 +3,7 @@ package com.example.cs205processes;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BasketManager {
     //To manage baskets, mainly fills the baskets at basketFiller and returns them when requested at UI thread
@@ -37,15 +35,6 @@ public class BasketManager {
                 Log.d(TAG, "Updated basket " + (basketIndex+1) + " to: " + ingredient.getName());
             }
         }
-    }
-
-    public Basket getBasket(int index) {
-        synchronized (basketsLock){
-            if (index > -1 && index < baskets.size()) {
-                return baskets.get(index);
-            }
-        }
-        return null;
     }
 
     public Ingredient getIngredientFromBasket(int index){
