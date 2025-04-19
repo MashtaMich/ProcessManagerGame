@@ -9,7 +9,7 @@ public class BasketManager {
     //To manage baskets, mainly fills the baskets at basketFiller and returns them when requested at UI thread
     //Basket index is 0 at bottom most and last is the vertically highest basket
     private final String TAG = "BasketManager";
-    private final int maxCap;//Max baskets
+    private final int maxCap; //Max num of baskets
     private final List<Basket> baskets;
     private final Object basketsLock = new Object();
 
@@ -39,9 +39,7 @@ public class BasketManager {
 
     public Ingredient getIngredientFromBasket(int index){
         synchronized (basketsLock){
-            if (index > -1 && index < baskets.size()) {
-                return new Ingredient(baskets.get(index).getIngredient());
-            }
+            if (index > -1 && index < baskets.size()) return new Ingredient(baskets.get(index).getIngredient());
         }
         return null;
     }

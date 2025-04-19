@@ -30,9 +30,6 @@ public class SubmissionZone extends Interactable {
         }
     }
 
-    /*
-     * check correct
-     */
     private Recipe checkCorrectIngredientsForRecipe(String recipeName, List<Ingredient> submittedIngredients) {
         if (recipeName == null || submittedIngredients == null) {
             return null;
@@ -112,7 +109,4 @@ public class SubmissionZone extends Interactable {
             Log.e(TAG,"Exception when playing notification sound:"+e.getLocalizedMessage());
         }
     }
-
-
-
 }

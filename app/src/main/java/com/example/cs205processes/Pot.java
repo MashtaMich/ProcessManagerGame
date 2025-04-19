@@ -20,8 +20,8 @@ public class Pot extends Interactable {
     private Bitmap emptySprite, cookingSprite, doneSprite;
     private final HashMap<String,Bitmap> ingredientSprites=new HashMap<>();
     //Shared pot thread pool
-    private final PotThreadPool potThreadPool;//Should be initialized in GameActivity then passed from Game
-    private final Context context;//Should be GameActivity context from Game
+    private final PotThreadPool potThreadPool; //Should be initialized in GameActivity then passed from Game
+    private final Context context; //Should be GameActivity context from Game
     private final Object stateLock = new Object();
 
     public Pot(Context context, float x, float y, JSONObject props,PotThreadPool potThreadPool) {
@@ -30,7 +30,7 @@ public class Pot extends Interactable {
         // preset cookingDuration, ms so 6 seconds
         int cookingDuration = 6000;
         this.potThreadPool=potThreadPool;
-        this.context=context;//Game Activity context
+        this.context=context; //Game Activity context
         //Use preset cooking duration if props has no cooking_time set
         cookingDuration = props.optInt("cooking_time", cookingDuration);
         this.potFunctions=new PotFunctions(cookingDuration);
@@ -167,8 +167,6 @@ public class Pot extends Interactable {
     }
 
     private void drawIngredientsAbovePot(Canvas canvas, Paint paint, int TILE_SIZE, List<Ingredient> ingredients) {
-        //Draw the ingredients on pot above the pot sprite
-
         //3 icons above pot max since capacity is 3, so tile size/3
         int spriteSize = TILE_SIZE / 3;
         int startX = (int) x;//Same starting x as pot

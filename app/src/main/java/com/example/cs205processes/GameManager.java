@@ -378,7 +378,6 @@ public class GameManager {
         return availableRecipes;
     }
 
-    // In GameManager.java
     public void addProcessDirectly(Process process) {
         synchronized (mutex) {
             activeProcesses.add(process);

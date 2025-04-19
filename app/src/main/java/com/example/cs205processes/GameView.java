@@ -17,9 +17,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean isRunning = false;
     private Game game;
 
-    private int screenWidth;//To help scale the map
-    private int screenHeight;
-
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
@@ -29,20 +26,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         this.game = game;
     }
 
-    public int getScreenWidth() {
-        return screenWidth;
-    }
-
-    public int getScreenHeight() {
-        return screenHeight;
-    }
-
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        //Get device screen's dimensions
-//        this.screenHeight=getHeight();
-//        this.screenWidth=getWidth();
-
         isRunning = true;
         gameThread = new Thread(this);
         gameThread.start();
@@ -89,7 +74,5 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        // No-op for now. Required by SurfaceHolder.Callback.
     }
-
 }

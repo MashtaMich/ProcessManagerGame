@@ -18,7 +18,7 @@ public class IngredientFetchWorker {
     private final List<Ingredient> usedList=new ArrayList<>();
     private final Random random;
     private final IngredientQueue queue;
-    private final Object availableLock = new Object();// to sync available list and usedList
+    private final Object availableLock = new Object(); // to sync available list and usedList
     private final int maxCap;
 
 

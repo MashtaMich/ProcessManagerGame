@@ -73,16 +73,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // Optional: Handle start of touch on SeekBar (if needed)
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // Optional: Handle stop of touch on SeekBar (if needed)
             }
         });
 
-        // Initialize buttons
         startGameButton = findViewById(R.id.StartGame);
         howToPlayButton = findViewById(R.id.HowToPlay);
         loadGameButton = findViewById(R.id.LoadGame);
@@ -90,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         settingMenu = findViewById(R.id.SettingsMenu);
         back = findViewById(R.id.backButton);
 
-        // Set button click listeners
         setupButtonListeners();
     }
 
@@ -107,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupButtonListeners() {
-        // Start Game button - Launches the Game Activity
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // How to Play button - Shows instructions dialog
         howToPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button - Shows settings dialog
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 // Check if a save exists
                 SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
                 if (prefs.contains("score")) {
-                    // Pass a load flag to GameActivity
                     Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
                     gameIntent.putExtra("loadSavedGame", true);
                     startActivity(gameIntent);
@@ -148,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Back button - goes back to main menu
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,23 +217,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("How to Play");
-//        builder.setMessage(
-//                "Process Manager: Cooking under CPU pressure!\n\n" +
-//                        "• You're the Process Manager in a busy kitchen.\n" +
-//                        "• Processes (customers) arrive randomly with orders.\n" +
-//                        "• Move your character around the kitchen to collect ingredients.\n" +
-//                        "• Cook dishes according to recipes before the process times out.\n" +
-//                        "• Each completed order gives you 100 points.\n" +
-//                        "• Each failed order costs you 500 points.\n" +
-//                        "• Game ends when 3 processes time out.\n\n" +
-//                        "Controls:\n" +
-//                        "• Use on-screen joystick to move your character.\n" +
-//                        "• Tap on ingredients or tools to interact with them.\n"
-//        );
-//        builder.setPositiveButton("Got it!", null);
-//        builder.show();
     }
 
     private void showSettingsDialog() {
@@ -250,11 +224,6 @@ public class MainActivity extends AppCompatActivity {
         // or launch a separate Settings Activity
         settingMenu.setVisibility(View.VISIBLE);
         back.setVisibility(VISIBLE);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Settings");
-//        builder.setMessage("Settings options would go here.");
-//        builder.setPositiveButton("Close", null);
-//        builder.show();
     }
     private void hideSystemUI() {
         WindowInsetsController controller = getWindow().getInsetsController();

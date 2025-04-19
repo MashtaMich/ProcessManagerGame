@@ -535,7 +535,6 @@ public class GameActivity extends AppCompatActivity implements
                 }
             }
 
-            // Update the process display
             if (processAdapter != null) {
                 processAdapter.updateProcesses(gameManager.getActiveProcesses());
             }
@@ -548,38 +547,23 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
     private void initializeGameComponents() {
-            // Initialize game view and logic
             gameView = findViewById(R.id.gameView);
 
-            // Initialize playerInventory first
             List<Recipe> recipeList=Recipe.getDefaultRecipes();
             playerInventory = new PlayerInventory(recipeList);
-
-            //Initialize basketManager
-            basketManager=new BasketManager(maxIngredients);
-
-            // Set up pool for PotFunctions calls
-            potThreadPool=new PotThreadPool(maxPots);
-            
-            // Create game with the playerInventory
+            basketManager = new BasketManager(maxIngredients);
+            potThreadPool = new PotThreadPool(maxPots);
             game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
             gameView.init(game);
 
-            // Set up movement controls
             setupMovementControls();
-
-            // Initialize UI components
             initializeUIComponents();
-
-            // Initialize ingredientInventory and ingredients
             initializeInventory();
 
-            // Initialize game manager
             gameManager = new GameManager(this, this,recipeList);
             game.setGameManager(gameManager);
             gameManager.startGame();
 
-            // Set initial values for statistics
             updateScoreDisplay(0);
             updateDeadProcessCountDisplay(0);
     }
@@ -600,7 +584,7 @@ public class GameActivity extends AppCompatActivity implements
         button.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    v.performClick();  // ✅ Accessibility fix
+                    v.performClick();
                     moveRunnable = new Runnable() {
                         @Override
                         public void run() {
@@ -645,14 +629,8 @@ public class GameActivity extends AppCompatActivity implements
 
     private void initializeInventory() {
         try {
-            // Initialize ingredient fetcher
             ingredientFetcher = new IngredientFetchWorker(maxIngredients,basketManager);
-            //Player inventory has been moved to earlier for when Game is initialized
-
-            // Initialize view lists
             initializeViewLists();
-
-            // Initialize ingredient views
             initIngredientViews();
         } catch (Exception e) {
             Log.e(TAG, "Error initializing ingredientInventory: " + e.getMessage(), e);
@@ -783,7 +761,6 @@ public class GameActivity extends AppCompatActivity implements
             if (selectedIngredientIndex != -1 && ingredientFetcher != null) {
                 //Get available list of swap ingredients
                 List<Ingredient> availableList = ingredientFetcher.getAvailableList();
-
 
                 if (availableList != null && index < availableList.size() && selectedIngredientIndex < basketManager.getBasketCount()) {
                     //map the basket index to selectedIngredientIndex
@@ -1103,7 +1080,7 @@ public class GameActivity extends AppCompatActivity implements
                 mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
                 mediaPlayer.start(); // Start playing the audio
             }
-            return; // Exit the method
+            return;
         }
 
         float speed;

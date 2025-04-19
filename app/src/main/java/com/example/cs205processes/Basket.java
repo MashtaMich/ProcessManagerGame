@@ -7,7 +7,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class Basket extends Interactable {
-    private String ingredient;//Store ingredient by name
+    private String ingredient; //Store ingredient by name
     private Bitmap emptySprite, cabbageSprite, carrotSprite,onionSprite,tomatoSprite,potatoSprite;
 
     public Basket(Context context, float x, float y, JSONObject props) {
@@ -36,7 +36,7 @@ public class Basket extends Interactable {
 
     public void setIngredient(String ingredient){
         try{
-            this.ingredient=ingredient;//Set ingredient at basket (Done at basket manager in Basket Filler)
+            this.ingredient=ingredient; //Set ingredient at basket (Done at basket manager in Basket Filler)
         } catch (Exception e) {
             Log.e("Basket","Error at setIngredient for basket:"+e.getLocalizedMessage());
         }
@@ -49,7 +49,7 @@ public class Basket extends Interactable {
         try {
             //Player only allowed to have one item at a time
             if (inventory.checkHeldType()==PlayerInventory.EMPTY){
-                inventory.grabItem(new Ingredient(ingredient));//init ingredient by name
+                inventory.grabItem(new Ingredient(ingredient)); //initialize ingredient by name
             }else{
                 Log.d("Basket","Player failed to take ingredient:inventory full");
             }
