@@ -70,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private BasketManager basketManager;
 
-    @Override
+            @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
@@ -1078,6 +1078,10 @@ public class GameActivity extends AppCompatActivity implements
                 mediaPlayer.stop(); // Stop the music
                 mediaPlayer.reset(); // Reset the MediaPlayer to prepare for reuse if needed
                 mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
+                sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+                int savedVolume = sharedPreferences.getInt("volume", 100);
+                float volume = savedVolume / 100f;
+                mediaPlayer.setVolume(volume,volume);
                 mediaPlayer.start(); // Start playing the audio
             }
             return;
