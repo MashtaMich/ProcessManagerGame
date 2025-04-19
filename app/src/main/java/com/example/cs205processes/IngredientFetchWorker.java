@@ -15,11 +15,11 @@ public class IngredientFetchWorker {
     private final ExecutorService executor= Executors.newSingleThreadExecutor();
     private final int totalIngredients =5;
     private List<Ingredient> availableList=new ArrayList<>(totalIngredients);
-    private List<Ingredient> usedList=new ArrayList<>();
-    private final int fetchTime =3000;
+    private final List<Ingredient> usedList=new ArrayList<>();
+    private final int fetchTime =3000;//In ms, currently 3 seconds
     private final Random random;
     private final IngredientQueue queue;
-    private final Object availableLock = new Object();// to sync available list
+    private final Object availableLock = new Object();// to sync available list and usedList
     private final int maxCap;
 
 
@@ -38,6 +38,7 @@ public class IngredientFetchWorker {
     }
 
     private void generateIngredientList(){
+        //generate ingredient list
         List<Ingredient> ingredientList=new ArrayList<>();
         for (int i = 0; i< totalIngredients; i++){
             Ingredient ingredient=new Ingredient(i);
@@ -55,51 +56,54 @@ public class IngredientFetchWorker {
     }
 
     public void exchangeIngredient(Ingredient returnIngredient,Ingredient getIngredient,ingredientFetchListener listener){
-
-            executor.submit(()->{
-                try{
-                    fetchIngredient(returnIngredient,getIngredient,listener);
-                }catch(Exception e){
-                    Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
-                }
-            });
+        //Swaps returnIngredient into availableList and getIngredient into usedList
+        executor.submit(()->{
+            try{
+                fetchIngredient(returnIngredient,getIngredient,listener);
+            }catch(Exception e){
+                Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
+            }
+        });
 
     }
 
     public void updateBaskets(ingredientFetchListener listener){
-            executor.submit(()->{
-                try{
-                    //Start consumer
-                    basketFiller.startFilling((IngredientBasketFiller.BasketFillListener) listener);
-                    //Start producer
-                    updatingBaskets();
-                }catch(Exception e){
-                    Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
-                }
-            });
+        //Updates baskets using Producer-Consumer pattern with used list
+        executor.submit(()->{
+            try{
+                //Start consumer
+                basketFiller.startFilling((IngredientBasketFiller.BasketFillListener) listener);
+                //Start producer
+                updatingBaskets();
+            }catch(Exception e){
+                Log.e(TAG,"Error at fetch Ingredient thread "+e.getLocalizedMessage());
+            }
+        });
 
     }
 
     private void updatingBaskets() {
         try{
-            if (usedList.size()!=3){
-                Log.e(TAG,"Used list is not correct size");
-                return;
-            }
             synchronized (availableLock){
+                //Used list should always be size of maxCap
+                if (usedList.size()!=maxCap){
+                    Log.e(TAG,"Used list is not correct size");
+                    return;
+                }
+                //Put all ingredients into the queue, will be taken from queue by basket filler
                 for (Ingredient ingredient:usedList){
                     queue.put(ingredient);
                 }
             }
 
         }catch(InterruptedException e){
-            Log.e(TAG, "filler interrupted: " + e.getMessage());
-            Thread.currentThread().interrupt();
+            Log.e(TAG, "updating interrupted: " + e.getMessage());
         }
 
     }
 
     public List<Ingredient> generateIngredientsRandom(ingredientFetchListener listener){
+        //Generates initial ingredient set up to maxCap
         synchronized (availableLock) {
             for (int i = 0; i < maxCap; i++) {
                 if (availableList.isEmpty()) {
@@ -117,6 +121,7 @@ public class IngredientFetchWorker {
     }
 
     private void fetchIngredient(Ingredient returnIngredient,Ingredient ingredient, ingredientFetchListener listener) {
+        //swaps the ingredient using a timer
         Log.d(TAG,"Starting fetch");
         try {
             for (int i=1;i<=fetchTime/1000;i++){
@@ -151,5 +156,10 @@ public class IngredientFetchWorker {
         listener.fetchIngredientProgressUpdate(fetchTime/1000+1);
         Log.d(TAG,"Starting update Baskets");
         updateBaskets(listener);
+    }
+
+    private void Shutdown(){
+        //To help with game end termination
+        executor.shutdownNow();
     }
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class IngredientQueue {
     //Queue replaces Ingredient Inventory, will fetch from Ingredient Fetch Worker to be consumed to fill the baskets at Basket Filler
+    //Uses FIFO to maintain order between baskets and fetch worker used list
     private static final String TAG = "Ingredient Queue";
     private final Queue<Ingredient> queue = new LinkedList<>();
     private final int capacity;
@@ -29,6 +30,7 @@ public class IngredientQueue {
                 Log.d(TAG, "Queue is full. Waiting to put: " + ingredient.getName());
                 notFull.await();
             }
+
             queue.add(ingredient);
             Log.d(TAG, "Added to queue: " + ingredient.getName());
             notEmpty.signal();
@@ -38,16 +40,16 @@ public class IngredientQueue {
     }
 
     public Ingredient take() throws InterruptedException {
-        //Standard consumer put function
+        //Standard consumer take function
         Log.d(TAG,"taking");
         queueLock.lock();
         try {
             while (queue.isEmpty()) {
-                //Queue shouldn't be empty
+                //Queue should be empty until fetch worker adds the first ingredient in
                 Log.d(TAG, "Queue is empty. Waiting to take an ingredient.");
                 notEmpty.await();
             }
-            Ingredient ingredient = queue.poll();
+            Ingredient ingredient = queue.poll();//Take from front for FIFO
             Log.d(TAG, "Removed from queue: " + ingredient.getName());
             notFull.signal();
             return ingredient;

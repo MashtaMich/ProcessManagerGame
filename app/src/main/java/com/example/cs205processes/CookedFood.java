@@ -3,9 +3,8 @@ package com.example.cs205processes;
 import java.util.List;
 
 public class CookedFood extends FoodItem {
-
+    //Class for food created by Pot using a recipe, foodItem id is always 5
     private final List<Ingredient> madeWith;
-    private List<String> recipeNames;
 
     public CookedFood(int id, String recipeName, List<Ingredient> madeWith) {
         super(id);

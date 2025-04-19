@@ -125,7 +125,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                             case "pot":
                                 Pot pot=new Pot(context,x,y,props,potThreadPool);
                                 interactables.add(pot);
-                                pots.add(pot);
+                                pots.add(pot);//To assist in saving their contents
                                 break;
                             case "rubbishbin":
                                 interactables.add(new RubbishBin(context, x, y, props));
@@ -133,7 +133,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                             case "basket":
                                 Basket basket=new Basket(context,x,y,props);
                                 interactables.add(basket);
-                                basketManager.registerBasket(basket);
+                                basketManager.addBasket(basket);//For saving contents and manipulation
                                 break;
                             case "table":
                                 interactables.add(new Table(context, x, y, props));

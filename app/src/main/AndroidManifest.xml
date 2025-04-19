@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CS205Processes">
 
-        <!-- Main Activity (you mentioned you already have this) -->
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Game Activity - Now in landscape mode -->
+        <!-- Game Activity - Should be in landscape mode -->
         <activity
             android:name=".GameActivity"
             android:exported="false" />

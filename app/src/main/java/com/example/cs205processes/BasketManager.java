@@ -8,19 +8,22 @@ import java.util.List;
 import java.util.Map;
 
 public class BasketManager {
+    //To manage baskets, mainly fills the baskets at basketFiller and returns them when requested at UI thread
+    //Basket index is 0 at bottom most and last is the vertically highest basket
     private final String TAG = "BasketManager";
-    private final int maxCap;
+    private final int maxCap;//Max baskets
     private final List<Basket> baskets;
+    private final Object basketsLock = new Object();
 
     public BasketManager(int maxCap){
         this.maxCap=maxCap;
         this.baskets=new ArrayList<>(maxCap);
     }
 
-    public void registerBasket(Basket basket) {
+    public void addBasket(Basket basket) {
         if (baskets.size() < maxCap) {
             baskets.add(basket);
-            Log.d(TAG, "Registered basket");
+            Log.d(TAG, "added basket:"+(baskets.size()-1));
         } else {
             Log.d(TAG, "Cannot add any more baskets");
         }
@@ -28,22 +31,28 @@ public class BasketManager {
 
     public void updateBasketContents(int basketIndex, Ingredient ingredient) {
         Log.d(TAG,"Updating basket content");
-        if (basketIndex > -1 && basketIndex < baskets.size()) {
-            baskets.get(basketIndex).setIngredient(ingredient.getName().toLowerCase());
-            Log.d(TAG, "Updated basket " + (basketIndex+1) + " to: " + ingredient.getName());
+        synchronized (basketsLock){
+            if (basketIndex > -1 && basketIndex < baskets.size()) {
+                baskets.get(basketIndex).setIngredient(ingredient.getName());
+                Log.d(TAG, "Updated basket " + (basketIndex+1) + " to: " + ingredient.getName());
+            }
         }
     }
 
     public Basket getBasket(int index) {
-        if (index > -1 && index < baskets.size()) {
-            return baskets.get(index);
+        synchronized (basketsLock){
+            if (index > -1 && index < baskets.size()) {
+                return baskets.get(index);
+            }
         }
         return null;
     }
 
     public Ingredient getIngredientFromBasket(int index){
-        if (index > -1 && index < baskets.size()) {
-            return new Ingredient(baskets.get(index).getIngredient());
+        synchronized (basketsLock){
+            if (index > -1 && index < baskets.size()) {
+                return new Ingredient(baskets.get(index).getIngredient());
+            }
         }
         return null;
     }

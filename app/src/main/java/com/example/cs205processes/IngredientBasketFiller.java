@@ -8,6 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class IngredientBasketFiller {
+    //Fills baskets off IngredientFetchWorker's input into Ingredient Queue
+    //To maintain index order with used List in fetch worker must maintain FIFO principles
     private static final String TAG = "Basket Filler";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final IngredientQueue queue;
@@ -29,7 +31,7 @@ public class IngredientBasketFiller {
                 List<Ingredient> fillOrder=new ArrayList<>();
 
                 for (int i=fillSize-1;i> -1;i--){
-                        // Take ingredient from queue (will block if no ingredient inside)
+                        // Take ingredient from queue (blocks if no ingredient inside)
                          Ingredient ingredient=null;
                          try {
                              ingredient = queue.take();

@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PotFunctions {
+    //To handle the pot internal functions
     private final String TAG="PotFunctions";
     private final List<Ingredient> ingredientsInside;
     private CookedFood foodDone;
+    private final int progressStep=1000;//in ms, how long each progress tick is
     private final int maxIngredients;
     private final int cookTime;
     private final Object foodDoneLock = new Object();// to sync available list
@@ -28,26 +30,29 @@ public class PotFunctions {
     }
 
     public boolean isReadyToCook() {
+        //Ready to cook if ingredient list reaches the maxIngredients
         synchronized (ingredientLock) {
             return ingredientsInside.size() == maxIngredients;
         }
     }
 
     public List<Ingredient> getIngredientsInside(){
+        //Return a copy of ingredients inside, shouldn't be manipulated outside of this class
         synchronized (ingredientLock) {
-            return new ArrayList<>(ingredientsInside); // return a copy to avoid concurrency issues
+            return new ArrayList<>(ingredientsInside);
         }
     }
 
     public CookedFood getFood(){
+        //Get finished food from pot and clear the food when passed
         synchronized (foodDoneLock) {
             if (this.foodDone != null) {
                 CookedFood food = this.foodDone;
                 this.foodDone = null;
                 return food;
             }
-            return null;
         }
+        return null;
     }
 
     public void addIngredient(Ingredient ingredient){
@@ -57,18 +62,21 @@ public class PotFunctions {
     }
 
     public boolean gotFood(){
+        //If there is finished food in the pot
         synchronized (foodDoneLock) {
             return foodDone != null;
         }
     }
 
-    public int potContainingNum(){
+    public int potContainingNumIngredients(){
         synchronized (ingredientLock) {
             return ingredientsInside.size();
         }
     }
 
     public void cookIngredients(Recipe recipe,PotListener listener){
+        //Cooking ingredients function
+
         boolean canCook;
         synchronized (ingredientLock) {
             canCook=isReadyToCook();
@@ -76,30 +84,38 @@ public class PotFunctions {
 
         if (canCook){
             CookedFood newFood;
-            this.recipeCooking=recipe;
+            this.recipeCooking=recipe;//Store recipe for saving
 
             // Start cooking the ingredients
-            this.cookProgress = 0; // Progress will be every 1 second
+            this.cookProgress = 0; // Store cooking progress for saving
 
             try {
-                while (cookProgress<cookTime/1000){
-                    Thread.sleep(1000);
+                //Simulate cooking
+                while (cookProgress<cookTime/progressStep){
+                    Thread.sleep(progressStep);
                     cookProgress++;
+
+                    //Send progress update to UI thread
                     listener.potProgressUpdate(cookProgress);
                 }
             } catch (InterruptedException e) {
                 Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
             }
 
+            //Create new cooked food using recipe, default id is 5
             newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
+
             synchronized (ingredientLock) {
                 this.ingredientsInside.clear();
             }
+
             synchronized (foodDoneLock) {
                 this.foodDone = newFood;
             }
+
             this.recipeCooking=null;
 
+            //Send final progressUpdate to UI thread
             listener.potProgressUpdate(cookProgress+1);
             this.cookProgress=0;
         }
@@ -108,13 +124,13 @@ public class PotFunctions {
     public void restartCooking(Recipe recipe,PotListener listener){
         // restart cooking the ingredients
         try {
-            while (cookProgress<cookTime/1000){
-                Thread.sleep(1000);
+            while (cookProgress<cookTime/progressStep){
+                Thread.sleep(progressStep);
                 this.cookProgress++;
                 listener.potProgressUpdate(cookProgress);
             }
         } catch (InterruptedException e) {
-                Log.e(TAG,"Error at cooking process Ingredient "+e.getLocalizedMessage());
+                Log.e(TAG,"Error at cooking process Ingredient after restart"+e.getLocalizedMessage());
         }
 
         CookedFood newFood = new CookedFood(5, recipe.getName(),new ArrayList<>(recipe.getIngredients()));
@@ -128,7 +144,7 @@ public class PotFunctions {
 
         listener.potProgressUpdate(cookProgress+1);
         this.cookProgress=0;
-        Log.d(TAG,"Restart complete");
+        Log.d(TAG,"Restarted cooking complete");
     }
 
     public Recipe getRecipeCooking(){

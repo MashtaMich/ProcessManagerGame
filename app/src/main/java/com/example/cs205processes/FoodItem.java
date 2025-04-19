@@ -3,6 +3,7 @@ package com.example.cs205processes;
 import androidx.annotation.NonNull;
 
 public class FoodItem {
+    //Super class for ingredients and CookedFood, uses name for equals and hashcode
     protected int id;
     protected String name;
     protected int iconResourceId;

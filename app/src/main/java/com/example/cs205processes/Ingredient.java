@@ -1,13 +1,14 @@
 package com.example.cs205processes;
 
 public class Ingredient extends FoodItem {
+    //Class for ingredients gotten from basket, in recipe and in CookedFood
 
-    public Ingredient(int id) {
+    public Ingredient(int id) {//Create using ingredient id
         super(id);
         setNameAndImage(id);
     }
 
-    public Ingredient(String name){
+    public Ingredient(String name){//Create using ingredient name
         super(name);
         setIdAndImage(name);
     }
