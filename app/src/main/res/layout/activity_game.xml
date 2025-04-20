@@ -296,14 +296,14 @@
         android:layout_width="79dp"
         android:layout_height="49dp"
         android:text="Resume"
-        android:textSize="12sp"
+        android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="@+id/gameView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.861"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.022"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,SmallSp" />
 
     <!-- Interact Button. Adjust location using marginEnd for x pos and marginBottom for y pos -->
     <Button
