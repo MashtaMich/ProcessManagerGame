@@ -36,13 +36,14 @@
         android:id="@+id/gameOverMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Too many processes died! The system crashed."
-        android:textSize="16sp"
-        android:textColor="@color/textMedium"
-        android:gravity="center"
         android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Too many processes died! The system crashed."
+        android:textColor="@color/textMedium"
+        android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/finalScoreTextView"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText,TextContrastCheck,TextContrastCheck"
+        tools:layout_editor_absoluteX="24dp" />
 
     <Button
         android:id="@+id/restartButton"

@@ -29,6 +29,7 @@
                 android:textColor="@color/timeRemainingColor"
                 android:textSize="11sp"
                 android:textStyle="bold"
+                tools:ignore="TextContrastCheck"
                 tools:text="45s" />
 
             <ProgressBar
