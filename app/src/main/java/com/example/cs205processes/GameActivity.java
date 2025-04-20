@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,7 +34,6 @@ import java.util.List;
 
 public class GameActivity extends AppCompatActivity implements
         GameManager.GameListener,
-        ProcessAdapter.OnProcessInteractionListener,
         IngredientFetchWorker.ingredientFetchListener,
         IngredientBasketFiller.BasketFillListener,
         PotFunctions.PotListener
@@ -41,17 +41,15 @@ public class GameActivity extends AppCompatActivity implements
 
     private static final String TAG = "GameActivity";
 
-    private final Handler moveHandler = new Handler();
+    private final Handler moveHandler = new Handler(Looper.getMainLooper());
     private Runnable moveRunnable;
     private MediaPlayer mediaPlayer;
     private GameManager gameManager;
     private ProcessAdapter processAdapter;
-    private RecyclerView processRecyclerView;
-    private TextView scoreTextView;
+            private TextView scoreTextView;
     private TextView deadProcessCountTextView;
 
-    private GameView gameView;
-    private Game game;
+            private Game game;
 
     private List<ImageView> inventoryViews;
     private List<ImageView> availableIngredientsViews;
@@ -62,21 +60,19 @@ public class GameActivity extends AppCompatActivity implements
     private PlayerInventory playerInventory;
     private int selectedIngredientIndex=-1;
     private int selectedSwapIndex=-1;
-    private final int maxPots=2;
-    private final int maxIngredients=3;
+            private final int maxIngredients=3;
     private PotThreadPool potThreadPool;
     private ImageView playerInventoryView;
-    private SeekBar volumeSeekBar;
-    private SharedPreferences sharedPreferences;
+            private SharedPreferences sharedPreferences;
     private BasketManager basketManager;
 
-            @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             setContentView(R.layout.activity_game);
-            volumeSeekBar = findViewById(R.id.volumeSeekBar);
+            SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
             sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
             int savedVolume = sharedPreferences.getInt("volume", 100);
             volumeSeekBar.setProgress(savedVolume);
@@ -91,7 +87,7 @@ public class GameActivity extends AppCompatActivity implements
 
             if (getIntent().getBooleanExtra("loadSavedGame", false)) {
                 // Load after a short delay to ensure all components are initialized
-                new Handler().postDelayed(this::loadGameState, 500);
+                new Handler(Looper.getMainLooper()).postDelayed(this::loadGameState, 500);
             }
 
             volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -120,7 +116,7 @@ public class GameActivity extends AppCompatActivity implements
 
             // Link buttons
             Button togglePauseButton = findViewById(R.id.togglePauseButton);
-            togglePauseButton.setText("Pause"); // Default state
+            togglePauseButton.setText(R.string.pause); // Default state
             LinearLayout pauseMenu = findViewById(R.id.pauseMenu);
             LinearLayout settingsMenu = findViewById(R.id.SettingsMenu);
             Button resume = findViewById(R.id.btnResume);
@@ -547,12 +543,13 @@ public class GameActivity extends AppCompatActivity implements
         }
     }
     private void initializeGameComponents() {
-            gameView = findViewById(R.id.gameView);
+        GameView gameView = findViewById(R.id.gameView);
 
             List<Recipe> recipeList=Recipe.getDefaultRecipes();
             playerInventory = new PlayerInventory(recipeList);
             basketManager = new BasketManager(maxIngredients);
-            potThreadPool = new PotThreadPool(maxPots);
+        int maxPots = 2;
+        potThreadPool = new PotThreadPool(maxPots);
             game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
             gameView.init(game);
 
@@ -612,7 +609,7 @@ public class GameActivity extends AppCompatActivity implements
             deadProcessCountTextView = findViewById(R.id.deadProcessCountTextView);
 
             // Initialize process list
-            processRecyclerView = findViewById(R.id.processRecyclerView);
+            RecyclerView processRecyclerView = findViewById(R.id.processRecyclerView);
             if (processRecyclerView == null) {
                 Log.e(TAG, "processRecyclerView is null");
                 return;
@@ -620,7 +617,7 @@ public class GameActivity extends AppCompatActivity implements
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             processRecyclerView.setLayoutManager(layoutManager);
-            processAdapter = new ProcessAdapter(this, new ArrayList<>(), this);
+            processAdapter = new ProcessAdapter(this, new ArrayList<>());
             processRecyclerView.setAdapter(processAdapter);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing UI components: " + e.getMessage(), e);
@@ -693,7 +690,7 @@ public class GameActivity extends AppCompatActivity implements
                 return;
             }
 
-            //Generate intiial 3 ingredients randomly
+            //Generate initial 3 ingredients randomly
             List<Ingredient> initialList = ingredientFetcher.generateIngredientsRandom(this);
             Log.d(TAG, "Initial ingredients: " + initialList.size());
 
@@ -936,9 +933,7 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void fetchIngredientProgressUpdate(int progress){
         //Add progress updater for ingredient fetch
-        runOnUiThread(() -> {
-            Log.d(TAG,"Received progress update for ingredient:"+progress);
-        });
+        runOnUiThread(() -> Log.d(TAG,"Received progress update for ingredient:"+progress));
     }
 
     @Override
@@ -973,9 +968,7 @@ public class GameActivity extends AppCompatActivity implements
     @Override
     public void potProgressUpdate(int progress){
         //Add progress updates for pot
-        runOnUiThread(() -> {
-            Log.d(TAG,"Received progress update for pot:"+progress);
-        });
+        runOnUiThread(() -> Log.d(TAG,"Received progress update for pot:"+progress));
     }
 
     private void resetSelectionState() {
@@ -1192,13 +1185,6 @@ public class GameActivity extends AppCompatActivity implements
         if (score > highScore || highScore == Integer.MIN_VALUE) {
             editor.putInt("highScore", score);
             editor.apply();
-        }
-    }
-
-    @Override
-    public void onCompleteButtonClicked(Process process) {
-        if (gameManager != null && process != null) {
-            gameManager.completeProcess(process.getId());
         }
     }
 }

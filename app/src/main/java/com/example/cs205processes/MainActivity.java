@@ -3,9 +3,7 @@ package com.example.cs205processes;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AlertDialog;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,8 +16,6 @@ import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MyGamePrefs";
     private MediaPlayer mediaPlayer;
     private TextView highScoreTextView;
-    private SeekBar volumeSeekBar;
     private LinearLayout settingMenu;
     private ImageButton back;
     private SharedPreferences sharedPreferences;
@@ -56,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         hideSystemUI();
 
         // Initialize SeekBar
-        volumeSeekBar = findViewById(R.id.volumeSeekBar);
+        SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
         volumeSeekBar.setProgress(savedVolume);
         // Set up SeekBar listener to update volume
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -103,49 +98,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupButtonListeners() {
-        startGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        startGameButton.setOnClickListener(v -> {
+            Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+            startActivity(gameIntent);
+        });
+
+        howToPlayButton.setOnClickListener(v -> showHowToPlayDialog());
+
+        settingsButton.setOnClickListener(v -> showSettingsDialog());
+
+        loadGameButton.setOnClickListener(v -> {
+            // Check if a save exists
+            SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
+            if (prefs.contains("score")) {
                 Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+                gameIntent.putExtra("loadSavedGame", true);
                 startActivity(gameIntent);
+            } else {
+                Toast.makeText(MainActivity.this, "No saved game found", Toast.LENGTH_SHORT).show();
             }
         });
 
-        howToPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showHowToPlayDialog();
-            }
-        });
-
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showSettingsDialog();
-            }
-        });
-
-        loadGameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Check if a save exists
-                SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
-                if (prefs.contains("score")) {
-                    Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
-                    gameIntent.putExtra("loadSavedGame", true);
-                    startActivity(gameIntent);
-                } else {
-                    Toast.makeText(MainActivity.this, "No saved game found", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                settingMenu.setVisibility(GONE);
-                back.setVisibility(GONE);
-            }
+        back.setOnClickListener(v -> {
+            settingMenu.setVisibility(GONE);
+            back.setVisibility(GONE);
         });
     }
 

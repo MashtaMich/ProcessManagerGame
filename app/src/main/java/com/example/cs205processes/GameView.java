@@ -2,15 +2,14 @@ package com.example.cs205processes;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import androidx.annotation.NonNull;
+
+/** @noinspection BusyWait*/
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
     private Thread gameThread;
@@ -27,19 +26,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(@NonNull SurfaceHolder holder) {
         isRunning = true;
         gameThread = new Thread(this);
         gameThread.start();
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
         isRunning = false;
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e("GameView","Failed to handle surfaceDestroyed:"+e.getLocalizedMessage());
+            //e.printStackTrace();
         }
     }
 
@@ -51,28 +51,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             try {
                 Thread.sleep(game.getSleepTime());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e("GameView","Failed to handle run:"+e.getLocalizedMessage());
+                //e.printStackTrace();
             }
         }
     }
 
-    public boolean useCanvas(Game.CanvasCallback callback) {
+    public void useCanvas(Game.CanvasCallback callback) {
         Canvas canvas = null;
         try {
             canvas = getHolder().lockCanvas();
             if (canvas != null) {
                 callback.draw(canvas);
-                return true;
+                //return true;
             }
         } finally {
             if (canvas != null) {
                 getHolder().unlockCanvasAndPost(canvas);
             }
         }
-        return false;
+        //return false;
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
     }
 }

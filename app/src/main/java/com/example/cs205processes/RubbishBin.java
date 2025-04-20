@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 public class RubbishBin extends Interactable {
     private Bitmap openSprite, closedSprite;
-    private boolean isClosed = true;
+    //private boolean isClosed = true;
 
     public RubbishBin(Context context, float x, float y, JSONObject props) {
         this.x = x;
@@ -21,7 +21,8 @@ public class RubbishBin extends Interactable {
             openSprite = loadSprite(context, props.getString("open_sprite"));
             sprite = closedSprite;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("Bin","Error loading sprites for Bin:"+e.getLocalizedMessage());
+            //e.printStackTrace();
         }
     }
 
@@ -40,7 +41,7 @@ public class RubbishBin extends Interactable {
             int heldType = inventory.checkHeldType();
 
             if (heldType != PlayerInventory.EMPTY) {
-                isClosed = false;
+                //isClosed = false;
                 sprite = openSprite;
 
                 // Remove the item from inventory
@@ -48,21 +49,21 @@ public class RubbishBin extends Interactable {
 
                 // Close the bin after a short delay
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    isClosed = true;
+                    //isClosed = true;
                     sprite = closedSprite;
                 }, 500);
             } else {
                 // Still animate the bin opening and closing for feedback
-                isClosed = false;
+                //isClosed = false;
                 sprite = openSprite;
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    isClosed = true;
+                    //isClosed = true;
                     sprite = closedSprite;
                 }, 500);
             }
         } catch (Exception e) {
-            isClosed = true;
+            //isClosed = true;
             sprite = closedSprite;
         }
     }

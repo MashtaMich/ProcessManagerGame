@@ -64,7 +64,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:listitem="@layout/item_process_compact"
-        android:contentDescription="Process List"/>
+        android:contentDescription="Process List"
+        tools:ignore="HardcodedText" />
 
     <!-- Pot List -->
 <!--    <FrameLayout-->
@@ -212,7 +213,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- This must come after inventoryContentLayout so it's on top to block whole framelayout -->
+        <!-- This must come after inventoryContentLayout so it's on top to block whole frame layout -->
         <View
             android:id="@+id/ingredientBlockerOverlay"
             android:layout_width="wrap_content"
@@ -295,15 +296,16 @@
         android:layout_width="79dp"
         android:layout_height="49dp"
         android:text="Resume"
-        android:textSize="8sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/gameView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.861"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
+        app:layout_constraintVertical_bias="0.022"
+        tools:ignore="HardcodedText" />
 
-    <!-- Interact Button. Adjust location using marginEnd for xpos and marginBottom for ypos -->
+    <!-- Interact Button. Adjust location using marginEnd for x pos and marginBottom for y pos -->
     <Button
         android:id="@+id/interactButton"
         android:layout_width="120dp"
@@ -317,7 +319,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="HardcodedText,MissingConstraints" />
 
 
     <LinearLayout
@@ -335,19 +337,22 @@
             android:id="@+id/btnResume"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Resume" />
+            android:text="Resume"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save Game" />
+            android:text="Save Game"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/btnSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Settings" />
+            android:text="Settings"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/btnMainMenu"
@@ -355,7 +360,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Back to Main Menu"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 
@@ -382,7 +388,8 @@
             android:src="@android:drawable/ic_media_previous"
             android:contentDescription="Back"
             android:layout_gravity="start|top"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            tools:ignore="HardcodedText" />
 
         <!-- Volume Control -->
         <TextView
@@ -396,7 +403,8 @@
             android:layout_marginTop="32dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
         <SeekBar
             android:id="@+id/volumeSeekBar"
@@ -421,7 +429,8 @@
             android:layout_marginTop="32dp"
             app:layout_constraintTop_toBottomOf="@+id/volumeSeekBar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
         <RadioGroup
             android:id="@+id/graphicsQualityGroup"
@@ -440,7 +449,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="Low"
-                android:checked="false"/>
+                android:checked="false"
+                tools:ignore="HardcodedText" />
 
             <RadioButton
                 android:id="@+id/mediumQuality"
@@ -449,7 +459,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="Medium"
-                android:checked="true"/>
+                android:checked="true"
+                tools:ignore="HardcodedText" />
 
             <RadioButton
                 android:id="@+id/highQuality"
@@ -458,7 +469,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="High"
-                android:checked="false"/>
+                android:checked="false"
+                tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>
 

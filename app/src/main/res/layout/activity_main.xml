@@ -18,7 +18,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.572"
-        app:srcCompat="@drawable/background" />
+        app:srcCompat="@drawable/background"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/textView1"
@@ -37,7 +38,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.017" />
+        app:layout_constraintVertical_bias="0.017"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -49,7 +51,8 @@
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.282" />
+        app:layout_constraintVertical_bias="0.282"
+        tools:ignore="ContentDescription" />
 
     <Button
         android:id="@+id/LoadGame"
@@ -63,7 +66,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.732" />
+        app:layout_constraintVertical_bias="0.732"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/HowToPlay"
@@ -77,7 +81,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.865" />
+        app:layout_constraintVertical_bias="0.865"
+        tools:ignore="HardcodedText" />
 
     <Button
         android:id="@+id/StartGame"
@@ -91,7 +96,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.6"
+        tools:ignore="HardcodedText" />
 
 
     <Button
@@ -103,7 +109,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.997" />
+        app:layout_constraintVertical_bias="0.997"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/highScore"
@@ -120,7 +127,8 @@
         app:layout_constraintHorizontal_bias="0.864"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.073" />
+        app:layout_constraintVertical_bias="0.073"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/highScore1"
@@ -135,7 +143,8 @@
         app:layout_constraintHorizontal_bias="0.801"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.224" />
+        app:layout_constraintVertical_bias="0.224"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/SettingsMenu"
@@ -160,7 +169,8 @@
             android:src="@android:drawable/ic_media_previous"
             android:contentDescription="Back"
             android:layout_gravity="start|top"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/white"
+            tools:ignore="HardcodedText" />
 
         <!-- Volume Control -->
         <TextView
@@ -174,7 +184,8 @@
             android:layout_marginTop="32dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
         <SeekBar
             android:id="@+id/volumeSeekBar"
@@ -199,7 +210,8 @@
             android:layout_marginTop="32dp"
             app:layout_constraintTop_toBottomOf="@+id/volumeSeekBar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="HardcodedText" />
 
         <RadioGroup
             android:id="@+id/graphicsQualityGroup"
@@ -218,7 +230,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="Low"
-                android:checked="false"/>
+                android:checked="false"
+                tools:ignore="HardcodedText" />
 
             <RadioButton
                 android:id="@+id/mediumQuality"
@@ -227,7 +240,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="Medium"
-                android:checked="true"/>
+                android:checked="true"
+                tools:ignore="HardcodedText" />
 
             <RadioButton
                 android:id="@+id/highQuality"
@@ -236,7 +250,8 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:text="High"
-                android:checked="false"/>
+                android:checked="false"
+                tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>
 

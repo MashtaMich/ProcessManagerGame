@@ -6,17 +6,16 @@ import android.os.Looper;
 import android.util.Log;
 
 public class Player {
-    private PlayerInventory inventory;
-    private Bitmap sprite;
+    private final PlayerInventory inventory;
+    private final Bitmap sprite;
     private Bitmap scaledSprite;
     private float x, y;
     private float targetX, targetY;
     private boolean isMoving = false;
-    private final float moveSpeed = 12f; // pixels per frame (~10 frames = 1 tile)
     private int queuedDX = 0, queuedDY = 0;
     private boolean movementHeld = false;
-    private int tileSize = 120;
-    private Game game;
+    private final int tileSize;
+    private final Game game;
 
     public Player(float x, float y, Bitmap sprite, int tileSize, Game game,PlayerInventory playerInventory) {
         this.x = x;
@@ -37,9 +36,6 @@ public class Player {
         this.isMoving = false;
     }
 
-    public void setInventory(PlayerInventory inventory) {
-        this.inventory = inventory;
-    }
     public PlayerInventory getInventory() {
         return inventory;
     }
@@ -125,6 +121,8 @@ public class Player {
         float dy = targetY - y;
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
+        // pixels per frame (~10 frames = 1 tile)
+        float moveSpeed = 12f;
         if (dist < moveSpeed) {
             x = targetX;
             y = targetY;

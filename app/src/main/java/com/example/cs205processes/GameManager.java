@@ -3,7 +3,6 @@ package com.example.cs205processes;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,8 +12,8 @@ import java.util.Random;
 
 public class GameManager {
     private static final String TAG = "GameManager";
-    private static final int POINTS_PER_COMPLETED_PROCESS = 100;
-    private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 300;
+    //private static final int POINTS_PER_COMPLETED_PROCESS = 100;
+    //private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 300;
     private static final int MAX_DEAD_PROCESSES = 3;
     private static final int TIMER_INTERVAL_MS = 16; // Update more frequently for smoother animation (~60 FPS)
     private static final int MAX_ACTIVE_PROCESSES = 5; // Maximum number of active processes
@@ -31,7 +30,7 @@ public class GameManager {
     private final List<Process> pendingRemovals;
 
     private final List<Recipe> availableRecipes;
-    private int score = 0;
+    private int score;
     private int streakCount;
     private long lastCompletionTime = 0L; // in milliseconds
     private static final long STREAK_TIME_LIMIT = 10_000L; // 10 seconds in milliseconds
@@ -158,11 +157,11 @@ public class GameManager {
         timerStepper.update(delta);
 
         // Create a local list of processes to handle in this update
-        List<Process> processesToUpdate = new ArrayList<>();
+        List<Process> processesToUpdate;
 
         // First, get a snapshot of current processes
         synchronized (mutex) {
-            processesToUpdate.addAll(activeProcesses);
+            processesToUpdate = new ArrayList<>(activeProcesses);
         }
 
         // Process the snapshot without holding the lock
@@ -352,9 +351,9 @@ public class GameManager {
     }
 
     public List<Process> getActiveProcesses() {
-        List<Process> processesCopy = new ArrayList<>();
+        List<Process> processesCopy;
         synchronized (mutex) {
-            processesCopy.addAll(activeProcesses);
+            processesCopy = new ArrayList<>(activeProcesses);
         }
         return processesCopy;
     }
@@ -372,10 +371,6 @@ public class GameManager {
 
     public boolean isRunning() {
         return !isPaused && !isGameOver;
-    }
-
-    public List<Recipe> getAvailableRecipes(){
-        return availableRecipes;
     }
 
     public void addProcessDirectly(Process process) {

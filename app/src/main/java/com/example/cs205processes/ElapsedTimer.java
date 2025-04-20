@@ -3,7 +3,6 @@ package com.example.cs205processes;
 public class ElapsedTimer {
     private long lastTimestamp = System.currentTimeMillis();
     private boolean paused = false;
-    private long pauseTimestamp = 0;
 
     public long progress() {
         if (paused) return 0;
@@ -16,7 +15,7 @@ public class ElapsedTimer {
 
     public void pause() {
         if (!paused) {
-            pauseTimestamp = System.currentTimeMillis();
+            //long pauseTimestamp = System.currentTimeMillis();
             paused = true;
         }
     }

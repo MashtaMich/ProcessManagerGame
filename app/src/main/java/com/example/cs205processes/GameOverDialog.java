@@ -1,23 +1,24 @@
 package com.example.cs205processes;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
 public class GameOverDialog extends Dialog {
 
-    private int finalScore;
+    private final int finalScore;
 
     public GameOverDialog(Context context, int finalScore) {
         super(context);
         this.finalScore = finalScore;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,31 +31,25 @@ public class GameOverDialog extends Dialog {
 
         scoreTextView.setText("Final Score: " + finalScore);
 
-        restartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-                // Restart the game
-                Intent intent = new Intent(getContext(), GameActivity.class);
-                getContext().startActivity(intent);
-                // Close current activity
-                if (getContext() instanceof GameActivity) {
-                    ((GameActivity) getContext()).finish();
-                }
+        restartButton.setOnClickListener(v -> {
+            dismiss();
+            // Restart the game
+            Intent intent = new Intent(getContext(), GameActivity.class);
+            getContext().startActivity(intent);
+            // Close current activity
+            if (getContext() instanceof GameActivity) {
+                ((GameActivity) getContext()).finish();
             }
         });
 
-        mainMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                getContext().startActivity(intent);
-                // Go back to main menu
-                if (getContext() instanceof GameActivity) {
-                    ((GameActivity) getContext()).finish();
-                }
+        mainMenuButton.setOnClickListener(v -> {
+            dismiss();
+            Intent intent = new Intent(getContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+            // Go back to main menu
+            if (getContext() instanceof GameActivity) {
+                ((GameActivity) getContext()).finish();
             }
         });
 

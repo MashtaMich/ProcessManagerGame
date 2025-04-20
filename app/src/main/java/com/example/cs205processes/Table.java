@@ -6,14 +6,14 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class Table extends Interactable {
-    private Bitmap tableSprite,cabbageSprite,tomatoSprite,onionSprite,carrotSprite,potatoSprite,mashedpotatoSprite,veggiestewSprite,trashSprite,tomatosoupSprite,saladSprite;
+    private Bitmap tableSprite,cabbageSprite,tomatoSprite,onionSprite,carrotSprite,potatoSprite,mashedPotatoSprite,veggieStewSprite,trashSprite,tomatoSoupSprite,saladSprite;
     private FoodItem itemOnTable;
-    private final Context context;
+    //private final Context context;
 
     public Table(Context context, float x, float y, JSONObject props) {
         this.x = x;
         this.y = y;
-        this.context = context;
+        //Context context = context;
         try {
             tableSprite = loadSprite(context, props.getString("sprite"));
             cabbageSprite = loadSprite(context, props.getString("table_cabbage_sprite"));
@@ -21,14 +21,14 @@ public class Table extends Interactable {
             onionSprite = loadSprite(context, props.getString("table_onion_sprite"));
             carrotSprite = loadSprite(context, props.getString("table_carrot_sprite"));
             potatoSprite = loadSprite(context, props.getString("table_potato_sprite"));
-            mashedpotatoSprite = loadSprite(context, props.getString("table_mashed potato_sprite"));
-            veggiestewSprite = loadSprite(context, props.getString("table_veggie stew_sprite"));
-            tomatosoupSprite = loadSprite(context, props.getString("table_tomato soup_sprite"));
+            mashedPotatoSprite = loadSprite(context, props.getString("table_mashed potato_sprite"));
+            veggieStewSprite = loadSprite(context, props.getString("table_veggie stew_sprite"));
+            tomatoSoupSprite = loadSprite(context, props.getString("table_tomato soup_sprite"));
             saladSprite = loadSprite(context, props.getString("table_salad_sprite"));
             trashSprite = loadSprite(context, props.getString("table_trash_sprite"));
             sprite = tableSprite; // Set the main sprite
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("Table","Failed to load table sprites:"+e.getLocalizedMessage());
         }
     }
 
@@ -79,13 +79,13 @@ public class Table extends Interactable {
                     sprite = carrotSprite;
                     break;
                 case "mashed potato":
-                    sprite = mashedpotatoSprite;
+                    sprite = mashedPotatoSprite;
                     break;
                 case "tomato soup":
-                    sprite = tomatosoupSprite;
+                    sprite = tomatoSoupSprite;
                     break;
                 case "veggie stew":
-                    sprite = veggiestewSprite;
+                    sprite = veggieStewSprite;
                     break;
                 case "salad":
                     sprite = saladSprite;

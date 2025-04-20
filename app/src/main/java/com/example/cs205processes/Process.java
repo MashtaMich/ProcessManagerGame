@@ -2,6 +2,8 @@ package com.example.cs205processes;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -135,6 +137,7 @@ public class Process {
     }
 
     // For debugging
+    @NonNull
     @Override
     public String toString() {
         synchronized (mutex) {

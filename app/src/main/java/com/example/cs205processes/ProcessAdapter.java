@@ -1,5 +1,6 @@
 package com.example.cs205processes;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -12,26 +13,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessViewHolder> {
-    private static final String TAG = "ProcessAdapter";
+    //private static final String TAG = "ProcessAdapter";
 
-    private List<Process> processes;
-    private Context context;
-    private OnProcessInteractionListener listener;
-
-    public interface OnProcessInteractionListener {
-        void onCompleteButtonClicked(Process process);
-    }
-
-    public ProcessAdapter(Context context, List<Process> processes, OnProcessInteractionListener listener) {
+    private final List<Process> processes;
+    private final Context context;
+    public ProcessAdapter(Context context, List<Process> processes) {
         this.context = context;
         this.processes = new ArrayList<>(processes);
-        this.listener = listener;
     }
 
     @NonNull
@@ -52,18 +48,19 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
         return processes.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateProcesses(List<Process> newProcesses) {
         this.processes.clear();
         this.processes.addAll(newProcesses);
         notifyDataSetChanged();
     }
 
-    class ProcessViewHolder extends RecyclerView.ViewHolder {
-        private TextView timeRemainingTextView;
-        private TextView recipeName;
-        private ProgressBar timeProgressBar;
-        private LinearLayout ingredientsContainer;
-        private CardView cardView;
+    public class ProcessViewHolder extends RecyclerView.ViewHolder {
+        private final TextView timeRemainingTextView;
+        private final TextView recipeName;
+        private final ProgressBar timeProgressBar;
+        private final LinearLayout ingredientsContainer;
+        private final CardView cardView;
 
         public ProcessViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,6 +71,7 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
             recipeName = itemView.findViewById(R.id.recipeName);
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(final Process process) {
             // Update time display
             int timeRemaining = process.getTimeRemaining();
@@ -108,14 +106,17 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
         private void updateProgressBarColor(Process process) {
             if (process.getTimeRemaining() < 10) {
-                timeProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progress_critical));
-                timeRemainingTextView.setTextColor(context.getResources().getColor(R.color.progressCritical));
+                timeProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(context.getResources(),
+                        R.drawable.progress_critical, null));
+                timeRemainingTextView.setTextColor(ContextCompat.getColor(context, R.color.progressCritical));
             } else if (process.getTimeRemaining() < process.getTimeLimit() / 2) {
-                timeProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progress_warning));
-                timeRemainingTextView.setTextColor(context.getResources().getColor(R.color.timeRemainingColor));
+                timeProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(
+                        context.getResources(), R.drawable.progress_warning, null));
+                timeRemainingTextView.setTextColor(ContextCompat.getColor(context, R.color.timeRemainingColor));
             } else {
-                timeProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.progress_normal));
-                timeRemainingTextView.setTextColor(context.getResources().getColor(R.color.timeRemainingColor));
+                timeProgressBar.setProgressDrawable(androidx.core.content.res.ResourcesCompat.getDrawable(
+                        context.getResources(), R.drawable.progress_normal, null));
+                timeRemainingTextView.setTextColor(ContextCompat.getColor(context, R.color.timeRemainingColor));
             }
         }
 

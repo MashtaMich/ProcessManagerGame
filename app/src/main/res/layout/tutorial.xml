@@ -19,7 +19,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/tutorial" />
+        app:srcCompat="@drawable/tutorial"
+        tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:id="@+id/step4"
@@ -42,7 +43,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="215"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/instructionBox4"
@@ -53,7 +55,8 @@
             android:padding="10dp"
             android:text="Here are the ingredients you need\nto make the recipe, there is a timer\nin order to score points. There is a \nsubmission streak where you get \nmore points for consecutive\nsubmissions within 10 seconds\nelse the streak is broken."
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/nextButton4"
@@ -63,7 +66,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,7 +99,8 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="180dp"
                 android:rotation="225"
-                android:src="@drawable/arrow" />
+                android:src="@drawable/arrow"
+                tools:ignore="ContentDescription" />
 
 
             <!-- Second Arrow -->
@@ -105,7 +110,8 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
                 android:rotation="300"
-                android:src="@drawable/arrow" />
+                android:src="@drawable/arrow"
+                tools:ignore="ContentDescription" />
         </LinearLayout>
 
         <!-- Instruction Box -->
@@ -118,7 +124,8 @@
             android:padding="10dp"
             android:text="The pause button is to show the main menu\nwhich allows resume, save game, settings \nand returning to main menu.\nThe top right hand corner shows the current\nscore and number of failed orders, once you\nhit 3 failed orders the game ends."
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <!-- Next Button -->
         <Button
@@ -129,7 +136,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -154,7 +162,8 @@
             android:layout_height="40dp"
             android:layout_marginStart="100dp"
             android:rotation="40"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -167,7 +176,8 @@
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
                 android:rotation="145"
-                android:src="@drawable/arrow" />
+                android:src="@drawable/arrow"
+                tools:ignore="ContentDescription" />
 
             <Button
                 android:id="@+id/nextButton6"
@@ -178,7 +188,8 @@
                 android:backgroundTint="#6200EE"
                 android:padding="8dp"
                 android:text="Next"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
 
 
@@ -191,7 +202,8 @@
             android:padding="10dp"
             android:text="The display at the right shows the \navailable ingredient currently in the\ngame you can swap one ingredient\nout at a time.It takes awhile before\nit is updated so swap wisely!"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -215,7 +227,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="0"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/instructionBox5"
@@ -226,7 +239,8 @@
             android:padding="10dp"
             android:text="This is the dustbin, if you make a\nmistake you can throw it away here."
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/nextButton5"
@@ -236,7 +250,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -260,7 +275,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="215"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/instructionBox1"
@@ -271,7 +287,8 @@
             android:padding="10dp"
             android:text="Here is your spawn point"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/nextButton1"
@@ -281,7 +298,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -305,7 +323,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="215"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -321,7 +340,8 @@
                 android:padding="10dp"
                 android:text="Here are your cooking pots, you need to place 3\ningredients before it start cooking, no mistakes \nare allowed. If you put the wrong ingredient you\nhave to restart and risk throwing the trash away"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="HardcodedText" />
 
             <Button
                 android:id="@+id/nextButton9"
@@ -332,7 +352,8 @@
                 android:backgroundTint="#6200EE"
                 android:padding="8dp"
                 android:text="Next"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
 
         <ImageView
@@ -340,7 +361,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="220"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 
@@ -368,7 +390,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/instructionBox7"
@@ -379,14 +402,16 @@
             android:padding="10dp"
             android:text="To pick up/down and submit"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/arrow7"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="25"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <LinearLayout
@@ -413,7 +438,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/instructionBox8"
@@ -424,14 +450,16 @@
             android:padding="10dp"
             android:text="Currently\nholding\nobject"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/arrow8"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="25"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <LinearLayout
@@ -458,7 +486,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/instructionBox10"
@@ -469,14 +498,16 @@
             android:padding="10dp"
             android:text="To store at table, 1 item \non each table maximum"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/arrow10"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="180"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <LinearLayout
@@ -503,7 +534,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Next"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/instructionBox2"
@@ -514,14 +546,16 @@
             android:padding="10dp"
             android:text="Joystick to move player"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/arrow2"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="180"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <LinearLayout
@@ -545,7 +579,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:rotation="180"
-            android:src="@drawable/arrow" />
+            android:src="@drawable/arrow"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/instructionBox11"
@@ -556,7 +591,8 @@
             android:padding="10dp"
             android:text="To submit the order and gain \npoints. If wrong order there will\nbe an notification sound."
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/nextButton11"
@@ -566,7 +602,8 @@
             android:backgroundTint="#6200EE"
             android:padding="8dp"
             android:text="Finish"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

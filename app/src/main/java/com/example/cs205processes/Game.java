@@ -2,7 +2,6 @@ package com.example.cs205processes;
 
 import android.content.Context;
 import android.graphics.*;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -17,30 +16,29 @@ public class Game {
         void draw(Canvas canvas);
     }
     private final GameView gameView;
-    private String TAG="Game";
     private GameManager gameManager;
     private final Paint paint = new Paint();
     public static final int TILE_SIZE = 120;
     public static final int MAP_WIDTH = 20;
     public static final int MAP_HEIGHT = 9;
-    public static final int SCREEN_WIDTH = TILE_SIZE * MAP_WIDTH;   // 2400
-    public static final int SCREEN_HEIGHT = TILE_SIZE * MAP_HEIGHT; // 1080
+    //public static final int SCREEN_WIDTH = TILE_SIZE * MAP_WIDTH;   // 2400
+    //public static final int SCREEN_HEIGHT = TILE_SIZE * MAP_HEIGHT; // 1080
 
     private final Context context;
 
     private Player player;
-    private Bitmap playerBitmap;
+    private final Bitmap playerBitmap;
 
     private int mapWidth;
     private int mapHeight;
     private int[][] tileLayer;
-    private Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
-    private List<Interactable> interactables = new ArrayList<>();
-    private List<Pot> pots=new ArrayList<>();
+    private final Map<Integer, Bitmap> tileIdToBitmap = new HashMap<>();
+    private final List<Interactable> interactable = new ArrayList<>();
+    private final List<Pot> pots=new ArrayList<>();
 
-    private PlayerInventory playerInventory;
-    private PotThreadPool potThreadPool;
-    private BasketManager basketManager;
+    private final PlayerInventory playerInventory;
+    private final PotThreadPool potThreadPool;
+    private final BasketManager basketManager;
 
 public Game(GameView gameView, Context context, PlayerInventory playerInventory,PotThreadPool potThreadPool,BasketManager basketManager) {
     this.gameView = gameView;
@@ -50,11 +48,12 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
     this.basketManager=basketManager;
 
     playerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.player);
-    loadMapFromJson("map.tmj"); // also handles creation of player
+    loadMapFromJson(); // also handles creation of player
 }
-    private void loadMapFromJson(String fileName) {
+    private void loadMapFromJson() {
+        String TAG = "Map";
         try {
-            InputStream is = context.getAssets().open(fileName);
+            InputStream is = context.getAssets().open("map.tmj");
             String jsonStr = new String(is.readAllBytes(), StandardCharsets.UTF_8);
             JSONObject root = new JSONObject(jsonStr);
 
@@ -113,7 +112,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                 else if (layer.getString("type").equals("objectgroup") &&
                         layer.getString("name").equals("Interactables")) {
                     JSONArray objects = layer.getJSONArray("objects");
-                    //go through each object, extract its details and add to list of interactables
+                    //go through each object, extract its details and add to list of interactable
                     for (int j = 0; j < objects.length(); j++) {
                         JSONObject obj = objects.getJSONObject(j);
                         JSONObject props = extractProperties(obj);
@@ -124,22 +123,22 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                         switch (type) {
                             case "pot":
                                 Pot pot=new Pot(context,x,y,props,potThreadPool);
-                                interactables.add(pot);
+                                interactable.add(pot);
                                 pots.add(pot);//To assist in saving their contents
                                 break;
                             case "rubbishbin":
-                                interactables.add(new RubbishBin(context, x, y, props));
+                                interactable.add(new RubbishBin(context, x, y, props));
                                 break;
                             case "basket":
                                 Basket basket=new Basket(context,x,y,props);
-                                interactables.add(basket);
+                                interactable.add(basket);
                                 basketManager.addBasket(basket);//For saving contents and manipulation
                                 break;
                             case "table":
-                                interactables.add(new Table(context, x, y, props));
+                                interactable.add(new Table(context, x, y, props));
                                 break;
                             case "submission_zone":
-                                interactables.add(new SubmissionZone(context, x, y, props));
+                                interactable.add(new SubmissionZone(context, x, y, props));
                                 break;
                         }
                         Log.d("ObjectPos", type + ": x=" + x + ", y=" + y);
@@ -184,8 +183,8 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
                 }
             }
 
-            //draw interactables
-            for (Interactable obj : interactables) {
+            //draw interactable
+            for (Interactable obj : interactable) {
                 obj.draw(canvas, paint, TILE_SIZE);
             }
 
@@ -207,7 +206,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
     public void interact() {
 
         // Use proximity check for button-based interaction
-        for (Interactable obj : interactables) {
+        for (Interactable obj : interactable) {
 
             float dx = Math.abs(player.getX() - obj.x);
             float dy = Math.abs(player.getY() - obj.y);
@@ -253,7 +252,7 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
         );
         
         // Check for collision with any interactable object
-        for (Interactable obj : interactables) {
+        for (Interactable obj : interactable) {
             RectF objRect = new RectF(
                     obj.x,
                     obj.y,
@@ -272,8 +271,8 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
     public List<Table> getTables() {
         List<Table> tableList = new ArrayList<>();
 
-        // Find all tables among interactables
-        for (Interactable obj : interactables) {
+        // Find all tables among interactable
+        for (Interactable obj : interactable) {
             if (obj instanceof Table) {
                 tableList.add((Table) obj);
             }

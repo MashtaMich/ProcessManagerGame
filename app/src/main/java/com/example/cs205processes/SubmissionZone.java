@@ -2,22 +2,17 @@
 package com.example.cs205processes;
 
 import android.content.Context;
-import android.graphics.*;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
-import android.os.VibratorManager;
 import android.util.Log;
 import org.json.JSONObject;
 
 import java.util.List;
 
 public class SubmissionZone extends Interactable {
-    private String TAG="SubmissionZone";
-    private Context context;
+    private final String TAG="SubmissionZone";
+    private final Context context;
     public SubmissionZone(Context context, float x, float y, JSONObject props) {
         this.context = context;
         this.x = x;
@@ -26,7 +21,7 @@ public class SubmissionZone extends Interactable {
             sprite = loadSprite(context, props.getString("sprite"));
         } catch (Exception e) {
             Log.e(TAG,"Error at loading submission zone sprite:"+e.getLocalizedMessage());
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -36,7 +31,7 @@ public class SubmissionZone extends Interactable {
         }
         for (Recipe recipe : Recipe.getDefaultRecipes()) {
             if (recipe.getName().equals(recipeName)) {
-                boolean result = recipe.canCook(submittedIngredients);
+                //boolean result = recipe.canCook(submittedIngredients);
                 return recipe;
             }
         }
@@ -88,7 +83,7 @@ public class SubmissionZone extends Interactable {
                 }
             } catch (ClassCastException e) {
                 Log.e(TAG, "ClassCastException: " + e.getMessage());
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         } else {
             // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
@@ -105,7 +100,7 @@ public class SubmissionZone extends Interactable {
                 r.play();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             Log.e(TAG,"Exception when playing notification sound:"+e.getLocalizedMessage());
         }
     }
