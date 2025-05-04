@@ -6,7 +6,6 @@ import static android.view.View.VISIBLE;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.media.PlaybackParams;
 import android.os.Bundle;
@@ -25,21 +24,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameActivity extends AppCompatActivity implements
+public class GameActivity extends BaseActivity implements
         GameManager.GameListener,
         IngredientFetchWorker.ingredientFetchListener,
         IngredientBasketFiller.BasketFillListener,
         PotFunctions.PotListener
         {
-
-    private static final String TAG = "GameActivity";
 
     private final Handler moveHandler = new Handler(Looper.getMainLooper());
     private Runnable moveRunnable;
@@ -70,7 +66,8 @@ public class GameActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            enableImmersiveMode();
+
             setContentView(R.layout.activity_game);
             SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
             sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
@@ -82,8 +79,9 @@ public class GameActivity extends AppCompatActivity implements
             mediaPlayer.setVolume(volume,volume);
             mediaPlayer.start();
 
-            hideSystemUI();
+
             initializeGameComponents();
+
 
             if (getIntent().getBooleanExtra("loadSavedGame", false)) {
                 // Load after a short delay to ensure all components are initialized
@@ -545,24 +543,24 @@ public class GameActivity extends AppCompatActivity implements
     private void initializeGameComponents() {
         GameView gameView = findViewById(R.id.gameView);
 
-            List<Recipe> recipeList=Recipe.getDefaultRecipes();
-            playerInventory = new PlayerInventory(recipeList);
-            basketManager = new BasketManager(maxIngredients);
+        List<Recipe> recipeList=Recipe.getDefaultRecipes();
+        playerInventory = new PlayerInventory(recipeList);
+        basketManager = new BasketManager(maxIngredients);
         int maxPots = 2;
         potThreadPool = new PotThreadPool(maxPots);
-            game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
-            gameView.init(game);
+        game = new Game(gameView, this, playerInventory,potThreadPool,basketManager);
+        gameView.init(game);
 
-            setupMovementControls();
-            initializeUIComponents();
-            initializeInventory();
+        setupMovementControls();
+        initializeUIComponents();
+        initializeInventory();
 
-            gameManager = new GameManager(this, this,recipeList);
-            game.setGameManager(gameManager);
-            gameManager.startGame();
+        gameManager = new GameManager(this, this,recipeList);
+        game.setGameManager(gameManager);
+        gameManager.startGame();
 
-            updateScoreDisplay(0);
-            updateDeadProcessCountDisplay(0);
+        updateScoreDisplay(0);
+        updateDeadProcessCountDisplay(0);
     }
 
     private void setupMovementControls() {
@@ -1059,9 +1057,20 @@ public class GameActivity extends AppCompatActivity implements
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
                 controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                //allows system bars to show temporarily by swiping
+                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error hiding system UI: " + e.getMessage(), e);
+        }
+    }
+
+    //rehide the navigation bar when it appears mid game
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
         }
     }
 
@@ -1187,4 +1196,6 @@ public class GameActivity extends AppCompatActivity implements
             editor.apply();
         }
     }
+
+
 }

@@ -3,11 +3,9 @@ package com.example.cs205processes;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -20,7 +18,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private Button startGameButton;
     private Button howToPlayButton;
@@ -37,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         int savedVolume = sharedPreferences.getInt("volume", 100);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         highScoreTextView = findViewById(R.id.highScore1);
         loadHighScore();
@@ -48,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer.setLooping(true); // Enable looping
         mediaPlayer.setVolume(savedVolume / 100f, savedVolume / 100f); // Set initial volume
         mediaPlayer.start(); // Start playing the audio
-        hideSystemUI();
+
+        enableImmersiveMode();
 
         // Initialize SeekBar
         SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
