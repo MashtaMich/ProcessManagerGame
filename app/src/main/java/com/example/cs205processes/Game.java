@@ -77,7 +77,15 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
 
                 if (imageName == null) continue;
 
-                Bitmap tileSheet = BitmapFactory.decodeStream(context.getAssets().open("tiles/" + imageName));
+                Bitmap tileSheet = ResourceLoader.get(imageName);
+                if (tileSheet == null) {
+                    Log.d(TAG, "Failed to preload floor tile, using fallback: " + imageName);
+                    tileSheet = BitmapFactory.decodeStream(context.getAssets().open("tiles/" + imageName));
+                }
+                else{
+                    Log.d(TAG, "Floortile loaded Success: " + imageName);
+                }
+
                 int tileSize = TILE_SIZE;
                 int columns = tileSheet.getWidth() / tileSize;
                 int rows = tileSheet.getHeight() / tileSize;

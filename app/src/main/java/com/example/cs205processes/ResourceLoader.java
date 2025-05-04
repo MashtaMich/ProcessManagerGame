@@ -3,7 +3,6 @@ package com.example.cs205processes;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -50,16 +49,17 @@ public class ResourceLoader {
             Log.d(TAG, "Preloaded: " + filename);
         } catch (Exception e) {
             Log.e(TAG, "Failed to preload: " + filename + " (" + e.getMessage() + ")");
-            spriteCache.put(filename, fallbackRedSquareBitmap());
+            //spriteCache.put(filename, fallbackRedSquareBitmap());
         }
     }
 
     // Use this in Pot/Table/Basket classes instead of their own loadSprite
     public static Bitmap get(String filename) {
         Bitmap bmp = spriteCache.get(filename);
-        if (bmp != null) return bmp;
-        Log.w(TAG, "Requested uncached sprite: " + filename);
-        return fallbackRedSquareBitmap();
+        if (bmp == null) {
+            Log.e("ResourceLoader", "Sprite not found in cache: " + filename);
+        }
+        return bmp;
     }
 
 
@@ -138,10 +138,10 @@ public class ResourceLoader {
     }
 
     // Default fallback if a sprite fails to load
-    private static Bitmap fallbackRedSquareBitmap() {
-        Bitmap bmp = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
-        bmp.eraseColor(Color.RED);
-        return bmp;
-    }
+//    private static Bitmap fallbackRedSquareBitmap() {
+//        Bitmap bmp = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
+//        bmp.eraseColor(Color.RED);
+//        return bmp;
+//    }
 }
 

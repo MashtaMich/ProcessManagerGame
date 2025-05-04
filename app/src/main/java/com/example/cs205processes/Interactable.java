@@ -17,7 +17,22 @@ public abstract class Interactable {
         canvas.drawBitmap(Bitmap.createScaledBitmap(sprite, TILE_SIZE, TILE_SIZE, true), x, y, paint);
     }
 
+    //trying to make use of the async loading of resources. Cannot then use old method
     protected Bitmap loadSprite(Context context, String filename) {
+        Log.d("LoadSprite", "Attempting to load sprite: " + filename);
+        Bitmap bmp = ResourceLoader.get(filename);
+        if (bmp == null) {
+            Log.w("LoadSprite", "Sprite not preloaded: " + filename);
+            bmp = fallbackLoadSprite(context, filename); // keep your existing fallback if you like
+        }
+        else{
+            Log.w("LoadSprite", "Sprite preloaded success: " + filename);
+        }
+        return bmp;
+    }
+
+    //original loading method that 100% worked
+    protected Bitmap fallbackLoadSprite(Context context, String filename) {
         Log.d("LoadSprite", "Attempting to load sprite: " + filename);
         try {
             return BitmapFactory.decodeStream(context.getAssets().open("tiles/" + filename));
