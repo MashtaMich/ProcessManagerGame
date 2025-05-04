@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -37,6 +38,17 @@ public class MainActivity extends BaseActivity {
         sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         int savedVolume = sharedPreferences.getInt("volume", 100);
         setContentView(R.layout.activity_main);
+
+        new Thread(() -> {
+            ResourceLoader.preloadFloorTiles(getApplicationContext());
+            ResourceLoader.preloadInteractableSprites(getApplicationContext());
+
+            for (String key : ResourceLoader.getAllSpriteKeys()) {
+                Log.d("MainActivity", "Preloaded: " + key);
+            }
+        }).start();
+
+
         highScoreTextView = findViewById(R.id.highScore1);
         loadHighScore();
 

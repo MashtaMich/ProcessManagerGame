@@ -51,8 +51,10 @@ public Game(GameView gameView, Context context, PlayerInventory playerInventory,
     private void loadMapFromJson() {
         String TAG = "Map";
         try {
-            InputStream is = context.getAssets().open("map.tmj");
-            String jsonStr = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            String jsonStr;
+            try (InputStream is = context.getAssets().open("map.tmj")) {
+                jsonStr = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
             JSONObject root = new JSONObject(jsonStr);
 
             mapWidth = root.getInt("width");
