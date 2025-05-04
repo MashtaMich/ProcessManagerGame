@@ -14,8 +14,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -66,100 +64,103 @@ public class GameActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            enableImmersiveMode();
-
             setContentView(R.layout.activity_game);
-            SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
             sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
-            int savedVolume = sharedPreferences.getInt("volume", 100);
-            volumeSeekBar.setProgress(savedVolume);
-            float volume = savedVolume / 100f;
-            mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.setVolume(volume,volume);
-            mediaPlayer.start();
-
-
+            enableImmersiveMode();
+            setupMediaPlayer();
+            setupVolumeSeekBar();
             initializeGameComponents();
+            setupInteractButton();
+            setupPauseMenuButtons();
 
-
-            if (getIntent().getBooleanExtra("loadSavedGame", false)) {
-                // Load after a short delay to ensure all components are initialized
-                new Handler(Looper.getMainLooper()).postDelayed(this::loadGameState, 500);
-            }
-
-            volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {                float newVolume = progress / 100f;
-                    mediaPlayer.setVolume(newVolume, newVolume);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putInt("volume", progress);
-                    editor.apply();
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-            });
-
-            //Interact Button
-            Button interactButton = findViewById(R.id.interactButton);
-            Log.d("Interact", "setting a listener");
-            interactButton.setOnClickListener(v -> game.interact());
-            Log.d("Interact", "done with listening and passing logic to game.interact()");
-
-            // Link buttons
-            Button togglePauseButton = findViewById(R.id.togglePauseButton);
-            togglePauseButton.setText(R.string.pause); // Default state
-            LinearLayout pauseMenu = findViewById(R.id.pauseMenu);
-            LinearLayout settingsMenu = findViewById(R.id.SettingsMenu);
-            Button resume = findViewById(R.id.btnResume);
-            Button save = findViewById(R.id.btnSave);
-            Button settings = findViewById(R.id.btnSettings);
-            Button mainMenuButton = findViewById(R.id.btnMainMenu);
-            ImageButton back = findViewById(R.id.backButton);
-
-           // Set listeners
-            togglePauseButton.setOnClickListener(v -> {
-                if (gameManager.isGameOver()) return; // Don’t allow toggling if game is over
-
-                if (gameManager.isRunning()) {
-                    gameManager.pauseGame();
-                    pauseMenu.setVisibility(View.VISIBLE);
-                }
-            });
-            resume.setOnClickListener(v -> {
-                gameManager.resumeGame();
-                pauseMenu.setVisibility(View.GONE);  // Hide the pause menu
-            });
-            save.setOnClickListener(v -> {
-                saveGameState();
-                Toast.makeText(this, "Game saved", Toast.LENGTH_SHORT).show();
-            });
-            settings.setOnClickListener(v -> {
-                settingsMenu.setVisibility(View.VISIBLE);
-                pauseMenu.setVisibility(GONE);
-                back.setVisibility(VISIBLE);
-            });
-            mainMenuButton.setOnClickListener(v -> {
-                Intent intent = new Intent(GameActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish(); // Close the current activity
-            });
-            back.setOnClickListener(v -> {
-                settingsMenu.setVisibility(View.GONE);
-                pauseMenu.setVisibility(View.VISIBLE);
-                back.setVisibility(View.GONE);
-            });
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate: " + e.getMessage(), e);
             finish();
         }
+    }
+    private void setupVolumeSeekBar() {
+        SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
+        int savedVolume = sharedPreferences.getInt("volume", 100);
+        volumeSeekBar.setProgress(savedVolume);
+        float volume = savedVolume / 100f;
+        mediaPlayer.setVolume(volume, volume);
+
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float newVolume = progress / 100f;
+                mediaPlayer.setVolume(newVolume, newVolume);
+                sharedPreferences.edit().putInt("volume", progress).apply();
+            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
+    private void setupMediaPlayer() {
+        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
+        mediaPlayer.setLooping(true);
+        int savedVolume = sharedPreferences.getInt("volume", 100);
+        float volume = savedVolume / 100f;
+        mediaPlayer.setVolume(volume, volume);
+        mediaPlayer.start();
+    }
+    private void setupInteractButton() {
+        Button interactButton = findViewById(R.id.interactButton);
+        Log.d("Interact", "Setting up interact button listener");
+        interactButton.setOnClickListener(v -> {
+            if (game != null) {
+                game.interact();
+            } else {
+                Log.w("Interact", "Game not initialized yet!");
+            }
+        });
+        Log.d("Interact", "Interact listener assigned");
+    }
+
+    private void setupPauseMenuButtons(){
+        // Link buttons
+        Button togglePauseButton = findViewById(R.id.togglePauseButton);
+        togglePauseButton.setText(R.string.pause); // Default state
+        LinearLayout pauseMenu = findViewById(R.id.pauseMenu);
+        LinearLayout settingsMenu = findViewById(R.id.SettingsMenu);
+        Button resume = findViewById(R.id.btnResume);
+        Button save = findViewById(R.id.btnSave);
+        Button settings = findViewById(R.id.btnSettings);
+        Button mainMenuButton = findViewById(R.id.btnMainMenu);
+        ImageButton back = findViewById(R.id.backButton);
+
+        // Set listeners
+        togglePauseButton.setOnClickListener(v -> {
+            if (gameManager.isGameOver()) return; // Don’t allow toggling if game is over
+
+            if (gameManager.isRunning()) {
+                gameManager.pauseGame();
+                pauseMenu.setVisibility(View.VISIBLE);
+            }
+        });
+        resume.setOnClickListener(v -> {
+            gameManager.resumeGame();
+            pauseMenu.setVisibility(View.GONE);  // Hide the pause menu
+        });
+        save.setOnClickListener(v -> {
+            saveGameState();
+            Toast.makeText(this, "Game saved", Toast.LENGTH_SHORT).show();
+        });
+        settings.setOnClickListener(v -> {
+            settingsMenu.setVisibility(View.VISIBLE);
+            pauseMenu.setVisibility(GONE);
+            back.setVisibility(VISIBLE);
+        });
+        mainMenuButton.setOnClickListener(v -> {
+            Intent intent = new Intent(GameActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish(); // Close the current activity
+        });
+        back.setOnClickListener(v -> {
+            settingsMenu.setVisibility(View.GONE);
+            pauseMenu.setVisibility(View.VISIBLE);
+            back.setVisibility(View.GONE);
+        });
     }
 
     private void saveGameState() {
@@ -561,6 +562,11 @@ public class GameActivity extends BaseActivity implements
 
         updateScoreDisplay(0);
         updateDeadProcessCountDisplay(0);
+
+        boolean shouldLoadSave = getIntent().getBooleanExtra("loadSavedGame", false);
+        if (shouldLoadSave) {
+            loadGameState();
+        }
     }
 
     private void setupMovementControls() {
@@ -1052,27 +1058,6 @@ public class GameActivity extends BaseActivity implements
         }
     }
 
-    private void hideSystemUI() {
-        try {
-            WindowInsetsController controller = getWindow().getInsetsController();
-            if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-                //allows system bars to show temporarily by swiping
-                controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error hiding system UI: " + e.getMessage(), e);
-        }
-    }
-
-    //rehide the navigation bar when it appears mid game
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            hideSystemUI();
-        }
-    }
 
     private void updateMediaPlaybackSpeed(int deadProcessCount) {
         if (deadProcessCount >= 3) {

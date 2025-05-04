@@ -21,8 +21,6 @@ public class Game {
     public static final int TILE_SIZE = 120;
     public static final int MAP_WIDTH = 20;
     public static final int MAP_HEIGHT = 9;
-    //public static final int SCREEN_WIDTH = TILE_SIZE * MAP_WIDTH;   // 2400
-    //public static final int SCREEN_HEIGHT = TILE_SIZE * MAP_HEIGHT; // 1080
 
     private final Context context;
 

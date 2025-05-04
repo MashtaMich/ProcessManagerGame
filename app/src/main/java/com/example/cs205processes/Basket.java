@@ -44,7 +44,7 @@ public class Basket extends Interactable {
 
     @Override
     public void onInteract(Player player) {
-        System.out.println("Player took a " + ingredient);
+        Log.d("Player","Player took a " + ingredient);
         PlayerInventory inventory=player.getInventory();
         try {
             //Player only allowed to have one item at a time

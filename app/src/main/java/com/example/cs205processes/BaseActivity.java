@@ -22,7 +22,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
     }
 
-    private void hideSystemUI() {
+    protected void hideSystemUI() {
         try {
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {

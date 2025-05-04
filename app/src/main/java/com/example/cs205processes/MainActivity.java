@@ -9,8 +9,6 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -199,12 +197,6 @@ public class MainActivity extends BaseActivity {
         // or launch a separate Settings Activity
         settingMenu.setVisibility(View.VISIBLE);
         back.setVisibility(VISIBLE);
-    }
-    private void hideSystemUI() {
-        WindowInsetsController controller = getWindow().getInsetsController();
-        if (controller != null) {
-            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-        }
     }
 
     @Override
