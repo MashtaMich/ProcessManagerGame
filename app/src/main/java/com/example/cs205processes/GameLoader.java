@@ -7,6 +7,8 @@ import android.os.Looper;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//not currently in use since resourceloader makes the game load fast enough. Can consider integrating if the game gets larger and loading takes longer
+//purpose : separate creation of game and game manager away from UI thread
 public class GameLoader {
     public interface Callback {
         void onGameLoaded(Game game);

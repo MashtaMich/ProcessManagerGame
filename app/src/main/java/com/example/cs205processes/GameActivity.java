@@ -111,23 +111,6 @@ public class GameActivity extends BaseActivity implements
         mediaPlayer.setVolume(volume, volume);
         mediaPlayer.start();
     }
-//    private void applyJoystickScale() {
-//        float scale = sharedPreferences.getFloat("joystickScale", 1.0f);
-//        int[] ids = { R.id.btnUp, R.id.btnDown, R.id.btnLeft, R.id.btnRight, R.id.interactButton };
-//        for (int id : ids) {
-//            View v = findViewById(id);
-//            if (v != null) {
-//                v.setScaleX(scale);
-//                v.setScaleY(scale);
-//            }
-//        }
-//        // Optional: scale container too (if not using fixed dp)
-//        View joystickLayout = findViewById(R.id.joystickLayout);
-//        if (joystickLayout != null) {
-//            joystickLayout.setScaleX(scale);
-//            joystickLayout.setScaleY(scale);
-//        }
-//    }
 
 
     private void setupInteractButton() {
@@ -136,6 +119,7 @@ public class GameActivity extends BaseActivity implements
         interactButton.setOnClickListener(v -> {
             if (game != null) {
                 game.interact();
+                updatePlayerInventoryView();
             } else {
                 Log.w("Interact", "Game not initialized yet!");
             }
