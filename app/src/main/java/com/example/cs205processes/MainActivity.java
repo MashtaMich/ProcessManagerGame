@@ -91,6 +91,13 @@ public class MainActivity extends BaseActivity {
         settingMenu = findViewById(R.id.SettingsMenu);
         back = findViewById(R.id.backButton);
 
+        setupJoystickSizeListener(
+                findViewById(R.id.joystickSizeGroup),
+                R.id.smallSize,
+                R.id.largeSize
+        );
+
+
         setupButtonListeners();
     }
 
@@ -241,5 +248,6 @@ public class MainActivity extends BaseActivity {
         if (mediaPlayer != null) {
             mediaPlayer.start(); // Resume playing if it was paused
         }
+
     }
 }

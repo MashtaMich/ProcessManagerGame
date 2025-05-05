@@ -67,55 +67,6 @@
         android:contentDescription="Process List"
         tools:ignore="HardcodedText" />
 
-    <!-- Pot List -->
-<!--    <FrameLayout-->
-<!--        android:id="@+id/PotContainer"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        android:elevation="4dp"-->
-<!--        android:padding="4dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/joystickInclude"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.3">-->
-
-<!--        &lt;!&ndash; Vertical Pot Stack &ndash;&gt;-->
-<!--        <LinearLayout-->
-<!--            android:id="@+id/potInventoryLayout"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="vertical"-->
-<!--            android:gravity="center">-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/potSlot1"-->
-<!--                android:layout_width="144dp"-->
-<!--                android:layout_height="74dp"-->
-<!--                android:layout_margin="2dp"-->
-<!--                android:src="@drawable/empty_pot"-->
-<!--                android:scaleType="fitCenter"-->
-<!--                android:clickable="true"-->
-<!--                android:focusable="true"-->
-<!--                android:contentDescription="@string/pot_slot" />-->
-
-<!--            <ImageView-->
-<!--                android:id="@+id/potSlot2"-->
-<!--                android:layout_width="144dp"-->
-<!--                android:layout_height="74dp"-->
-<!--                android:layout_margin="2dp"-->
-<!--                android:src="@drawable/empty_pot"-->
-<!--                android:scaleType="fitCenter"-->
-<!--                android:clickable="true"-->
-<!--                android:focusable="true"-->
-<!--                android:contentDescription="@string/pot_slot" />-->
-<!--        </LinearLayout>-->
-<!--    </FrameLayout>-->
-
-
-
-
     <!-- Ingredient List -->
     <FrameLayout
         android:id="@+id/ingredientInventoryContainer"
@@ -234,51 +185,6 @@
         android:id="@+id/joystickInclude"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
-
-<!--    <ImageView-->
-<!--        android:id="@+id/basket1"-->
-<!--        android:layout_width="125dp"-->
-<!--        android:layout_height="123dp"-->
-<!--        android:adjustViewBounds="true"-->
-<!--        android:contentDescription="basket 1"-->
-<!--        android:scaleType="fitCenter"-->
-<!--        android:src="@drawable/potato_basket"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.194"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="1.0" />-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/basket2"-->
-<!--        android:layout_width="125dp"-->
-<!--        android:layout_height="123dp"-->
-<!--        android:adjustViewBounds="true"-->
-<!--        android:contentDescription="basket 2"-->
-<!--        android:scaleType="fitCenter"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/gameView"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.413"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/gameView"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.996"-->
-<!--        app:srcCompat="@drawable/cabbage_basket"  />-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/basket3"-->
-<!--        android:layout_width="125dp"-->
-<!--        android:layout_height="123dp"-->
-<!--        android:adjustViewBounds="true"-->
-<!--        android:contentDescription="basket 3"-->
-<!--        android:scaleType="fitCenter"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.66"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.996"-->
-<!--        app:srcCompat="@drawable/tomato_basket" />-->
 
     <ImageView
         android:id="@+id/playerInventory"
@@ -421,13 +327,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
 
-        <!-- Graphics Quality Control -->
+        <!-- Joystick Size Control -->
         <TextView
-            android:id="@+id/graphicsQualityLabel"
+            android:id="@+id/joystickSizeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:text="Graphics Quality"
+            android:text="Joystick Size"
             android:textColor="#FFFFFF"
             android:textSize="30sp"
             android:layout_marginTop="32dp"
@@ -437,43 +343,41 @@
             tools:ignore="HardcodedText" />
 
         <RadioGroup
-            android:id="@+id/graphicsQualityGroup"
+            android:id="@+id/joystickSizeGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/graphicsQualityLabel"
+            app:layout_constraintTop_toBottomOf="@+id/joystickSizeLabel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="horizontal"
             android:layout_marginTop="16dp">
 
             <RadioButton
-                android:id="@+id/lowQuality"
+                android:id="@+id/smallSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:text="Low"
-                android:checked="false"
+                android:text="Small"
                 tools:ignore="HardcodedText" />
 
-            <RadioButton
-                android:id="@+id/mediumQuality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:text="Medium"
-                android:checked="true"
-                tools:ignore="HardcodedText" />
+<!--            <RadioButton-->
+<!--                android:id="@+id/mediumSize"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:textSize="20sp"-->
+<!--                android:text="Medium"-->
+<!--                android:checked="true"-->
+<!--                tools:ignore="HardcodedText" />-->
 
             <RadioButton
-                android:id="@+id/highQuality"
+                android:id="@+id/largeSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:text="High"
-                android:checked="false"
+                android:text="Large"
                 tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>

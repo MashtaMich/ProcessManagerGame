@@ -198,13 +198,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
 
-        <!-- Graphics Quality Control -->
+        <!-- Joystick Size Control -->
         <TextView
-            android:id="@+id/graphicsQualityLabel"
+            android:id="@+id/joystickSizeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:text="Graphics Quality"
+            android:text="Joystick Size"
             android:textColor="#FFFFFF"
             android:textSize="30sp"
             android:layout_marginTop="32dp"
@@ -214,43 +214,41 @@
             tools:ignore="HardcodedText" />
 
         <RadioGroup
-            android:id="@+id/graphicsQualityGroup"
+            android:id="@+id/joystickSizeGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/graphicsQualityLabel"
+            app:layout_constraintTop_toBottomOf="@+id/joystickSizeLabel"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="horizontal"
             android:layout_marginTop="16dp">
 
             <RadioButton
-                android:id="@+id/lowQuality"
+                android:id="@+id/smallSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:text="Low"
-                android:checked="false"
+                android:text="Small"
                 tools:ignore="HardcodedText" />
 
-            <RadioButton
-                android:id="@+id/mediumQuality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:text="Medium"
-                android:checked="true"
-                tools:ignore="HardcodedText" />
+            <!--            <RadioButton-->
+            <!--                android:id="@+id/mediumSize"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:textColor="@android:color/white"-->
+            <!--                android:textSize="20sp"-->
+            <!--                android:text="Medium"-->
+            <!--                android:checked="true"-->
+            <!--                tools:ignore="HardcodedText" />-->
 
             <RadioButton
-                android:id="@+id/highQuality"
+                android:id="@+id/largeSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:text="High"
-                android:checked="false"
+                android:text="Large"
                 tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>

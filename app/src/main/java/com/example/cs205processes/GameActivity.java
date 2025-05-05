@@ -66,6 +66,14 @@ public class GameActivity extends BaseActivity implements
         try {
             setContentView(R.layout.activity_game);
             sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+            setupJoystickSizeListener(
+                    findViewById(R.id.joystickSizeGroup),
+                    R.id.smallSize,
+                    R.id.largeSize,
+                    scale -> applyJoystickScale(findViewById(android.R.id.content))
+            );
+
+
             enableImmersiveMode();
             setupMediaPlayer();
             setupVolumeSeekBar();
@@ -103,6 +111,25 @@ public class GameActivity extends BaseActivity implements
         mediaPlayer.setVolume(volume, volume);
         mediaPlayer.start();
     }
+//    private void applyJoystickScale() {
+//        float scale = sharedPreferences.getFloat("joystickScale", 1.0f);
+//        int[] ids = { R.id.btnUp, R.id.btnDown, R.id.btnLeft, R.id.btnRight, R.id.interactButton };
+//        for (int id : ids) {
+//            View v = findViewById(id);
+//            if (v != null) {
+//                v.setScaleX(scale);
+//                v.setScaleY(scale);
+//            }
+//        }
+//        // Optional: scale container too (if not using fixed dp)
+//        View joystickLayout = findViewById(R.id.joystickLayout);
+//        if (joystickLayout != null) {
+//            joystickLayout.setScaleX(scale);
+//            joystickLayout.setScaleY(scale);
+//        }
+//    }
+
+
     private void setupInteractButton() {
         Button interactButton = findViewById(R.id.interactButton);
         Log.d("Interact", "Setting up interact button listener");
@@ -115,7 +142,6 @@ public class GameActivity extends BaseActivity implements
         });
         Log.d("Interact", "Interact listener assigned");
     }
-
     private void setupPauseMenuButtons(){
         // Link buttons
         Button togglePauseButton = findViewById(R.id.togglePauseButton);
@@ -1036,6 +1062,8 @@ public class GameActivity extends BaseActivity implements
             if (mediaPlayer != null) {
                 mediaPlayer.start();
             }
+            applyJoystickScale(findViewById(android.R.id.content));
+
         } catch (Exception e) {
             Log.e(TAG, "Error in onResume: " + e.getMessage(), e);
         }
