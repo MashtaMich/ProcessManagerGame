@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +27,15 @@ public class MainActivity extends BaseActivity {
     private TextView highScoreTextView;
     private LinearLayout settingMenu;
     private ImageButton back;
-    private SharedPreferences sharedPreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        int savedVolume = sharedPreferences.getInt("volume", 100);
+        SharedPreferences sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         setContentView(R.layout.activity_main);
 
+        //preload resources at main menu
         new Thread(() -> {
             ResourceLoader.preloadFloorTiles(getApplicationContext());
             ResourceLoader.preloadInteractableSprites(getApplicationContext());
@@ -48,56 +45,24 @@ public class MainActivity extends BaseActivity {
             }
         }).start();
 
+        //audio setup
+        mediaPlayer = setupMediaPlayer(R.raw.overcooked, sharedPreferences);
+        setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer, sharedPreferences);
 
+        //load high score
         highScoreTextView = findViewById(R.id.highScore1);
         loadHighScore();
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
-        mediaPlayer.setLooping(true); // Enable looping
-        mediaPlayer.setVolume(savedVolume / 100f, savedVolume / 100f); // Set initial volume
-        mediaPlayer.start(); // Start playing the audio
-
+        //enable immersive UI
         enableImmersiveMode();
 
-        // Initialize SeekBar
-        SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
-        volumeSeekBar.setProgress(savedVolume);
-        // Set up SeekBar listener to update volume
-        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Update MediaPlayer volume as user changes the SeekBar
-                mediaPlayer.setVolume(progress / 100f, progress / 100f);
-
-                // Save the new volume setting to SharedPreferences
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("volume", progress);
-                editor.apply(); // Apply changes to SharedPreferences asynchronously
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-
+        //link buttons and views
         startGameButton = findViewById(R.id.StartGame);
         howToPlayButton = findViewById(R.id.HowToPlay);
         loadGameButton = findViewById(R.id.LoadGame);
         settingsButton = findViewById(R.id.Settings);
         settingMenu = findViewById(R.id.SettingsMenu);
         back = findViewById(R.id.backButton);
-
-        setupJoystickSizeListener(
-                findViewById(R.id.joystickSizeGroup),
-                R.id.smallSize,
-                R.id.largeSize
-        );
-
-
         setupButtonListeners();
     }
 

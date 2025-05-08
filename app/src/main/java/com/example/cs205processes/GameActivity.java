@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,10 +72,9 @@ public class GameActivity extends BaseActivity implements
                     scale -> applyJoystickScale(findViewById(android.R.id.content))
             );
 
-
             enableImmersiveMode();
-            setupMediaPlayer();
-            setupVolumeSeekBar();
+            mediaPlayer = setupMediaPlayer(R.raw.overcooked, sharedPreferences);
+            setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer, sharedPreferences);
             initializeGameComponents();
             setupInteractButton();
             setupPauseMenuButtons();
@@ -86,32 +84,6 @@ public class GameActivity extends BaseActivity implements
             finish();
         }
     }
-    private void setupVolumeSeekBar() {
-        SeekBar volumeSeekBar = findViewById(R.id.volumeSeekBar);
-        int savedVolume = sharedPreferences.getInt("volume", 100);
-        volumeSeekBar.setProgress(savedVolume);
-        float volume = savedVolume / 100f;
-        mediaPlayer.setVolume(volume, volume);
-
-        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float newVolume = progress / 100f;
-                mediaPlayer.setVolume(newVolume, newVolume);
-                sharedPreferences.edit().putInt("volume", progress).apply();
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-    }
-    private void setupMediaPlayer() {
-        mediaPlayer = MediaPlayer.create(this, R.raw.overcooked);
-        mediaPlayer.setLooping(true);
-        int savedVolume = sharedPreferences.getInt("volume", 100);
-        float volume = savedVolume / 100f;
-        mediaPlayer.setVolume(volume, volume);
-        mediaPlayer.start();
-    }
-
 
     private void setupInteractButton() {
         Button interactButton = findViewById(R.id.interactButton);
