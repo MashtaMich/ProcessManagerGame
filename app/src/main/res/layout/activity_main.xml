@@ -232,16 +232,6 @@
                 android:text="Small"
                 tools:ignore="HardcodedText" />
 
-            <!--            <RadioButton-->
-            <!--                android:id="@+id/mediumSize"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:textColor="@android:color/white"-->
-            <!--                android:textSize="20sp"-->
-            <!--                android:text="Medium"-->
-            <!--                android:checked="true"-->
-            <!--                tools:ignore="HardcodedText" />-->
-
             <RadioButton
                 android:id="@+id/largeSize"
                 android:layout_width="wrap_content"
@@ -252,6 +242,4 @@
                 tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
