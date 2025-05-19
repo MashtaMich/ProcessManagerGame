@@ -5,14 +5,19 @@ import android.graphics.*;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
+import android.widget.Toast;
 import org.json.JSONObject;
 
 public class RubbishBin extends Interactable {
     private Bitmap openSprite, closedSprite;
     //private boolean isClosed = true;
 
+    private int emptyInteractionCount = 0;
+
+    private final Context context;
+
     public RubbishBin(Context context, float x, float y, JSONObject props) {
+        this.context = context;
         this.x = x;
         this.y = y;
 
@@ -53,9 +58,15 @@ public class RubbishBin extends Interactable {
                     sprite = closedSprite;
                 }, 500);
             } else {
+                emptyInteractionCount++;
                 // Still animate the bin opening and closing for feedback
                 //isClosed = false;
                 sprite = openSprite;
+
+                if (emptyInteractionCount >= 10) {
+                    emptyInteractionCount = 0;
+                    Toast.makeText(context, "Stop playing with my feelings, give me some actual food!", Toast.LENGTH_SHORT).show();
+                }
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     //isClosed = true;

@@ -42,7 +42,7 @@ public class GameActivity extends BaseActivity implements
             private TextView scoreTextView;
     private TextView deadProcessCountTextView;
 
-            private Game game;
+    private Game game;
 
     private List<ImageView> inventoryViews;
     private List<ImageView> availableIngredientsViews;
@@ -53,10 +53,10 @@ public class GameActivity extends BaseActivity implements
     private PlayerInventory playerInventory;
     private int selectedIngredientIndex=-1;
     private int selectedSwapIndex=-1;
-            private final int maxIngredients=3;
+    private final int maxIngredients=3;
     private PotThreadPool potThreadPool;
     private ImageView playerInventoryView;
-            private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
     private BasketManager basketManager;
 
     @Override
