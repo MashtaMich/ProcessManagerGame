@@ -22,6 +22,7 @@ public class MainActivity extends BaseActivity {
     private Button howToPlayButton;
     private Button settingsButton;
     private Button loadGameButton;
+    private Button creditsButton;
     private static final String PREFS_NAME = "MyGamePrefs";
     private MediaPlayer mediaPlayer;
     private TextView highScoreTextView;
@@ -62,6 +63,7 @@ public class MainActivity extends BaseActivity {
         loadGameButton = findViewById(R.id.LoadGame);
         settingsButton = findViewById(R.id.Settings);
         settingMenu = findViewById(R.id.SettingsMenu);
+        creditsButton = findViewById(R.id.Credits);
         back = findViewById(R.id.backButton);
         setupButtonListeners();
     }
