@@ -232,4 +232,67 @@
                 tools:ignore="HardcodedText" />
         </RadioGroup>
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/CreditsPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#D2B48C"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/backFromCredits"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="start"
+            android:layout_margin="16dp"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/ic_media_previous"
+            android:contentDescription="Back from credits"
+            app:tint="@android:color/white"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/creditsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Credits"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="16dp"
+            tools:ignore="HardcodedText" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/contributorsText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Matthew Ng - Backend\n
+                        Michael Suteja - Backend\n
+                        Jeremy Lin - Art and Assets\n
+                        Jeffrey Goh - Backend\n
+                        Damien Chew - Backend\n
+                        Ing Reiwen - Backend\n"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

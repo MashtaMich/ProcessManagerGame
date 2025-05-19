@@ -27,7 +27,9 @@ public class MainActivity extends BaseActivity {
     private MediaPlayer mediaPlayer;
     private TextView highScoreTextView;
     private LinearLayout settingMenu;
+    private LinearLayout creditsPage;
     private ImageButton back;
+    private ImageButton backFromCredits;
 
 
     @Override
@@ -64,7 +66,9 @@ public class MainActivity extends BaseActivity {
         settingsButton = findViewById(R.id.Settings);
         settingMenu = findViewById(R.id.SettingsMenu);
         creditsButton = findViewById(R.id.Credits);
+        creditsPage = findViewById(R.id.CreditsPage);
         back = findViewById(R.id.backButton);
+        backFromCredits = findViewById(R.id.backFromCredits);
         setupButtonListeners();
     }
 
@@ -89,6 +93,16 @@ public class MainActivity extends BaseActivity {
         howToPlayButton.setOnClickListener(v -> showHowToPlayDialog());
 
         settingsButton.setOnClickListener(v -> showSettingsDialog());
+
+        creditsButton.setOnClickListener(v -> {
+            creditsPage.setVisibility(View.VISIBLE);
+            backFromCredits.setVisibility(View.VISIBLE);
+        });
+
+        backFromCredits.setOnClickListener(v -> {
+            creditsPage.setVisibility(View.GONE);
+            backFromCredits.setVisibility(View.GONE);
+        });
 
         loadGameButton.setOnClickListener(v -> {
             // Check if a save exists
@@ -184,7 +198,6 @@ public class MainActivity extends BaseActivity {
         settingMenu.setVisibility(View.VISIBLE);
         back.setVisibility(VISIBLE);
     }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
