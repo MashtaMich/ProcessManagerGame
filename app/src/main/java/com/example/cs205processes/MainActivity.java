@@ -213,6 +213,5 @@ public class MainActivity extends BaseActivity {
         if (mediaPlayer != null) {
             mediaPlayer.start(); // Resume playing if it was paused
         }
-
     }
 }

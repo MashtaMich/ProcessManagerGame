@@ -18,7 +18,6 @@ public class Recipe {
     private final String id;
     private final String name;
     private final List<Ingredient> ingredients;
-    //protected int iconResourceId;
 
     public Recipe(String name, List<Ingredient> ingredients) {
         this.id = java.util.UUID.randomUUID().toString();

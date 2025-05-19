@@ -187,7 +187,6 @@ public class Pot extends Interactable {
         }
     }
 
-
     private void updateSprite() {
         //update pot sprite
         synchronized (stateLock) {

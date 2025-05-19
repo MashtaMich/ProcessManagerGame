@@ -8,12 +8,10 @@ import org.json.JSONObject;
 public class Table extends Interactable {
     private Bitmap tableSprite,cabbageSprite,tomatoSprite,onionSprite,carrotSprite,potatoSprite,mashedPotatoSprite,veggieStewSprite,trashSprite,tomatoSoupSprite,saladSprite;
     private FoodItem itemOnTable;
-    //private final Context context;
 
     public Table(Context context, float x, float y, JSONObject props) {
         this.x = x;
         this.y = y;
-        //Context context = context;
         try {
             tableSprite = loadSprite(context, props.getString("sprite"));
             cabbageSprite = loadSprite(context, props.getString("table_cabbage_sprite"));
@@ -52,7 +50,6 @@ public class Table extends Interactable {
             Log.d("Table", "Item picked up from table: " + itemOnTable.getName());
             itemOnTable = null;
             updateSprite();
-
         }
     }
 

@@ -1173,6 +1173,4 @@ public class GameActivity extends BaseActivity implements
             editor.apply();
         }
     }
-
-
 }

@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 public class RubbishBin extends Interactable {
     private Bitmap openSprite, closedSprite;
-    //private boolean isClosed = true;
 
     private int emptyInteractionCount = 0;
 
@@ -27,7 +26,6 @@ public class RubbishBin extends Interactable {
             sprite = closedSprite;
         } catch (Exception e) {
             Log.e("Bin","Error loading sprites for Bin:"+e.getLocalizedMessage());
-            //e.printStackTrace();
         }
     }
 
@@ -54,13 +52,10 @@ public class RubbishBin extends Interactable {
 
                 // Close the bin after a short delay
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    //isClosed = true;
                     sprite = closedSprite;
                 }, 500);
             } else {
                 emptyInteractionCount++;
-                // Still animate the bin opening and closing for feedback
-                //isClosed = false;
                 sprite = openSprite;
 
                 if (emptyInteractionCount >= 10) {
@@ -69,12 +64,10 @@ public class RubbishBin extends Interactable {
                 }
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    //isClosed = true;
                     sprite = closedSprite;
                 }, 500);
             }
         } catch (Exception e) {
-            //isClosed = true;
             sprite = closedSprite;
         }
     }

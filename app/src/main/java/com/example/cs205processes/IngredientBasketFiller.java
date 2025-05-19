@@ -47,8 +47,6 @@ public class IngredientBasketFiller {
                          }else{
                              Log.e(TAG,"Failed to add an ingredient at basket"+i);
                          }
-
-
                 }
                 listener.finishedBasketFilling(fillOrder);
             });

@@ -21,7 +21,6 @@ public class SubmissionZone extends Interactable {
             sprite = loadSprite(context, props.getString("sprite"));
         } catch (Exception e) {
             Log.e(TAG,"Error at loading submission zone sprite:"+e.getLocalizedMessage());
-            //e.printStackTrace();
         }
     }
 
@@ -83,10 +82,8 @@ public class SubmissionZone extends Interactable {
                 }
             } catch (ClassCastException e) {
                 Log.e(TAG, "ClassCastException: " + e.getMessage());
-                //e.printStackTrace();
             }
         } else {
-            // DISPLAY AN ERROR MESSAGE TO SAY WRONG INGREDIENTS FOR THE DISH
             Log.d(TAG, "Nothing to submit or invalid item. HeldType: " + heldType);
             playNotificationSound();
         }
@@ -100,7 +97,6 @@ public class SubmissionZone extends Interactable {
                 r.play();
             }
         } catch (Exception e) {
-            //e.printStackTrace();
             Log.e(TAG,"Exception when playing notification sound:"+e.getLocalizedMessage());
         }
     }

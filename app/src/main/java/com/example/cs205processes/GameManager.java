@@ -12,8 +12,6 @@ import java.util.Random;
 
 public class GameManager {
     private static final String TAG = "GameManager";
-    //private static final int POINTS_PER_COMPLETED_PROCESS = 100;
-    //private static final int POINTS_DEDUCTION_FOR_DEAD_PROCESS = 300;
     private static final int MAX_DEAD_PROCESSES = 3;
     private static final int TIMER_INTERVAL_MS = 16; // Update more frequently for smoother animation (~60 FPS)
     private static final int MAX_ACTIVE_PROCESSES = 5; // Maximum number of active processes
@@ -113,7 +111,7 @@ public class GameManager {
     }
 
     private void generateNewProcess() {
-        Order newOrder = Order.generateRandomProcess(availableRecipes);
+        Order newOrder = Order.generateRandomOrder(availableRecipes);
 
         synchronized (mutex) {
             // Check if we can add directly to active processes
@@ -185,8 +183,6 @@ public class GameManager {
         Log.d(TAG, "Process died: " + order.getName());
 
         deadProcessCount++;
-//        score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
-//        if (score < 0) score = 0;
 
         // Add to pending removals
         synchronized (mutex) {
@@ -235,8 +231,7 @@ public class GameManager {
 
         // Complete the process if found
         if (orderToComplete != null) {
-            orderToComplete.completeProcess();
-//            score += POINTS_PER_COMPLETED_PROCESS;
+            orderToComplete.completeOrder();
             // Check if the process was successfully completed
             if (!orderToComplete.isDead()) {
                 long currentTime = System.currentTimeMillis();

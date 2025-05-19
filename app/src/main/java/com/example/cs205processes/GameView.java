@@ -52,7 +52,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 Thread.sleep(game.getSleepTime());
             } catch (InterruptedException e) {
                 Log.e("GameView","Failed to handle run:"+e.getLocalizedMessage());
-                //e.printStackTrace();
             }
         }
     }
@@ -63,14 +62,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas = getHolder().lockCanvas();
             if (canvas != null) {
                 callback.draw(canvas);
-                //return true;
             }
         } finally {
             if (canvas != null) {
                 getHolder().unlockCanvasAndPost(canvas);
             }
         }
-        //return false;
     }
 
     @Override

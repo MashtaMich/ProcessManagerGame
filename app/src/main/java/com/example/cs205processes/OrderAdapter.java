@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ProcessViewHolder> {
-    //private static final String TAG = "ProcessAdapter";
-
     private final List<Order> orders;
     private final Context context;
     public OrderAdapter(Context context, List<Order> orders) {
@@ -81,7 +79,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ProcessViewH
             timeProgressBar.setMax(order.getTimeLimit());
             timeProgressBar.setProgress(timeRemaining);
 
-            // Update card color based on process state
+            // Update card color based on order state
             updateCardBackgroundColor(order);
 
             // Set progress bar color based on time remaining
@@ -133,7 +131,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ProcessViewH
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 80);
                 params.setMargins(2, 0, 2, 0);
                 ingredientIcon.setLayoutParams(params);
-
                 ingredientsContainer.addView(ingredientIcon);
             }
         }

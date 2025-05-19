@@ -25,7 +25,6 @@ public class ResourceLoader {
         return spriteCache.keySet();
     }
 
-
     private static JSONObject getMapJson(Context context) {
         if (cachedMapJSON != null) return cachedMapJSON;
 
@@ -136,12 +135,4 @@ public class ResourceLoader {
         }
         return propsMap;
     }
-
-    // Default fallback if a sprite fails to load
-//    private static Bitmap fallbackRedSquareBitmap() {
-//        Bitmap bmp = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
-//        bmp.eraseColor(Color.RED);
-//        return bmp;
-//    }
 }
-
