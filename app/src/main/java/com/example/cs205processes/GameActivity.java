@@ -38,7 +38,7 @@ public class GameActivity extends BaseActivity implements
     private Runnable moveRunnable;
     private MediaPlayer mediaPlayer;
     private GameManager gameManager;
-    private ProcessAdapter processAdapter;
+    private OrderAdapter orderAdapter;
             private TextView scoreTextView;
     private TextView deadProcessCountTextView;
 
@@ -225,24 +225,24 @@ public class GameActivity extends BaseActivity implements
             }
 
             // Save Process information
-            List<Process> activeProcesses = gameManager.getActiveProcesses();
-            List<Process> relevantProcesses = new ArrayList<>();
+            List<Order> activeOrders = gameManager.getActiveProcesses();
+            List<Order> relevantOrders = new ArrayList<>();
 
             // Only save processes that aren't complete or dead
-            for (Process process : activeProcesses) {
-                if (!process.isComplete() && !process.isDead()) {
-                    relevantProcesses.add(process);
+            for (Order order : activeOrders) {
+                if (!order.isComplete() && !order.isDead()) {
+                    relevantOrders.add(order);
                 }
             }
 
-            editor.putInt("processCount", relevantProcesses.size());
+            editor.putInt("processCount", relevantOrders.size());
 
             // Save each process
-            for (int i = 0; i < relevantProcesses.size(); i++) {
-                Process process = relevantProcesses.get(i);
-                editor.putString("process_" + i + "_recipe", process.getRecipe().getName());
-                editor.putInt("process_" + i + "_remaining", process.getTimeRemaining());
-                editor.putInt("process_" + i + "_limit", process.getTimeLimit());
+            for (int i = 0; i < relevantOrders.size(); i++) {
+                Order order = relevantOrders.get(i);
+                editor.putString("process_" + i + "_recipe", order.getRecipe().getName());
+                editor.putInt("process_" + i + "_remaining", order.getTimeRemaining());
+                editor.putInt("process_" + i + "_limit", order.getTimeLimit());
             }
 
             // Save pots
@@ -421,8 +421,8 @@ public class GameActivity extends BaseActivity implements
                 for (Recipe recipe : recipes) {
                     if (recipe.getName().equals(recipeName)) {
                         // Create a new process with this data
-                        Process process = Process.generateRandomProcess(recipe, timeLimit, timeRemaining);
-                        gameManager.addProcessDirectly(process);
+                        Order order = Order.generateRandomOrder(recipe, timeLimit, timeRemaining);
+                        gameManager.addProcessDirectly(order);
                         break;
                     }
                 }
@@ -512,8 +512,8 @@ public class GameActivity extends BaseActivity implements
                 }
             }
 
-            if (processAdapter != null) {
-                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            if (orderAdapter != null) {
+                orderAdapter.updateProcesses(gameManager.getActiveProcesses());
             }
 
             updateMediaPlaybackSpeed(deadProcessCount);
@@ -603,8 +603,8 @@ public class GameActivity extends BaseActivity implements
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             processRecyclerView.setLayoutManager(layoutManager);
-            processAdapter = new ProcessAdapter(this, new ArrayList<>());
-            processRecyclerView.setAdapter(processAdapter);
+            orderAdapter = new OrderAdapter(this, new ArrayList<>());
+            processRecyclerView.setAdapter(orderAdapter);
         } catch (Exception e) {
             Log.e(TAG, "Error initializing UI components: " + e.getMessage(), e);
         }
@@ -1087,9 +1087,9 @@ public class GameActivity extends BaseActivity implements
     public void onTimerTick() {
         runOnUiThread(() -> {
             try {
-                if (gameManager != null && processAdapter != null) {
+                if (gameManager != null && orderAdapter != null) {
                     updatePlayerInventoryView();
-                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                    orderAdapter.updateProcesses(gameManager.getActiveProcesses());
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error in onTimerTick: " + e.getMessage(), e);
@@ -1098,11 +1098,11 @@ public class GameActivity extends BaseActivity implements
     }
 
     @Override
-    public void onProcessAdded(Process process) {
+    public void onProcessAdded(Order order) {
         runOnUiThread(() -> {
             try {
-                if (processAdapter != null && gameManager != null) {
-                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                if (orderAdapter != null && gameManager != null) {
+                    orderAdapter.updateProcesses(gameManager.getActiveProcesses());
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error in onProcessAdded: " + e.getMessage(), e);
@@ -1111,11 +1111,11 @@ public class GameActivity extends BaseActivity implements
     }
 
     @Override
-    public void onProcessCompleted(Process process) {
+    public void onProcessCompleted(Order order) {
         runOnUiThread(() -> {
             try {
-                if (processAdapter != null && gameManager != null) {
-                    processAdapter.updateProcesses(gameManager.getActiveProcesses());
+                if (orderAdapter != null && gameManager != null) {
+                    orderAdapter.updateProcesses(gameManager.getActiveProcesses());
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error in onProcessCompleted: " + e.getMessage(), e);
@@ -1124,10 +1124,10 @@ public class GameActivity extends BaseActivity implements
     }
 
     @Override
-    public void onProcessDied(Process process) {
+    public void onProcessDied(Order order) {
         runOnUiThread(() -> {
-            if (processAdapter != null && gameManager != null) {
-                processAdapter.updateProcesses(gameManager.getActiveProcesses());
+            if (orderAdapter != null && gameManager != null) {
+                orderAdapter.updateProcesses(gameManager.getActiveProcesses());
                 updateDeadProcessCountDisplay(gameManager.getDeadProcessCount());
                 updateMediaPlaybackSpeed(gameManager.getDeadProcessCount());
             }

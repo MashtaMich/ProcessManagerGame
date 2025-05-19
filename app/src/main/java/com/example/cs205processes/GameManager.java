@@ -26,8 +26,8 @@ public class GameManager {
     private final Object mutex = new Object();
 
     // Process collections
-    private final List<Process> activeProcesses;
-    private final List<Process> pendingRemovals;
+    private final List<Order> activeOrders;
+    private final List<Order> pendingRemovals;
 
     private final List<Recipe> availableRecipes;
     private int score;
@@ -46,9 +46,9 @@ public class GameManager {
     private final GameListener gameListener;
     private boolean isPaused = false;
     public interface GameListener {
-        void onProcessAdded(Process process);
-        void onProcessCompleted(Process process);
-        void onProcessDied(Process process);
+        void onProcessAdded(Order order);
+        void onProcessCompleted(Order order);
+        void onProcessDied(Order order);
         void onScoreChanged(int newScore);
         void onGameOver(int finalScore);
         void onTimerTick(); // Notify UI of every timer tick
@@ -57,7 +57,7 @@ public class GameManager {
     public GameManager(Context context, GameListener listener,List<Recipe> recipeList) {
         this.context = context;
         this.gameListener = listener;
-        this.activeProcesses = new ArrayList<>();
+        this.activeOrders = new ArrayList<>();
         this.pendingRemovals = new ArrayList<>();
         this.availableRecipes = recipeList;
         this.score = 0;
@@ -86,7 +86,7 @@ public class GameManager {
 
         // Clear any existing processes
         synchronized (mutex) {
-            activeProcesses.clear();
+            activeOrders.clear();
             pendingRemovals.clear();
         }
 
@@ -113,16 +113,16 @@ public class GameManager {
     }
 
     private void generateNewProcess() {
-        Process newProcess = Process.generateRandomProcess(availableRecipes);
+        Order newOrder = Order.generateRandomProcess(availableRecipes);
 
         synchronized (mutex) {
             // Check if we can add directly to active processes
-            if (activeProcesses.size() < MAX_ACTIVE_PROCESSES) {
-                activeProcesses.add(newProcess);
-                Log.d(TAG, "New process added directly: " + newProcess.getName());
+            if (activeOrders.size() < MAX_ACTIVE_PROCESSES) {
+                activeOrders.add(newOrder);
+                Log.d(TAG, "New process added directly: " + newOrder.getName());
 
                 if (gameListener != null) {
-                    gameListener.onProcessAdded(newProcess);
+                    gameListener.onProcessAdded(newOrder);
                 }
             }
         }
@@ -157,22 +157,22 @@ public class GameManager {
         timerStepper.update(delta);
 
         // Create a local list of processes to handle in this update
-        List<Process> processesToUpdate;
+        List<Order> processesToUpdate;
 
         // First, get a snapshot of current processes
         synchronized (mutex) {
-            processesToUpdate = new ArrayList<>(activeProcesses);
+            processesToUpdate = new ArrayList<>(activeOrders);
         }
 
         // Process the snapshot without holding the lock
-        for (Process process : processesToUpdate) {
-            if (!process.isComplete() && !process.isDead()) {
+        for (Order order : processesToUpdate) {
+            if (!order.isComplete() && !order.isDead()) {
                 // Update each process's timer
-                process.updateTime();
+                order.updateTime();
 
                 // Check if process died during this update
-                if (process.isDead()) {
-                    handleDeadProcess(process);
+                if (order.isDead()) {
+                    handleDeadProcess(order);
                 }
             }
         }
@@ -181,8 +181,8 @@ public class GameManager {
         handlePendingRemovals();
     }
 
-    private void handleDeadProcess(Process process) {
-        Log.d(TAG, "Process died: " + process.getName());
+    private void handleDeadProcess(Order order) {
+        Log.d(TAG, "Process died: " + order.getName());
 
         deadProcessCount++;
 //        score -= POINTS_DEDUCTION_FOR_DEAD_PROCESS;
@@ -190,11 +190,11 @@ public class GameManager {
 
         // Add to pending removals
         synchronized (mutex) {
-            pendingRemovals.add(process);
+            pendingRemovals.add(order);
         }
 
         if (gameListener != null) {
-            gameListener.onProcessDied(process);
+            gameListener.onProcessDied(order);
             gameListener.onScoreChanged(score);
         }
 
@@ -215,30 +215,30 @@ public class GameManager {
         synchronized (mutex) {
             if (!pendingRemovals.isEmpty()) {
                 // Remove all pending processes
-                activeProcesses.removeAll(pendingRemovals);
+                activeOrders.removeAll(pendingRemovals);
                 pendingRemovals.clear();
             }
         }
     }
 
     public void completeProcess(String processId) {
-        Process processToComplete = null;
+        Order orderToComplete = null;
 
         synchronized (mutex) {
-            for (Process process : activeProcesses) {
-                if (process.getId().equals(processId) && !process.isComplete() && !process.isDead()) {
-                    processToComplete = process;
+            for (Order order : activeOrders) {
+                if (order.getId().equals(processId) && !order.isComplete() && !order.isDead()) {
+                    orderToComplete = order;
                     break;
                 }
             }
         }
 
         // Complete the process if found
-        if (processToComplete != null) {
-            processToComplete.completeProcess();
+        if (orderToComplete != null) {
+            orderToComplete.completeProcess();
 //            score += POINTS_PER_COMPLETED_PROCESS;
             // Check if the process was successfully completed
-            if (!processToComplete.isDead()) {
+            if (!orderToComplete.isDead()) {
                 long currentTime = System.currentTimeMillis();
 
                 if (lastCompletionTime > 0 && (currentTime - lastCompletionTime <= STREAK_TIME_LIMIT)) {
@@ -257,13 +257,13 @@ public class GameManager {
 
             // Add to pending removals to be cleared next tick
             synchronized (mutex) {
-                pendingRemovals.add(processToComplete);
+                pendingRemovals.add(orderToComplete);
             }
 
-            Log.d(TAG, "Process completed: " + processToComplete.getName() + ", New score: " + score);
+            Log.d(TAG, "Process completed: " + orderToComplete.getName() + ", New score: " + score);
 
             if (gameListener != null) {
-                gameListener.onProcessCompleted(processToComplete);
+                gameListener.onProcessCompleted(orderToComplete);
                 gameListener.onScoreChanged(score);
             }
         } else{
@@ -318,8 +318,8 @@ public class GameManager {
 
         // Pause all active process timers
         synchronized (mutex) {
-            for (Process process : activeProcesses) {
-                process.pauseTimer();
+            for (Order order : activeOrders) {
+                order.pauseTimer();
             }
         }
         
@@ -333,8 +333,8 @@ public class GameManager {
             
             // Resume all active process timers
             synchronized (mutex) {
-                for (Process process : activeProcesses) {
-                    process.resumeTimer();
+                for (Order order : activeOrders) {
+                    order.resumeTimer();
                 }
             }
             
@@ -350,10 +350,10 @@ public class GameManager {
         gameTickHandler.removeCallbacks(gameTickRunnable);
     }
 
-    public List<Process> getActiveProcesses() {
-        List<Process> processesCopy;
+    public List<Order> getActiveProcesses() {
+        List<Order> processesCopy;
         synchronized (mutex) {
-            processesCopy = new ArrayList<>(activeProcesses);
+            processesCopy = new ArrayList<>(activeOrders);
         }
         return processesCopy;
     }
@@ -373,9 +373,9 @@ public class GameManager {
         return !isPaused && !isGameOver;
     }
 
-    public void addProcessDirectly(Process process) {
+    public void addProcessDirectly(Order order) {
         synchronized (mutex) {
-            activeProcesses.add(process);
+            activeOrders.add(order);
         }
     }
 

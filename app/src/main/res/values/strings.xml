@@ -20,7 +20,7 @@
     <!-- Game Over Dialog Strings -->
     <string name="game_over_title">Game Over!</string>
     <string name="final_score_format">Final Score: %d</string>
-    <string name="game_over_message">Too many processes died! The system crashed.</string>
+    <string name="game_over_message">Too many orders died! The system crashed.</string>
     <string name="restart_button">Restart</string>
     <string name="main_menu_button">Main Menu</string>
 

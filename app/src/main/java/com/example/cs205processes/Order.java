@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import java.util.List;
 import java.util.UUID;
 
-public class Process {
-    private static final String TAG = "Process";
+public class Order {
+    private static final String TAG = "Order";
     private static final long TIME_INTERVAL_MS = 1000; // 1 second interval
 
     private final String id;
@@ -27,7 +27,7 @@ public class Process {
             "Customer A", "Customer B", "Customer C"
     };
 
-    public Process(Recipe recipe, int timeLimit) {
+    public Order(Recipe recipe, int timeLimit) {
         this.id = UUID.randomUUID().toString();
         this.name = CUSTOMER_NAMES[(int)(Math.random() * CUSTOMER_NAMES.length)];
         this.recipe = recipe;
@@ -39,20 +39,20 @@ public class Process {
         // Initialize the DeltaStepper with our time update logic
         this.timeStepper = new DeltaStepper(TIME_INTERVAL_MS, this::timeStep);
 
-        Log.d(TAG, "New process created: " + name + ", Recipe: " + recipe.getName() + ", Time: " + timeLimit + "s");
+        Log.d(TAG, "New order created: " + name + ", Recipe: " + recipe.getName() + ", Time: " + timeLimit + "s");
     }
 
-    public static Process generateRandomProcess(List<Recipe> availableRecipes) {
+    public static Order generateRandomOrder(List<Recipe> availableRecipes) {
         // Random time between 60-120 seconds
         int randomTime = 60 + (int)(Math.random() * 61);
         Recipe randomRecipe = availableRecipes.get((int)(Math.random() * availableRecipes.size()));
-        return new Process(randomRecipe, randomTime);
+        return new Order(randomRecipe, randomTime);
     }
-    public static Process generateRandomProcess(Recipe recipe, int timeLimit, int timeRemaining) {
-        Process process = new Process(recipe, timeLimit);
+    public static Order generateRandomOrder(Recipe recipe, int timeLimit, int timeRemaining) {
+        Order order = new Order(recipe, timeLimit);
         // Access the private field via reflection or add a package-private setter
-        process.timeRemaining = timeRemaining;
-        return process;
+        order.timeRemaining = timeRemaining;
+        return order;
     }
 
     // This is called by the DeltaStepper
@@ -65,11 +65,11 @@ public class Process {
                 if (timeRemaining <= 0) {
                     timeRemaining = 0;
                     isDead = true;
-                    Log.d(TAG, "Process died: " + name);
+                    Log.d(TAG, "Order died: " + name);
                 }
             }
         }
-        return true; // Continue processing time steps
+        return true; // Continue ordering time steps
     }
 
     // This will be called from GameManager
@@ -83,7 +83,7 @@ public class Process {
         }
     }
     
-    // Add methods to pause and resume the process timer
+    // Add methods to pause and resume the order timer
     public void pauseTimer() {
         elapsedTimer.pause();
     }
@@ -92,11 +92,11 @@ public class Process {
         elapsedTimer.resume();
     }
 
-    public void completeProcess() {
+    public void completeOrder() {
         synchronized (mutex) {
             if (!isComplete && !isDead) {
                 isComplete = true;
-                Log.d(TAG, "Process completed: " + name);
+                Log.d(TAG, "Order completed: " + name);
             }
         }
     }
@@ -141,7 +141,7 @@ public class Process {
     @Override
     public String toString() {
         synchronized (mutex) {
-            return "Process{" + "name='" + name + '\'' + ", recipe=" + recipe.getName() + ", timeRemaining=" + timeRemaining + ", isComplete=" + isComplete + ", isDead=" + isDead + '}';
+            return "Order{" + "name='" + name + '\'' + ", recipe=" + recipe.getName() + ", timeRemaining=" + timeRemaining + ", isComplete=" + isComplete + ", isDead=" + isDead + '}';
         }
     }
 }

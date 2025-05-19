@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:gravity="center"
-        android:text="Too many processes died! The system crashed."
+        android:text="Too many orders died! The system crashed."
         android:textColor="@color/textMedium"
         android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/finalScoreTextView"

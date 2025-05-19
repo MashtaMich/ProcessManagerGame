@@ -20,14 +20,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessViewHolder> {
+public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ProcessViewHolder> {
     //private static final String TAG = "ProcessAdapter";
 
-    private final List<Process> processes;
+    private final List<Order> orders;
     private final Context context;
-    public ProcessAdapter(Context context, List<Process> processes) {
+    public OrderAdapter(Context context, List<Order> orders) {
         this.context = context;
-        this.processes = new ArrayList<>(processes);
+        this.orders = new ArrayList<>(orders);
     }
 
     @NonNull
@@ -39,19 +39,19 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
 
     @Override
     public void onBindViewHolder(@NonNull ProcessViewHolder holder, int position) {
-        Process process = processes.get(position);
-        holder.bind(process);
+        Order order = orders.get(position);
+        holder.bind(order);
     }
 
     @Override
     public int getItemCount() {
-        return processes.size();
+        return orders.size();
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateProcesses(List<Process> newProcesses) {
-        this.processes.clear();
-        this.processes.addAll(newProcesses);
+    public void updateProcesses(List<Order> newOrders) {
+        this.orders.clear();
+        this.orders.addAll(newOrders);
         notifyDataSetChanged();
     }
 
@@ -72,44 +72,44 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(final Process process) {
+        public void bind(final Order order) {
             // Update time display
-            int timeRemaining = process.getTimeRemaining();
+            int timeRemaining = order.getTimeRemaining();
             timeRemainingTextView.setText(timeRemaining + "s");
 
             // Update progress bar
-            timeProgressBar.setMax(process.getTimeLimit());
+            timeProgressBar.setMax(order.getTimeLimit());
             timeProgressBar.setProgress(timeRemaining);
 
             // Update card color based on process state
-            updateCardBackgroundColor(process);
+            updateCardBackgroundColor(order);
 
             // Set progress bar color based on time remaining
-            updateProgressBarColor(process);
+            updateProgressBarColor(order);
 
             // Display tiny ingredient icons
-            displayTinyIngredientIcons(process);
+            displayTinyIngredientIcons(order);
 
             // Display recipe name
-            recipeName.setText(process.getRecipe().getName());
+            recipeName.setText(order.getRecipe().getName());
         }
 
-        private void updateCardBackgroundColor(Process process) {
-            if (process.isComplete()) {
+        private void updateCardBackgroundColor(Order order) {
+            if (order.isComplete()) {
                 cardView.setCardBackgroundColor(Color.parseColor("#E8F5E9")); // Light green
-            } else if (process.isDead()) {
+            } else if (order.isDead()) {
                 cardView.setCardBackgroundColor(Color.parseColor("#FFEBEE")); // Light red
             } else {
                 cardView.setCardBackgroundColor(Color.WHITE);
             }
         }
 
-        private void updateProgressBarColor(Process process) {
-            if (process.getTimeRemaining() < 10) {
+        private void updateProgressBarColor(Order order) {
+            if (order.getTimeRemaining() < 10) {
                 timeProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(context.getResources(),
                         R.drawable.progress_critical, null));
                 timeRemainingTextView.setTextColor(ContextCompat.getColor(context, R.color.progressCritical));
-            } else if (process.getTimeRemaining() < process.getTimeLimit() / 2) {
+            } else if (order.getTimeRemaining() < order.getTimeLimit() / 2) {
                 timeProgressBar.setProgressDrawable(ResourcesCompat.getDrawable(
                         context.getResources(), R.drawable.progress_warning, null));
                 timeRemainingTextView.setTextColor(ContextCompat.getColor(context, R.color.timeRemainingColor));
@@ -120,11 +120,11 @@ public class ProcessAdapter extends RecyclerView.Adapter<ProcessAdapter.ProcessV
             }
         }
 
-        private void displayTinyIngredientIcons(Process process) {
+        private void displayTinyIngredientIcons(Order order) {
             ingredientsContainer.removeAllViews();
 
             // Show tiny icons in a row
-            for (Ingredient ingredient : process.getRecipe().getIngredients()) {
+            for (Ingredient ingredient : order.getRecipe().getIngredients()) {
                 ImageView ingredientIcon = new ImageView(context);
                 ingredientIcon.setImageResource(ingredient.getIconResourceId());
                 ingredientIcon.setContentDescription(ingredient.getName());

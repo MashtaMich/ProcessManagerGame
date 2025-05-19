@@ -60,13 +60,13 @@ public class SubmissionZone extends Interactable {
 
                 if (getRecipe != null) {
                     GameManager manager = player.getGame().getGameManager();
-                    List<Process> active = manager.getActiveProcesses();
+                    List<Order> active = manager.getActiveProcesses();
                     boolean submitted = false;
-                    for (Process process : active) {
-                        if (!process.isComplete() && !process.isDead() &&
-                                process.getRecipe().getName().equals(food.getName())) {
+                    for (Order order : active) {
+                        if (!order.isComplete() && !order.isDead() &&
+                                order.getRecipe().getName().equals(food.getName())) {
 
-                            manager.completeProcess(process.getId()); // removes it next tick + updates UI
+                            manager.completeProcess(order.getId()); // removes it next tick + updates UI
                             submitted = true;
                             break;
                         }
