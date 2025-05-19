@@ -1151,7 +1151,15 @@ public class GameActivity extends BaseActivity implements
             GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
             gameOverDialog.show();
             saveHighScore(finalScore);
+            clearSaveState();
         });
+    }
+
+    private void clearSaveState() {
+        SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear(); // This clears all data in the "GameSave" preferences
+        editor.apply(); // or editor.commit() if you prefer synchronous saving
     }
 
     private void saveHighScore(int score) {
