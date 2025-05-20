@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,7 +32,6 @@ public class MainActivity extends BaseActivity {
     private LinearLayout creditsPage;
     private ImageButton back;
     private ImageButton backFromCredits;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,17 @@ public class MainActivity extends BaseActivity {
         creditsPage = findViewById(R.id.CreditsPage);
         back = findViewById(R.id.backButton);
         backFromCredits = findViewById(R.id.backFromCredits);
+        TextView contributorsText = findViewById(R.id.contributorsText);
+        contributorsText.setText(Html.fromHtml(
+                "<ul>" +
+                        "<li><a href='https://github.com/matthew-ngzc'>Matthew Ng</a> - Backend</li>" +
+                        "<li><a href='https://github.com/MashtaMich'>Michael Suteja</a> - Backend</li>" +
+                        "<li><a href='https://github.com/Cutcuu'>Jeremy Lin</a> - Art & Assets</li>" +
+                        "<li><a href='https://github.com/jeffreygoh2023'>Jeffrey Goh</a> - Backend, Sound & Music</li>" +
+                        "<li><a href='https://github.com/ChewWaiMunDamien'>Damien Chew</a> - Backend</li>" +
+                        "<li><a href='https://github.com/reiwening'>Ing Reiwen</a> - Backend</li>" +
+                        "</ul>", Html.FROM_HTML_MODE_LEGACY));
+        contributorsText.setMovementMethod(LinkMovementMethod.getInstance());
         setupButtonListeners();
     }
 

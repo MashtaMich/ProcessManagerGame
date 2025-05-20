@@ -283,14 +283,11 @@
                     android:id="@+id/contributorsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Matthew Ng - Backend\n
-                        Michael Suteja - Backend\n
-                        Jeremy Lin - Art and Assets\n
-                        Jeffrey Goh - Backend\n
-                        Damien Chew - Backend\n
-                        Ing Reiwen - Backend\n"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
+                    android:autoLink="web"
+                    android:linksClickable="true"
+                    android:textIsSelectable="false"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
         </ScrollView>
