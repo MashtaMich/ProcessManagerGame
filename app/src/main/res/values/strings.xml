@@ -35,4 +35,14 @@
     <string name="gettable_ingredient">gettable Ingredient</string>
     <string name="pot_slot">pot slot</string>
     <string name="pause">Pause</string>
+
+    <!-- Google and Firebase Strings -->
+    <string name="default_web_client_id">279517247709-kc7ld9lqdfijvtca7o6c3i39eg6drs7k.apps.googleusercontent.com</string>
+    <string name="sign_in">SIGN IN</string>
+
+    <!-- Main screen -->
+    <string name="chef_greeting">Welcome, Chef %1$s!</string>
+    <string name="welcome">Welcome!</string>
+
+
 </resources>

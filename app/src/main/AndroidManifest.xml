@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.cs205processes">
+    package="com.game.cookingspree">
+
+    <!-- Internet connectivity for leaderboard and accounts-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -14,7 +18,7 @@
 
         <!-- Main Activity - should be in landscape mode-->
         <activity
-            android:name=".MainActivity"
+            android:name="com.game.cookingspree.MainActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize"
@@ -27,7 +31,7 @@
 
         <!-- Game Activity - Should be in landscape mode -->
         <activity
-            android:name=".GameActivity"
+            android:name="com.game.cookingspree.GameActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize"

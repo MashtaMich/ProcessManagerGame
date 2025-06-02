@@ -5,21 +5,39 @@
     android:id="@+id/ConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="0dp"
     android:visibility="visible"
     tools:context=".MainActivity"
     tools:visibility="visible">
+<!--    "-->
 
+    <!-- Fixed Size for background-->
+<!--    <ImageView-->
+<!--        android:id="@+id/imageView9"-->
+<!--        android:layout_width="923dp"-->
+<!--        android:layout_height="576dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.572"-->
+<!--        app:srcCompat="@drawable/background"-->
+<!--        tools:ignore="ContentDescription" />-->
+
+    <!-- Background, this one is stretching but there is a white border on the left idk why-->
     <ImageView
         android:id="@+id/imageView9"
-        android:layout_width="923dp"
-        android:layout_height="576dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.572"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/background"
         tools:ignore="ContentDescription" />
+
 
     <TextView
         android:id="@+id/textView1"
@@ -114,6 +132,7 @@
         app:layout_constraintVertical_bias="0.991"
         tools:ignore="HardcodedText" />
 
+    <!-- High score display -->
     <TextView
         android:id="@+id/highScore"
         android:layout_width="wrap_content"
@@ -148,6 +167,32 @@
         app:layout_constraintVertical_bias="0.224"
         tools:ignore="HardcodedText" />
 
+    <!-- Google account sign in Button -->
+    <Button
+        android:id="@+id/SignInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in"
+        android:backgroundTint="#4CAF50"
+        android:textStyle="bold"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <!-- Chef name replaces sign in button when signed in -->
+    <TextView
+        android:id="@+id/ChefNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/SignInButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Settings Menu -->
     <LinearLayout
         android:id="@+id/SettingsMenu"
         android:layout_width="match_parent"

@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
-    namespace = "com.example.cs205processes"
+    namespace = "com.game.cookingspree"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.cs205processes"
+        applicationId = "com.game.cookingspree"
         minSdk = 34
         targetSdk = 35
         versionCode = 1
@@ -40,4 +41,15 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    //firebase plugins for db
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    //google acc login plugin
+    implementation(libs.play.services.auth)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play)
+    implementation(libs.googleid)
+
 }

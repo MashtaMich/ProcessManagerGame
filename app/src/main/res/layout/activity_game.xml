@@ -11,7 +11,7 @@
     <!-- Game canvas -->
 
     <!-- Minimal Stats (Top Right) -->
-    <com.example.cs205processes.GameView
+    <com.game.cookingspree.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
