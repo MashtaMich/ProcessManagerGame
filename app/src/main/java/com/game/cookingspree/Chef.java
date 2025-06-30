@@ -12,7 +12,7 @@ public class Chef {
     private String photoUrl;
     private int highScore;
     private int gamesPlayed;
-    private double averageScore;
+    private float averageScore;
     private List<String> following;
 
     public Chef() {
@@ -54,10 +54,10 @@ public class Chef {
     public void setGamesPlayed(int gamesPlayed) { this.gamesPlayed = gamesPlayed; }
 
     public double getAverageScore() { return averageScore; }
-    public void setAverageScore(double averageScore) { this.averageScore = averageScore; }
+    public void setAverageScore(float averageScore) { this.averageScore = averageScore; }
 
     public List<String> getFollowing() { return following; }
-    public void setFollowing(List<String> friends) { this.following = following; }
+    public void setFollowing(List<String> following) { this.following = following; }
 
     public void follow(String uid) {
         if (!following.contains(uid)) {

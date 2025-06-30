@@ -1,7 +1,7 @@
 package com.game.cookingspree;
 
-import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,48 +15,58 @@ import java.util.function.Consumer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.game.cookingspree.util.PrefsHelper;
+import com.google.firebase.auth.FirebaseAuth;
+
 
 public abstract class BaseActivity extends AppCompatActivity {
     protected final String TAG = getClass().getSimpleName();
     protected static final float JOYSTICK_SCALE_SMALL = 1.0f;
     protected static final float JOYSTICK_SCALE_LARGE = 1.4f;
-    protected static final float JOYSTICK_SCALE_DEFAULT = JOYSTICK_SCALE_SMALL;
+    public static final float JOYSTICK_SCALE_DEFAULT = JOYSTICK_SCALE_SMALL;
     protected static final int JOYSTICK_BASE_SIZE_DP = 60;
 
 
 
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Initialize preferences
+        PrefsHelper.init(this, new AccountManager(this));
+
+    }
+
+
     //JOYSTICK METHODS
-    protected float getSavedJoystickScale() {
-        SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        return prefs.getFloat("joystickScale", JOYSTICK_SCALE_DEFAULT); // Default to Small
-    }
-    protected void saveJoystickScale(float scale) {
-        SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        prefs.edit().putFloat("joystickScale", scale).apply();
-    }
+//    protected float getSavedJoystickScale() {
+//        SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
+//        return prefs.getFloat("joystickScale", JOYSTICK_SCALE_DEFAULT); // Default to Small
+//    }
+//    protected void saveJoystickScale(float scale) {
+//        SharedPreferences prefs = getSharedPreferences("AppSettings", MODE_PRIVATE);
+//        prefs.edit().putFloat("joystickScale", scale).apply();
+//    }
 
     protected void setupJoystickSizeListener(RadioGroup group, int smallId, int largeId, Consumer<Float> onChange) {
-        float savedScale = getSavedJoystickScale();
-
+//        float savedScale = getSavedJoystickScale();
+        float savedScale = PrefsHelper.getJoystickScale();
         group.post(() -> {
-            if (savedScale == JOYSTICK_SCALE_SMALL && group.findViewById(smallId) != null) {
-                ((RadioButton) group.findViewById(smallId)).setChecked(true);
-            } else if (savedScale == JOYSTICK_SCALE_LARGE && group.findViewById(largeId) != null) {
+            if (savedScale == JOYSTICK_SCALE_LARGE && group.findViewById(largeId) != null) {
                 ((RadioButton) group.findViewById(largeId)).setChecked(true);
-            }
+            } else ((RadioButton) group.findViewById(smallId)).setChecked(true);
         });
 
         group.setOnCheckedChangeListener((radioGroup, checkedId) -> {
             float selectedScale = (checkedId == smallId) ? JOYSTICK_SCALE_SMALL : JOYSTICK_SCALE_LARGE;
-            saveJoystickScale(selectedScale);
+            //saveJoystickScale(selectedScale);
+            PrefsHelper.setJoystickScale(selectedScale);
             if (onChange != null) {
                 onChange.accept(selectedScale); // Apply immediately if callback provided
             }
         });
     }
     protected void applyJoystickScale(View rootView) {
-        float scale = getSavedJoystickScale();
-
+        //float scale = getSavedJoystickScale();
+        float scale = PrefsHelper.getJoystickScale();
         int newSizePx = (int) (scale * dpToPx());
 
         int[] ids = { R.id.btnUp, R.id.btnDown, R.id.btnLeft, R.id.btnRight};
@@ -110,17 +120,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     //VOLUME SETUP
-    protected MediaPlayer setupMediaPlayer(int audioResId, SharedPreferences sharedPreferences) {
+    protected MediaPlayer setupMediaPlayer(int audioResId) {
         MediaPlayer mediaPlayer = MediaPlayer.create(this, audioResId);
         mediaPlayer.setLooping(true);
-        int savedVolume = sharedPreferences.getInt("volume", 100);
+        //int savedVolume = sharedPreferences.getInt("volume", 100);
+        int savedVolume = PrefsHelper.getVolume();
         float volume = savedVolume / 100f;
         mediaPlayer.setVolume(volume, volume);
         mediaPlayer.start();
         return mediaPlayer;
     }
-    protected void setupVolumeSeekBar(SeekBar volumeSeekBar, MediaPlayer mediaPlayer, SharedPreferences sharedPreferences) {
-        int savedVolume = sharedPreferences.getInt("volume", 100);
+    protected void setupVolumeSeekBar(SeekBar volumeSeekBar, MediaPlayer mediaPlayer) {
+        //int savedVolume = sharedPreferences.getInt("volume", 100);
+        int savedVolume = PrefsHelper.getVolume();
         volumeSeekBar.setProgress(savedVolume);
         float volume = savedVolume / 100f;
         mediaPlayer.setVolume(volume, volume);
@@ -129,7 +141,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 float newVolume = progress / 100f;
                 mediaPlayer.setVolume(newVolume, newVolume);
-                sharedPreferences.edit().putInt("volume", progress).apply();
+                //sharedPreferences.edit().putInt("volume", progress).apply();
+                PrefsHelper.setVolume(progress);
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}

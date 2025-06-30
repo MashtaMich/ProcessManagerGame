@@ -24,6 +24,8 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.game.cookingspree.util.PrefsHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public class GameActivity extends BaseActivity implements
     private final int maxIngredients=3;
     private PotThreadPool potThreadPool;
     private ImageView playerInventoryView;
-    private SharedPreferences sharedPreferences;
+    //private SharedPreferences sharedPreferences;
     private BasketManager basketManager;
 
     @Override
@@ -64,7 +66,7 @@ public class GameActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         try {
             setContentView(R.layout.activity_game);
-            sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+            //sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
             setupJoystickSizeListener(
                     findViewById(R.id.joystickSizeGroup),
                     R.id.smallSize,
@@ -73,8 +75,8 @@ public class GameActivity extends BaseActivity implements
             );
 
             enableImmersiveMode();
-            mediaPlayer = setupMediaPlayer(R.raw.overcooked, sharedPreferences);
-            setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer, sharedPreferences);
+            mediaPlayer = setupMediaPlayer(R.raw.overcooked);
+            setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer);
             initializeGameComponents();
             setupInteractButton();
             setupPauseMenuButtons();
@@ -1049,8 +1051,9 @@ public class GameActivity extends BaseActivity implements
                 mediaPlayer.stop(); // Stop the music
                 mediaPlayer.reset(); // Reset the MediaPlayer to prepare for reuse if needed
                 mediaPlayer = MediaPlayer.create(this, R.raw.gameover);
-                sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
-                int savedVolume = sharedPreferences.getInt("volume", 100);
+//                sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+//                int savedVolume = sharedPreferences.getInt("volume", 100);
+                int savedVolume = PrefsHelper.getVolume();
                 float volume = savedVolume / 100f;
                 mediaPlayer.setVolume(volume,volume);
                 mediaPlayer.start(); // Start playing the audio
@@ -1151,26 +1154,28 @@ public class GameActivity extends BaseActivity implements
             GameOverDialog gameOverDialog = new GameOverDialog(this, finalScore);
             gameOverDialog.show();
             saveHighScore(finalScore);
-            clearSaveState();
+            updateAverageScoreAndGamesPlayed(finalScore);
+            PrefsHelper.clearSaveState();
         });
     }
 
-    private void clearSaveState() {
-        SharedPreferences prefs = getSharedPreferences("GameSave", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.clear(); // This clears all data in the "GameSave" preferences
-        editor.apply(); // or editor.commit() if you prefer synchronous saving
-    }
+
 
     private void saveHighScore(int score) {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyGamePrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE);
-
-        if (score > highScore || highScore == Integer.MIN_VALUE) {
-            editor.putInt("highScore", score);
-            editor.apply();
+        int highScore = PrefsHelper.getHighScore();
+        if (score > highScore) {
+            PrefsHelper.setHighScore(score);
         }
+    }
+    public static void updateAverageScoreAndGamesPlayed(int score){
+        int gamesPlayed = PrefsHelper.getGamesPlayed();
+        float currentAveScore = PrefsHelper.getAverageScore();
+        float totalScore = gamesPlayed * currentAveScore + score;
+        gamesPlayed++;
+        float newAve =  totalScore / gamesPlayed;
+        // update average
+        PrefsHelper.setAverageScore(newAve);
+        //update games played
+        PrefsHelper.setGamesPlayed(gamesPlayed);
     }
 }

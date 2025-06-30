@@ -18,8 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.game.cookingspree.util.PrefsHelper;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
 
 public class MainActivity extends BaseActivity {
 
@@ -28,7 +32,7 @@ public class MainActivity extends BaseActivity {
     private Button settingsButton;
     private Button loadGameButton;
     private Button creditsButton;
-    private static final String PREFS_NAME = "MyGamePrefs";
+//    private static final String PREFS_NAME = "MyGamePrefs";
     private MediaPlayer mediaPlayer;
     private TextView highScoreTextView;
     private LinearLayout settingMenu;
@@ -36,12 +40,22 @@ public class MainActivity extends BaseActivity {
     private ImageButton back;
     private ImageButton backFromCredits;
     private AccountManager accountManager;
+    //private SharedPreferences sharedPreferences;
 
 
+    // Only called once when the activity is created for the first time. E.g. after finish a game it doesn't call this, instead calls onStart
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        PrefsHelper.setSyncedThisSession(false);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null && !PrefsHelper.hasSyncedThisSession()) {
+            new AccountManager(this).syncFromFirestoreToPrefs(() -> {
+                PrefsHelper.setSyncedThisSession(true);
+                setupSignInUI(); // or refresh just the name
+            });
+        }
+
+        //sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE);
         setContentView(R.layout.activity_main);
 
         //preload resources at main menu
@@ -55,8 +69,8 @@ public class MainActivity extends BaseActivity {
         }).start();
 
         //audio setup
-        mediaPlayer = setupMediaPlayer(R.raw.overcooked, sharedPreferences);
-        setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer, sharedPreferences);
+        mediaPlayer = setupMediaPlayer(R.raw.overcooked);
+        setupVolumeSeekBar(findViewById(R.id.volumeSeekBar), mediaPlayer);
 
         //load high score
         highScoreTextView = findViewById(R.id.highScore1);
@@ -66,6 +80,13 @@ public class MainActivity extends BaseActivity {
         enableImmersiveMode();
 
         //Google sign in
+        Log.d("PrefsDump", "=== BEGIN PREF DUMP ===");
+        Map<String, ?> allPrefs = PrefsHelper.getAll();
+        for (Map.Entry<String, ?> entry : allPrefs.entrySet()) {
+            Log.d("PrefsDump", entry.getKey() + " = " + entry.getValue());
+        }
+        Log.d("PrefsDump", "=== END PREF DUMP ===");
+        accountManager = new AccountManager(this);
         setupSignInUI();
 
         //link buttons and views
@@ -90,41 +111,63 @@ public class MainActivity extends BaseActivity {
                         "</ul>", Html.FROM_HTML_MODE_LEGACY));
         contributorsText.setMovementMethod(LinkMovementMethod.getInstance());
         setupButtonListeners();
+
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("SignInDebug", "onStart() triggered");
+        setupSignInUI();
+        Log.d("SignInDebug", "onStart() completed");
     }
 
-    private void setupSignInUI() {
-        Button signInButton = findViewById(R.id.SignInButton);
-        if (signInButton == null) {
-            Log.e("SignInTest", "SignInButton is NULL. ID mismatch or wrong layout loaded.");
-        }
 
+    // sets up the UI based on the sign in state (signed in vs not signed in)
+    private void setupSignInUI() {
+        Log.d("SignInTest", "Starting setupSignInUI");
+
+        ImageButton  signInButton = findViewById(R.id.SignInButton);
         TextView chefNameText = findViewById(R.id.ChefNameText);
-        accountManager = new AccountManager(this);
+
+        // Debug checks
+        if (signInButton == null) Log.e("SignInTest", "SignInButton is NULL.");
+        if (chefNameText == null) Log.e("SignInTest", "ChefNameText is NULL.");
+        assert chefNameText != null;
+        assert signInButton != null;
 
         FirebaseUser user = accountManager.getCurrentUser();
-        if (user != null) {
-            signInButton.setVisibility(View.GONE);
+        boolean isSignedIn = user != null;
+
+        // Displaying Welcome message
+        if (isSignedIn) {
+            Log.d("SignInTest", "User is signed in.");
             showChefName(chefNameText, user.getUid());
         } else {
-            signInButton.setVisibility(View.VISIBLE);
-            chefNameText.setVisibility(View.GONE);
+            Log.d("SignInTest", "No user signed in.");
+            chefNameText.setText(getString(R.string.welcome));
         }
 
+        // Sign in button setup
         signInButton.setOnClickListener(v -> {
             Log.d("SignInTest", "Sign-In button clicked");
             accountManager.signIn(() ->
-                    runOnUiThread(() -> {
-                        Log.d("SignInTest", "Sign-in callback triggered");
-                        signInButton.setVisibility(View.GONE);
-                        chefNameText.setVisibility(View.VISIBLE);
-                        showChefName(chefNameText, accountManager.getCurrentUser().getUid());
-                    })
+                    runOnUiThread(this::setupSignInUI) // re-run whole UI logic
             );
         });
-
     }
 
+    // call this method to display chef name
     private void showChefName(TextView chefNameText, String uid) {
+        // Check shared preferences for name
+        //String cachedChefName = sharedPreferences.getString("chefName", null);
+        String cachedChefName = PrefsHelper.getChefName();
+        if (cachedChefName != null) {
+            chefNameText.setText(getString(R.string.chef_greeting, cachedChefName));
+            Log.d("Prefs_debug MainActivity", "chefName = " + cachedChefName);
+            return;
+        }
+        Log.d("Prefs_debug MainActivity", "no chef in prefs");
+        // shared preferences no name, check firebase
         FirebaseFirestore.getInstance()
             .collection("chefs")
             .document(uid)
@@ -132,22 +175,17 @@ public class MainActivity extends BaseActivity {
             .addOnSuccessListener(doc -> {
                 String chefName = doc.getString("chefName");
                 chefNameText.setText(getString(R.string.chef_greeting, chefName));
+                PrefsHelper.setChefName(chefName);
             })
             .addOnFailureListener(e -> chefNameText.setText(R.string.welcome));
     }
 
     private void loadHighScore() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        int highScore = sharedPreferences.getInt("highScore", Integer.MIN_VALUE); // Default to Integer.MIN_VALUE
-
-        // Display the high score, or leave it empty if it's the initial value
-        if (highScore == Integer.MIN_VALUE) {
-            highScoreTextView.setText(""); // Set as empty
-        } else {
-            highScoreTextView.setText(String.valueOf(highScore)); // Display the high score
-        }
+        int highScore = PrefsHelper.getHighScore();
+        highScoreTextView.setText(String.valueOf(highScore));
     }
 
+    // prepare buttons on home screen
     private void setupButtonListeners() {
         startGameButton.setOnClickListener(v -> {
             Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);

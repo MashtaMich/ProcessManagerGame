@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "279517247709",
+    "project_id": "cooking-spree-c0cf1",
+    "storage_bucket": "cooking-spree-c0cf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279517247709:android:384d2a4b693d1df25d0334",
+        "android_client_info": {
+          "package_name": "com.game.cookingspree"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAenSnI1eK0XmhCG3QmiEt6faEe2-kRLDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
