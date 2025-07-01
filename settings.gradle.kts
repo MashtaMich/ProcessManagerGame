@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CS205 Processes"
+rootProject.name = "Cooking Spree"
 include(":app")
  
