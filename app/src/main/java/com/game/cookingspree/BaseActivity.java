@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.game.cookingspree.util.PrefsHelper;
-import com.google.firebase.auth.FirebaseAuth;
 
 
 public abstract class BaseActivity extends AppCompatActivity {

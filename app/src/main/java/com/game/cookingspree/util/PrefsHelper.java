@@ -1,6 +1,5 @@
 package com.game.cookingspree.util;
 
-import android.accounts.Account;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
