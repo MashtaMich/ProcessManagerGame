@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "279517247709",
+    "project_id": "cooking-spree-c0cf1",
+    "storage_bucket": "cooking-spree-c0cf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279517247709:android:384d2a4b693d1df25d0334",
+        "android_client_info": {
+          "package_name": "com.game.cookingspree"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "279517247709-btttj091gkl16989apn0f38okev1to1t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.game.cookingspree",
+            "certificate_hash": "ed4fc5a4da0c45580b8d5d5bc11c663250c7b423"
+          }
+        },
+        {
+          "client_id": "279517247709-k3q4vfuhgcsm96g5cdjhn33ef0cv6km2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.game.cookingspree",
+            "certificate_hash": "d08815daf2bfa43da169ab2a80244916b26f0322"
+          }
+        },
+        {
+          "client_id": "279517247709-of1lveh2u33ms574q5ui06g977852hnv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.game.cookingspree",
+            "certificate_hash": "4ef699435eb0ce83042ad2a4febe6ecbe7c0eb3b"
+          }
+        },
+        {
+          "client_id": "279517247709-kc7ld9lqdfijvtca7o6c3i39eg6drs7k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAenSnI1eK0XmhCG3QmiEt6faEe2-kRLDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "279517247709-kc7ld9lqdfijvtca7o6c3i39eg6drs7k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

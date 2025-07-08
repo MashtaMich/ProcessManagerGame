@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TutorialActivity"
+    android:background="@color/gameBackground">
+
+    <!-- Include the entire game layout -->
+    <include
+        layout="@layout/activity_game"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Tutorial Overlay -->
+    <LinearLayout
+        android:id="@+id/tutorialOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="#B0000000"
+        android:padding="24dp"
+        android:visibility="visible">
+
+        <!-- Tutorial Content Container -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="8dp"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Tutorial Text -->
+                <TextView
+                    android:id="@+id/tutorialText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tutorial text will appear here"
+                    android:textSize="18sp"
+                    android:textColor="@color/textDark"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    tools:ignore="HardcodedText" />
+
+                <!-- Button Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center">
+
+                    <!-- Skip Button -->
+                    <Button
+                        android:id="@+id/tutorialSkipButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Skip"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_secondary"
+                        tools:ignore="HardcodedText" />
+
+                    <!-- Next Button -->
+                    <Button
+                        android:id="@+id/tutorialNextButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Next"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_primary"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
