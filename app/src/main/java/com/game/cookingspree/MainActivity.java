@@ -192,7 +192,14 @@ public class MainActivity extends BaseActivity {
             startActivity(gameIntent);
         });
 
-        howToPlayButton.setOnClickListener(v -> showHowToPlayDialog());
+//        howToPlayButton.setOnClickListener(v -> showHowToPlayDialog());
+
+        // Add tutorial button listener
+        Button tutorialButton = findViewById(R.id.Tutorial);
+        tutorialButton.setOnClickListener(v -> {
+            Intent tutorialIntent = new Intent(MainActivity.this, TutorialActivity.class);
+            startActivity(tutorialIntent);
+        });
 
         settingsButton.setOnClickListener(v -> showSettingsDialog());
 
@@ -224,75 +231,75 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private void showHowToPlayDialog() {
-        setContentView(R.layout.tutorial);
-        LinearLayout instructions1 = findViewById(R.id.step1);
-        LinearLayout instructions2 = findViewById(R.id.step2);
-        LinearLayout instructions3 = findViewById(R.id.step3);
-        LinearLayout instructions4 = findViewById(R.id.step4);
-        LinearLayout instructions5 = findViewById(R.id.step5);
-        LinearLayout instructions6 = findViewById(R.id.step6);
-        LinearLayout instructions7 = findViewById(R.id.step7);
-        LinearLayout instructions8 = findViewById(R.id.step8);
-        LinearLayout instructions9 = findViewById(R.id.step9);
-        LinearLayout instructions10 = findViewById(R.id.step10);
-        LinearLayout instructions11 = findViewById(R.id.step11);
-        Button step1 = findViewById(R.id.nextButton1);
-        Button step2 = findViewById(R.id.nextButton2);
-        Button step3 = findViewById(R.id.nextButton3);
-        Button step4 = findViewById(R.id.nextButton4);
-        Button step5 = findViewById(R.id.nextButton5);
-        Button step6 = findViewById(R.id.nextButton6);
-        Button step7 = findViewById(R.id.nextButton7);
-        Button step8 = findViewById(R.id.nextButton8);
-        Button step9 = findViewById(R.id.nextButton9);
-        Button step10 = findViewById(R.id.nextButton10);
-        Button step11 = findViewById(R.id.nextButton11);
-        step1.setOnClickListener(v -> {
-            instructions1.setVisibility(View.GONE);
-            instructions2.setVisibility(VISIBLE);
-        });
-        step2.setOnClickListener(v -> {
-            instructions2.setVisibility(View.GONE);
-            instructions3.setVisibility(VISIBLE);
-        });
-        step3.setOnClickListener(v -> {
-            instructions3.setVisibility(View.GONE);
-            instructions4.setVisibility(VISIBLE);
-        });
-        step4.setOnClickListener(v -> {
-            instructions4.setVisibility(View.GONE);
-            instructions5.setVisibility(VISIBLE);
-        });
-        step5.setOnClickListener(v -> {
-            instructions5.setVisibility(View.GONE);
-            instructions6.setVisibility(VISIBLE);
-        });
-        step6.setOnClickListener(v -> {
-            instructions6.setVisibility(View.GONE);
-            instructions7.setVisibility(VISIBLE);
-        });
-        step7.setOnClickListener(v -> {
-            instructions7.setVisibility(View.GONE);
-            instructions8.setVisibility(VISIBLE);
-        });
-        step8.setOnClickListener(v -> {
-            instructions8.setVisibility(View.GONE);
-            instructions9.setVisibility(VISIBLE);
-        });
-        step9.setOnClickListener(v -> {
-            instructions9.setVisibility(View.GONE);
-            instructions10.setVisibility(VISIBLE);
-        });
-        step10.setOnClickListener(v -> {
-            instructions10.setVisibility(View.GONE);
-            instructions11.setVisibility(VISIBLE);
-        });
-        step11.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-        });
-    }
+//    private void showHowToPlayDialog() {
+//        setContentView(R.layout.activity_tutorial);
+//        LinearLayout instructions1 = findViewById(R.id.step1);
+//        LinearLayout instructions2 = findViewById(R.id.step2);
+//        LinearLayout instructions3 = findViewById(R.id.step3);
+//        LinearLayout instructions4 = findViewById(R.id.step4);
+//        LinearLayout instructions5 = findViewById(R.id.step5);
+//        LinearLayout instructions6 = findViewById(R.id.step6);
+//        LinearLayout instructions7 = findViewById(R.id.step7);
+//        LinearLayout instructions8 = findViewById(R.id.step8);
+//        LinearLayout instructions9 = findViewById(R.id.step9);
+//        LinearLayout instructions10 = findViewById(R.id.step10);
+//        LinearLayout instructions11 = findViewById(R.id.step11);
+//        Button step1 = findViewById(R.id.nextButton1);
+//        Button step2 = findViewById(R.id.nextButton2);
+//        Button step3 = findViewById(R.id.nextButton3);
+//        Button step4 = findViewById(R.id.nextButton4);
+//        Button step5 = findViewById(R.id.nextButton5);
+//        Button step6 = findViewById(R.id.nextButton6);
+//        Button step7 = findViewById(R.id.nextButton7);
+//        Button step8 = findViewById(R.id.nextButton8);
+//        Button step9 = findViewById(R.id.nextButton9);
+//        Button step10 = findViewById(R.id.nextButton10);
+//        Button step11 = findViewById(R.id.nextButton11);
+//        step1.setOnClickListener(v -> {
+//            instructions1.setVisibility(View.GONE);
+//            instructions2.setVisibility(VISIBLE);
+//        });
+//        step2.setOnClickListener(v -> {
+//            instructions2.setVisibility(View.GONE);
+//            instructions3.setVisibility(VISIBLE);
+//        });
+//        step3.setOnClickListener(v -> {
+//            instructions3.setVisibility(View.GONE);
+//            instructions4.setVisibility(VISIBLE);
+//        });
+//        step4.setOnClickListener(v -> {
+//            instructions4.setVisibility(View.GONE);
+//            instructions5.setVisibility(VISIBLE);
+//        });
+//        step5.setOnClickListener(v -> {
+//            instructions5.setVisibility(View.GONE);
+//            instructions6.setVisibility(VISIBLE);
+//        });
+//        step6.setOnClickListener(v -> {
+//            instructions6.setVisibility(View.GONE);
+//            instructions7.setVisibility(VISIBLE);
+//        });
+//        step7.setOnClickListener(v -> {
+//            instructions7.setVisibility(View.GONE);
+//            instructions8.setVisibility(VISIBLE);
+//        });
+//        step8.setOnClickListener(v -> {
+//            instructions8.setVisibility(View.GONE);
+//            instructions9.setVisibility(VISIBLE);
+//        });
+//        step9.setOnClickListener(v -> {
+//            instructions9.setVisibility(View.GONE);
+//            instructions10.setVisibility(VISIBLE);
+//        });
+//        step10.setOnClickListener(v -> {
+//            instructions10.setVisibility(View.GONE);
+//            instructions11.setVisibility(VISIBLE);
+//        });
+//        step11.setOnClickListener(v -> {
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
+//        });
+//    }
 
     private void showSettingsDialog() {
         // In a real app, you might implement a more complex settings dialog

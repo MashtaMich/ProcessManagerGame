@@ -36,6 +36,13 @@
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|screenSize"
             tools:ignore="DiscouragedApi" />
+
+        <activity
+            android:name="com.game.cookingspree.TutorialActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|screenSize"
+            tools:ignore="DiscouragedApi" />
     </application>
 
 </manifest>

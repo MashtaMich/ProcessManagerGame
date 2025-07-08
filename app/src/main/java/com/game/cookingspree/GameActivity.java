@@ -38,13 +38,13 @@ public class GameActivity extends BaseActivity implements
 
     private final Handler moveHandler = new Handler(Looper.getMainLooper());
     private Runnable moveRunnable;
-    private MediaPlayer mediaPlayer;
-    private GameManager gameManager;
+    protected MediaPlayer mediaPlayer;
+    protected GameManager gameManager;
     private OrderAdapter orderAdapter;
             private TextView scoreTextView;
     private TextView deadProcessCountTextView;
 
-    private Game game;
+    protected Game game;
 
     private List<ImageView> inventoryViews;
     private List<ImageView> availableIngredientsViews;
@@ -87,7 +87,7 @@ public class GameActivity extends BaseActivity implements
         }
     }
 
-    private void setupInteractButton() {
+    protected void setupInteractButton() {
         Button interactButton = findViewById(R.id.interactButton);
         Log.d("Interact", "Setting up interact button listener");
         interactButton.setOnClickListener(v -> {
@@ -100,7 +100,7 @@ public class GameActivity extends BaseActivity implements
         });
         Log.d("Interact", "Interact listener assigned");
     }
-    private void setupPauseMenuButtons(){
+    protected void setupPauseMenuButtons(){
         // Link buttons
         Button togglePauseButton = findViewById(R.id.togglePauseButton);
         togglePauseButton.setText(R.string.pause); // Default state
@@ -525,7 +525,7 @@ public class GameActivity extends BaseActivity implements
             Log.e("GameActivity", "Error loading game: " + e.getMessage());
         }
     }
-    private void initializeGameComponents() {
+    protected void initializeGameComponents() {
         GameView gameView = findViewById(R.id.gameView);
 
         List<Recipe> recipeList=Recipe.getDefaultRecipes();
@@ -553,7 +553,7 @@ public class GameActivity extends BaseActivity implements
         }
     }
 
-    private void setupMovementControls() {
+    protected void setupMovementControls() {
         View btnUp = findViewById(R.id.btnUp);
         View btnDown = findViewById(R.id.btnDown);
         View btnLeft = findViewById(R.id.btnLeft);
@@ -590,7 +590,7 @@ public class GameActivity extends BaseActivity implements
         });
     }
 
-    private void initializeUIComponents() {
+    protected void initializeUIComponents() {
         try {
             // Initialize statistics text views
             scoreTextView = findViewById(R.id.scoreTextView);
@@ -612,7 +612,7 @@ public class GameActivity extends BaseActivity implements
         }
     }
 
-    private void initializeInventory() {
+    protected void initializeInventory() {
         try {
             ingredientFetcher = new IngredientFetchWorker(maxIngredients,basketManager);
             initializeViewLists();

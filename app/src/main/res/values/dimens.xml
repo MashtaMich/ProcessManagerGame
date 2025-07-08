@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default dimensions for phones -->
+
+    <!-- UI Spacing -->
+    <dimen name="ui_padding_small">8dp</dimen>
+    <dimen name="ui_padding_medium">16dp</dimen>
+    <dimen name="ui_padding_large">24dp</dimen>
+    <dimen name="ui_margin_small">4dp</dimen>
+    <dimen name="ui_margin_medium">8dp</dimen>
+    <dimen name="ui_margin_large">16dp</dimen>
+
+    <!-- Control Elements -->
+    <dimen name="joystick_button_size">60dp</dimen>
+    <dimen name="joystick_button_margin">8dp</dimen>
+    <dimen name="interact_button_size">48dp</dimen>
+    <dimen name="interact_button_margin">16dp</dimen>
+
+    <!-- Game UI -->
+    <dimen name="game_view_margin_bottom">120dp</dimen>
+    <dimen name="inventory_slot_size">56dp</dimen>
+    <dimen name="inventory_slot_margin">4dp</dimen>
+    <dimen name="process_card_height">80dp</dimen>
+    <dimen name="process_card_margin">4dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_large">16sp</dimen>
+    <dimen name="text_size_xlarge">18sp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+
+    <!-- Icon Sizes -->
+    <dimen name="icon_size_small">24dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+
+    <!-- Menu and Dialog -->
+    <dimen name="menu_button_height">48dp</dimen>
+    <dimen name="menu_button_margin">8dp</dimen>
+    <dimen name="dialog_padding">16dp</dimen>
+
+    <!-- Status Bar -->
+    <dimen name="status_bar_height">48dp</dimen>
+    <dimen name="score_text_size">14sp</dimen>
+
+    <!-- Settings Menu -->
+    <dimen name="settings_item_height">56dp</dimen>
+    <dimen name="settings_padding">16dp</dimen>
+
+    <!-- Minimum touch target -->
+    <dimen name="min_touch_target">48dp</dimen>
+</resources>
